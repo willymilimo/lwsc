@@ -1,8 +1,10 @@
-export default interface ActionI {
+export interface ActionI {
   type: string;
   payload: any;
 }
 
-export const Actions = {
-    SET_THEME: 'SET_THEME'
-}
+export default {
+  SET_THEME_REDUCER: 'SET_THEME_REDUCER',
+  SET_THEME_NAME: 'SET_THEME_NAME',
+  SET_THEME: "SET_THEME",
+};

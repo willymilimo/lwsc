@@ -84,11 +84,6 @@ const HomeScreen = () => {
             itemsPerInterval={1}
             items={[
               {
-                label: "Water is Life... Value it!",
-                value: 1,
-                image: banner_1,
-              },
-              {
                 label: "Sanitization is Health!",
                 value: 2,
                 image: banner_2,
@@ -97,6 +92,11 @@ const HomeScreen = () => {
                 label: "Rehabilitation of Kaunda Square ponds.",
                 value: 3,
                 image: banner_3,
+              },
+              {
+                label: "Water is Life... Value it!",
+                value: 1,
+                image: banner_1,
               },
             ]}
           />

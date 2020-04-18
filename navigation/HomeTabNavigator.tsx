@@ -3,11 +3,33 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import HomeScreen from "../screens/HomeScreen";
 import ServicesScreen from "../screens/ServicesScreen";
-import Colors from "../constants/Colors";
+import { connect } from "react-redux";
+import { RootReducerI } from "../redux/reducers";
+import { ThemeReducer, ThemeType } from "../types/theme";
+
+interface HTNI {
+  theme: ThemeType;
+}
+
+type HTNT = HTNI;
 
 const Tab = createBottomTabNavigator();
 
-export default function () {
+const HomeTabNavigator = ({ theme }: HTNT) => {
+  const [activeTheme, setActiveTheme] = React.useState(theme);
+
+  React.useEffect(() => {
+    let is_subscribed = true;
+
+    if (is_subscribed) {
+      setActiveTheme(theme);
+    }
+
+    return () => {
+      is_subscribed = false;
+    };
+  }, [theme]);
+
   return (
     <Tab.Navigator
       screenOptions={({ route }: any) => ({
@@ -27,8 +49,10 @@ export default function () {
         },
       })}
       tabBarOptions={{
-        activeTintColor: `${Colors.LwscBlue}`,
-        inactiveTintColor: `${Colors.LwscBlue}88`,
+        activeTintColor: activeTheme.activeTintColor,
+        inactiveTintColor: activeTheme.inactiveTintColor,
+        activeBackgroundColor: activeTheme.backgroundColor,
+        inactiveBackgroundColor: activeTheme.backgroundColor,
       }}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
@@ -37,4 +61,8 @@ export default function () {
       <Tab.Screen name="History" component={ServicesScreen} />
     </Tab.Navigator>
   );
-}
+};
+
+const mapStateToProps = ({ theme }: RootReducerI) => ({ theme: theme.theme });
+
+export default connect(mapStateToProps)(HomeTabNavigator);

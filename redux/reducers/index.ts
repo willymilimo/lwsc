@@ -1,9 +1,9 @@
 import { combineReducers } from "redux";
-import { ThemeType } from "../../types/theme";
+import { ThemeReducer } from "../../types/theme";
 import theme from "./theme";
 
 export interface RootReducerI {
-  theme: ThemeType;
+  theme: ThemeReducer;
 }
 
 const rootReducer = combineReducers({

@@ -35,6 +35,7 @@ export default {
   LwscBlack,
   LwscBlackLighter: `${LwscBlack}cc`,
   LwscRed,
+  notificationRed: "#e10050",
 
   // primary colors
   PrimaryColor: `${LwscBlue}99`,

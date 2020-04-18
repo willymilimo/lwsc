@@ -10,6 +10,9 @@ export default {
   PaymentScreen: 'PaymentScreen',
   ServicesScreen: 'ServicesScreen',
 
+  WHITE_THEME: 'WHITE_THEME',
+  BLUE_THEME: 'BLUE_THEME',
+
   // stacks
 //   HomeStack: "HomeStack",
 //   ProfileStack: "ProfileStack",
