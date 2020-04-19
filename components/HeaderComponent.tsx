@@ -38,7 +38,7 @@ const menuStyle = {
 interface HeaderComponentI {
   navigation: any;
   title: string;
-  show_back: string;
+  show_back: boolean;
   params?: any;
   setThemeReducer(theme: ThemeReducer): void;
   themeReducer: ThemeReducer;
@@ -92,10 +92,12 @@ const HeaderComponent = ({
         // actionItemsStyle={{color: Colors.PrimaryColor}},
         barType={"normal"}
         title={title}
-        // navigation={
-        //   <IconButton name="menu" size={24} color={Colors.LwscBlackLighter} />
-        // }
-        // onNavigation={() => console.log("onNavigation!")}
+        navigation={
+          show_back ? (
+            <IconButton name="arrow-back" size={24} color={theme.textColor} />
+          ) : null
+        }
+        onNavigation={() => console.log("onNavigation!")}
         actionItems={[
           <Badge
             containerStyle={{
@@ -112,6 +114,7 @@ const HeaderComponent = ({
               name="notifications"
               size={24}
               color={theme.textColor}
+              
             />
           </Badge>,
           <Menu

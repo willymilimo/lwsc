@@ -20,11 +20,7 @@ const Stat = (props: any) => {
         style={styles.statImage}
         source={typeof image === "string" ? { uri: image } : image}
       >
-        <Text
-          style={styles.statLabel}
-        >
-          {label}
-        </Text>
+        <Text style={styles.statLabel}>{label}</Text>
       </ImageBackground>
     </View>
   );
@@ -40,14 +36,13 @@ const Slide = (props: any) => {
   );
 };
 
-export const Carousel = (props: any) => {
-  const { items, style } = props;
-  const itemsPerInterval =
-    props.itemsPerInterval === undefined ? 1 : props.itemsPerInterval;
+export const Carousel = ({ items, style, itemsPerInterval }: any) => {
+  itemsPerInterval = itemsPerInterval === undefined ? 1 : itemsPerInterval;
 
   const [interval, setInterval] = React.useState(1);
   const [intervals, setIntervals] = React.useState(1);
   const [width, setWidth] = React.useState(0);
+  const [scrollView, setScrollView] = React.useState(null);
 
   const init = (width: number) => {
     // initialise width
@@ -71,6 +66,22 @@ export const Carousel = (props: any) => {
     return result;
   };
 
+  React.useEffect(() => {
+    // let is_subscribed = true;
+
+    const scroll = (index = 1) => {
+      if (scrollView) {
+        let m = index % intervals;
+        const w = width;
+        scrollView.scrollTo({ x: m * w, y: 0, animated: true });
+
+        setTimeout(() => scroll(index + 1), 30000);
+      }
+    };
+
+    scroll();
+  }, [intervals]);
+
   let bullets = [];
   for (let i = 1; i <= intervals; i++) {
     bullets.push(
@@ -89,6 +100,7 @@ export const Carousel = (props: any) => {
   return (
     <View style={styles.container}>
       <ScrollView
+        ref={(ref: any) => setScrollView(ref)}
         horizontal={true}
         contentContainerStyle={{
           ...styles.scrollView,
@@ -208,7 +220,7 @@ const styles = StyleSheet.create({
     paddingTop: 5,
     padding: 10,
     backgroundColor: `${Colors.LwscBlue}55`,
-    color: '#fff'
+    color: "#fff",
   },
   slide: {
     paddingHorizontal: 20,

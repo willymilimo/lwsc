@@ -1,14 +1,21 @@
-import React, { Component } from 'react'
-import { Text, StyleSheet, View } from 'react-native'
+import React from "react";
+import { Text, StyleSheet, View, SafeAreaView } from "react-native";
+import HeaderComponent from "../components/HeaderComponent";
 
-export default class NotificationsScreen extends Component {
-    render() {
-        return (
-            <View>
-                <Text> textInComponent </Text>
-            </View>
-        )
-    }
-}
+const NotificationsScreen = () => {
+  const { container } = styles;
+  return (
+    <SafeAreaView style={container}>
+      <HeaderComponent show_back={true} title="Notifications" />
+    </SafeAreaView>
+  );
+};
 
-const styles = StyleSheet.create({})
+export default NotificationsScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    display: "flex",
+    flex: 1,
+  },
+});

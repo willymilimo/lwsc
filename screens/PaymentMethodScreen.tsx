@@ -58,7 +58,7 @@ const PaymentMethodScreen = () => {
   );
 };
 
-export default HomeScreen;
+export default PaymentMethodScreen;
 
 const styles = StyleSheet.create({
   container: {

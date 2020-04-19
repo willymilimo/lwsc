@@ -2,7 +2,7 @@ export default {
   // screens
   HomeScreen: "HomeScreen",
   AccountScreen: "AccountScreen",
-  ListNotificationsScreen: 'ListNotificationsScreen',
+  NotificationsScreen: 'NotificationsScreen',
   LocatePayPointScreen: 'LocatePayPointScreen',
   ManageAccountsScreen: 'ManageAccountsScreen',
   NotificationScreen: 'NotificationScreen',
@@ -14,7 +14,7 @@ export default {
   BLUE_THEME: 'BLUE_THEME',
 
   // stacks
-//   HomeStack: "HomeStack",
+  HomeTabNavigator: "HomeTabNavigator",
 //   ProfileStack: "ProfileStack",
 //   MoreStack: "MoreStack",
 //   PromotionsStack: "PromotionsStackNavigator",

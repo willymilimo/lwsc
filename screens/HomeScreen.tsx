@@ -35,6 +35,7 @@ import { RootReducerI } from "../redux/reducers";
 import { bindActionCreators } from "redux";
 import { setTheme } from "../redux/actions/theme";
 import HeaderComponent from "../components/HeaderComponent";
+import Shadowed from "../components/Shadowed";
 
 const HomeScreen = () => {
   const {
