@@ -42,7 +42,7 @@ export const Carousel = ({ items, style, itemsPerInterval }: any) => {
   const [interval, setInterval] = React.useState(1);
   const [intervals, setIntervals] = React.useState(1);
   const [width, setWidth] = React.useState(0);
-  const [scrollView, setScrollView] = React.useState(null);
+  const [scrollView, setScrollView] = React.useState<ScrollView | null>(null);
 
   const init = (width: number) => {
     // initialise width
@@ -100,7 +100,7 @@ export const Carousel = ({ items, style, itemsPerInterval }: any) => {
   return (
     <View style={styles.container}>
       <ScrollView
-        ref={(ref: any) => setScrollView(ref)}
+        ref={(ref: ScrollView) => setScrollView(ref)}
         horizontal={true}
         contentContainerStyle={{
           ...styles.scrollView,

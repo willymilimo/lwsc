@@ -28,6 +28,9 @@ export default {
 //   BuyForOtherStack: "BuyForOtherStack",
 //   FeedbackHistoryStackNavigator: "FeedbackHistoryStackNavigator",
 
+  // async storage
+  THEME_STORAGE: 'THEME_STORAGE',
+
   // API
   REQUEST_OTP:
     "https://apps.LWSC.co.zm/LWSCRestApp/api/setpassword/login/msisdn", // 'http://10.3.104.229:5000/api/auth/request',

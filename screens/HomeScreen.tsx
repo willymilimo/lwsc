@@ -35,6 +35,8 @@ import { RootReducerI } from "../redux/reducers";
 import { bindActionCreators } from "redux";
 import { setTheme } from "../redux/actions/theme";
 import HeaderComponent from "../components/HeaderComponent";
+import Strings from "../constants/Strings";
+import { useNavigation } from "@react-navigation/native";
 
 const HomeScreen = () => {
   const {
@@ -45,6 +47,7 @@ const HomeScreen = () => {
     btnStyle,
     iconContainer,
   } = styles;
+  const navigation = useNavigation();
 
   const [marginLeft, setMarginLeft] = React.useState(new Animated.Value(0));
 
@@ -103,12 +106,39 @@ const HomeScreen = () => {
         </Paper>
         <View style={btnsBox}>
           {btns.map((btn) => (
-            <Paper key={btn.label} elevation={2} style={btnStyle}>
+            <Button
+              key={btn.component}
+              onPress={() => navigation.navigate(btn.component)}
+              style={{
+                height: Layouts.window.width / 2 - 80,
+                width: Layouts.window.width / 2 - 80,
+                flexDirection: "column",
+                marginRight: 24,
+                padding: 20,
+                backgroundColor: "#fff",
+                shadowColor: Colors.LwscBlue,
+                shadowOffset: {
+                  width: 0,
+                  height: 2,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+
+                elevation: 5,
+                marginBottom: 25,
+                borderColor: "white",
+              }}
+              type={"outlined"}
+              borderSize={0}
+              radius={10}
+            >
               <View style={[iconContainer, { backgroundColor: btn.color }]}>
                 {btn.icon}
               </View>
-              <Text style={{ textAlign: "center" }}>{btn.label}</Text>
-            </Paper>
+              <Text style={{ fontWeight: "600", textAlign: "center" }}>
+                {btn.label}
+              </Text>
+            </Button>
           ))}
         </View>
       </ScrollView>
@@ -121,19 +151,19 @@ const btns = [
     icon: <FontAwesome name="credit-card" color="#00bb27" size={25} />,
     label: "Make Payment",
     color: `#00bb2723`,
-    component: "",
+    component: Strings.ManageAccountsScreen,
   },
   {
     icon: <FontAwesome name="map-marker" color="maroon" size={40} />,
     label: "Pay Points",
     color: "#ff000023",
-    component: "",
+    component: Strings.LocatePayPointScreen,
   },
   {
     icon: <Octicons name="settings" color={Colors.LwscBlack} size={30} />,
     label: "Services",
     color: "#00000023",
-    component: "",
+    component: Strings.ServicesScreen,
   },
   {
     icon: (
@@ -145,13 +175,13 @@ const btns = [
     ),
     label: "Request Connection",
     color: "#1081e923",
-    component: "",
+    component: "test",
   },
   {
     icon: <Entypo name="drop" color="#1ac3ee" size={30} />,
     label: "Report Leakage",
     color: "#1ac3ee23",
-    component: "",
+    component: "test2",
   },
   {
     icon: (
@@ -163,7 +193,7 @@ const btns = [
     ),
     label: "Lodge Complaint",
     color: "#fdd02333",
-    component: "",
+    component: "test3",
   },
 ];
 

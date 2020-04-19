@@ -1,6 +1,5 @@
 import React from "react";
-import { Text, StyleSheet, View, SafeAreaView } from "react-native";
-import HeaderComponent from "../components/HeaderComponent";
+import { StyleSheet, SafeAreaView } from "react-native";
 
 const NotificationsScreen = () => {
   const { container } = styles;

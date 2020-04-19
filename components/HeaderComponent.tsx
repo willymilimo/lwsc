@@ -23,21 +23,6 @@ import Strings from "../constants/Strings";
 import { TouchableHighlight, Switch } from "react-native-gesture-handler";
 import Layouts from "../constants/Layouts";
 
-const menuStyle = {
-  [Strings.BLUE_THEME]: {
-    name: Strings.WHITE_THEME,
-    bgColor: Colors.whiteColor,
-    text: "White",
-    textColor: Colors.LwscBlackLighter,
-  },
-  [Strings.WHITE_THEME]: {
-    name: Strings.BLUE_THEME,
-    bgColor: Colors.LwscBlue,
-    text: "Blue",
-    textColor: Colors.whiteColor,
-  },
-};
-
 interface HeaderComponentI {
   navigation: any;
   title: string;
@@ -58,14 +43,12 @@ const HeaderComponent = ({
 }: HeaderComponentT) => {
   const { name, theme } = themeReducer;
   const [activeTheme, setActiveTheme] = React.useState(name);
-  const [style, setStyle] = React.useState(menuStyle[name]);
 
   React.useEffect(() => {
     let is_subscribed = true;
 
     if (is_subscribed) {
       setThemeReducer({ name: activeTheme, theme: Styles[activeTheme] });
-      setStyle(menuStyle[activeTheme]);
     }
 
     return () => {
@@ -90,9 +73,10 @@ const HeaderComponent = ({
           {previous && (
             <IconButton
               onPress={navigation.goBack}
-              name="arrow-back"
+              name={`${Platform.OS === "ios" ? "ios" : "md"}-arrow-back`}
               size={24}
               color={theme.textColor}
+              iconComponent={Ionicons}
             />
           )}
           <Text
