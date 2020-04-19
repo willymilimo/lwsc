@@ -1,20 +1,20 @@
 export default {
   // screens
-  HomeScreen: "HomeScreen",
-  AccountScreen: "AccountScreen",
-  NotificationsScreen: 'NotificationsScreen',
-  LocatePayPointScreen: 'LocatePayPointScreen',
-  ManageAccountsScreen: 'ManageAccountsScreen',
-  NotificationScreen: 'NotificationScreen',
-  PaymentMethodScreen: 'PaymentMethodScreen',
-  PaymentScreen: 'PaymentScreen',
-  ServicesScreen: 'ServicesScreen',
+  HomeScreen: "Home",
+  AccountScreen: "Account",
+  NotificationsScreen: 'Notifications',
+  LocatePayPointScreen: 'Locate Pay Point',
+  ManageAccountsScreen: 'Manage Accounts',
+  NotificationScreen: 'Notification',
+  PaymentMethodScreen: 'Payment Options',
+  PaymentScreen: 'Make Payment',
+  ServicesScreen: 'Services',
 
   WHITE_THEME: 'WHITE_THEME',
   BLUE_THEME: 'BLUE_THEME',
 
   // stacks
-  HomeTabNavigator: "HomeTabNavigator",
+  HomeTabNavigator: "LWSC",
 //   ProfileStack: "ProfileStack",
 //   MoreStack: "MoreStack",
 //   PromotionsStack: "PromotionsStackNavigator",

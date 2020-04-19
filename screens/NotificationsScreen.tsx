@@ -4,11 +4,7 @@ import HeaderComponent from "../components/HeaderComponent";
 
 const NotificationsScreen = () => {
   const { container } = styles;
-  return (
-    <SafeAreaView style={container}>
-      <HeaderComponent show_back={true} title="Notifications" />
-    </SafeAreaView>
-  );
+  return <SafeAreaView style={container}></SafeAreaView>;
 };
 
 export default NotificationsScreen;

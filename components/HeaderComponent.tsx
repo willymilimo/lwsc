@@ -1,6 +1,7 @@
 import React from "react";
 import Colors from "../constants/Colors";
-import { StyleSheet, View, StatusBar, Text } from "react-native";
+import { StyleSheet, View, StatusBar, Text, Platform } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import {
   Appbar,
   // Menu,
@@ -8,7 +9,7 @@ import {
   // Button,
   IconButton,
   BodyText,
-  Switch,
+  // Switch,
   // MenuItem,
 } from "material-bread";
 import Menu, { MenuItem } from "react-native-material-menu";
@@ -19,6 +20,8 @@ import { ThemeReducer } from "../types/theme";
 import Styles from "../constants/Styles";
 import { bindActionCreators } from "redux";
 import Strings from "../constants/Strings";
+import { TouchableHighlight, Switch } from "react-native-gesture-handler";
+import Layouts from "../constants/Layouts";
 
 const menuStyle = {
   [Strings.BLUE_THEME]: {
@@ -38,18 +41,17 @@ const menuStyle = {
 interface HeaderComponentI {
   navigation: any;
   title: string;
-  show_back: boolean;
-  params?: any;
+  previous: string;
   setThemeReducer(theme: ThemeReducer): void;
   themeReducer: ThemeReducer;
+  headerTintColor?: string;
 }
 
 type HeaderComponentT = HeaderComponentI;
 
 const HeaderComponent = ({
   title,
-  params,
-  show_back,
+  previous,
   navigation,
   setThemeReducer,
   themeReducer,
@@ -57,15 +59,6 @@ const HeaderComponent = ({
   const { name, theme } = themeReducer;
   const [activeTheme, setActiveTheme] = React.useState(name);
   const [style, setStyle] = React.useState(menuStyle[name]);
-  const [menu, setMenu] = React.useState(null);
-
-  const showMenu = () => {
-    menu.show();
-  };
-
-  const hideMenu = () => {
-    menu.hide();
-  };
 
   React.useEffect(() => {
     let is_subscribed = true;
@@ -82,76 +75,115 @@ const HeaderComponent = ({
   // console.log(theme);
 
   return (
-    <View style={styles.container}>
-      <StatusBar />
-      <Appbar
-        style={{ borderBottomWidth: 0.75, borderBottomColor: "#00000033" }}
-        color={theme.backgroundColor}
-        elevation={0}
-        titleStyles={{ color: theme.textColor }}
-        // actionItemsStyle={{color: Colors.PrimaryColor}},
-        barType={"normal"}
-        title={title}
-        navigation={
-          show_back ? (
-            <IconButton name="arrow-back" size={24} color={theme.textColor} />
-          ) : null
-        }
-        onNavigation={() => console.log("onNavigation!")}
-        actionItems={[
-          <Badge
-            containerStyle={{
-              marginRight: 16,
-              flex: 1,
-              backgroundColor: "red",
-            }}
-            color={Colors.notificationRed}
-            textColor={"white"}
-            size={14}
-            content={77}
-          >
+    <View>
+      <StatusBar backgroundColor={`${Colors.LwscBlue}aa`} />
+      <View
+        style={[styles.container, { backgroundColor: theme.backgroundColor }]}
+      >
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          {previous && (
             <IconButton
-              name="notifications"
+              onPress={navigation.goBack}
+              name="arrow-back"
               size={24}
               color={theme.textColor}
-              
             />
-          </Badge>,
-          <Menu
-            ref={(ref: any) => setMenu(ref)} //this.setMenuRef
-            // visible={showMenu}
-            menuStyle={{ width: 50, right: 0, height: 35 }}
-            // onBackdropPress={() => setShowMenu(false)}
-            button={
-              <IconButton
-                name="more-vert"
-                size={24}
-                color={theme.textColor}
-                onPress={showMenu}
-              />
-            }
+          )}
+          <Text
+            style={{
+              marginLeft: 20,
+              fontWeight: "bold",
+              fontSize: 19,
+              color: theme.textColor,
+            }}
           >
-            <MenuItem
-              style={{ backgroundColor: style.bgColor }}
-              onPress={() => {
-                hideMenu();
-                setActiveTheme(style.name);
-                // console.log(style.name);
+            {title}
+          </Text>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              width: 100,
+              alignItems: "center",
+            }}
+          >
+            <Switch
+              trackColor={{ false: "#767577", true: "#81b0ff" }}
+              thumbColor={
+                activeTheme === Strings.WHITE_THEME
+                  ? Colors.LwscBlue
+                  : Colors.whiteColor
+              }
+              ios_backgroundColor="#3e3e3e"
+              onValueChange={() => {
+                setActiveTheme(
+                  activeTheme === Strings.WHITE_THEME
+                    ? Strings.BLUE_THEME
+                    : Strings.WHITE_THEME
+                );
+              }}
+              value={activeTheme === Strings.WHITE_THEME}
+            />
+            <TouchableHighlight
+              onPress={() => navigation.navigate(Strings.NotificationsScreen)}
+              underlayColor="#55555544"
+              style={{
+                width: 50,
+                height: 50,
+                padding: 10,
+                borderRadius: 25,
               }}
             >
-              <Text style={{ color: style.textColor }}>{style.text}</Text>
-            </MenuItem>
-          </Menu>,
-        ]}
-      />
+              <Badge
+                style={{
+                  backgroundColor: Colors.LwscRed,
+                }}
+                color={Colors.notificationRed}
+                textColor={"white"}
+                size={14}
+                content={77}
+              >
+                <IconButton
+                  name="notifications"
+                  size={24}
+                  color={theme.textColor}
+                />
+              </Badge>
+            </TouchableHighlight>
+          </View>
+        </View>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     display: "flex",
-    flexDirection: "column",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    // height: 80,
+    paddingVertical: 30,
+    alignItems: "center",
+    // backgroundColor: "pink",
+    // margin: 0,
+
+    shadowColor: Colors.LwscBlue,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
   },
   themeItemBox: {
     display: "flex",
