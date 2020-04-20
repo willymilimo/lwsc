@@ -6,6 +6,7 @@ import ServicesScreen from "../screens/ServicesScreen";
 import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
 import { ThemeReducer, ThemeType } from "../types/theme";
+import BillsScreen from "../screens/BillsScreen";
 
 interface HTNI {
   theme: ThemeType;
@@ -56,7 +57,7 @@ const HomeTabNavigator = ({ theme }: HTNT) => {
       }}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Bills" component={ServicesScreen} />
+      <Tab.Screen name="Bills" component={BillsScreen} />
       {/* <Tab.Screen name="Accounts" component={ServicesScreen} /> */}
       <Tab.Screen name="History" component={ServicesScreen} />
     </Tab.Navigator>

@@ -5,8 +5,8 @@ import Strings from "../../constants/Strings";
 import { AsyncStorage } from "react-native";
 
 const initState = {
-  name: Strings.WHITE_THEME,
-  theme: Styles[Strings.WHITE_THEME],
+  name: Strings.BLUE_THEME,
+  theme: Styles[Strings.BLUE_THEME],
 };
 
 export default function (state = initState, action: ActionI): ThemeReducer {

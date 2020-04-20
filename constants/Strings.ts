@@ -1,6 +1,7 @@
 export default {
   // screens
   HomeScreen: "Home",
+  BillsScreen: "Bills",
   AccountScreen: "Account",
   NotificationsScreen: 'Notifications',
   LocatePayPointScreen: 'Locate Pay Point',

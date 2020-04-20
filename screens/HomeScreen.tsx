@@ -37,6 +37,7 @@ import { setTheme } from "../redux/actions/theme";
 import HeaderComponent from "../components/HeaderComponent";
 import Strings from "../constants/Strings";
 import { useNavigation } from "@react-navigation/native";
+import LwscButton from "../components/LwscButton";
 
 const HomeScreen = () => {
   const {
@@ -106,45 +107,59 @@ const HomeScreen = () => {
         </Paper>
         <View style={btnsBox}>
           {btns.map((btn) => (
-            <Button
+            <LwscButton
+              height={Layouts.window.width / 2 - 80}
+              width={Layouts.window.width / 2 - 80}
               key={btn.component}
               onPress={() => navigation.navigate(btn.component)}
-              style={{
-                height: Layouts.window.width / 2 - 80,
-                width: Layouts.window.width / 2 - 80,
-                flexDirection: "column",
-                marginRight: 24,
-                padding: 20,
-                backgroundColor: "#fff",
-                shadowColor: Colors.LwscBlue,
-                shadowOffset: {
-                  width: 0,
-                  height: 2,
-                },
-                shadowOpacity: 0.25,
-                shadowRadius: 3.84,
-
-                elevation: 5,
-                marginBottom: 25,
-                borderColor: "white",
-              }}
-              type={"outlined"}
-              borderSize={0}
-              radius={10}
-            >
-              <View style={[iconContainer, { backgroundColor: btn.color }]}>
-                {btn.icon}
-              </View>
-              <Text style={{ fontWeight: "600", textAlign: "center" }}>
-                {btn.label}
-              </Text>
-            </Button>
+              content={
+                <React.Fragment>
+                  <View style={[iconContainer, { backgroundColor: btn.color }]}>
+                    {btn.icon}
+                  </View>
+                  <Text style={{ fontWeight: "600", textAlign: "center" }}>
+                    {btn.label}
+                  </Text>
+                </React.Fragment>
+              }
+            />
           ))}
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
+
+{
+  /* <Button */
+}
+//   key={btn.component}
+//   onPress={() => navigation.navigate(btn.component)}
+//   style={{
+//     height: Layouts.window.width / 2 - 80,
+//     width: Layouts.window.width / 2 - 80,
+//     flexDirection: "column",
+//     marginRight: 24,
+//     padding: 20,
+//     backgroundColor: "#fff",
+//     shadowColor: Colors.LwscBlue,
+//     shadowOffset: {
+//       width: 0,
+//       height: 2,
+//     },
+//     shadowOpacity: 0.25,
+//     shadowRadius: 3.84,
+
+//     elevation: 5,
+//     marginBottom: 25,
+//     borderColor: "white",
+//   }}
+//   type={"outlined"}
+//   borderSize={0}
+//   radius={10}
+// >
+
+// </Button>
 
 const btns = [
   {
@@ -207,7 +222,6 @@ const styles = StyleSheet.create({
     flex: 1,
     // backgroundColor: 'red'
   },
-  carousel: {},
   btnsBox: {
     display: "flex",
     flexDirection: "row",
