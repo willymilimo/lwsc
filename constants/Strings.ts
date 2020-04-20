@@ -10,6 +10,7 @@ export default {
   PaymentMethodScreen: 'Payment Options',
   PaymentScreen: 'Make Payment',
   ServicesScreen: 'Services',
+  FeedbackScreen: 'Feedback',
 
   WHITE_THEME: 'WHITE_THEME',
   BLUE_THEME: 'BLUE_THEME',

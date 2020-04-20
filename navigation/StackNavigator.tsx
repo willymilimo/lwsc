@@ -16,6 +16,7 @@ import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
 import { ThemeReducer } from "../types/theme";
 import { ActionI } from "../redux/Actions";
+import FeedbackScreen from "../screens/FeedbackScreen";
 
 const Stack = createStackNavigator();
 
@@ -105,6 +106,7 @@ const StackNavigator = ({ setThemeReducer }: SNT) => {
       />
       <Stack.Screen name={Strings.PaymentScreen} component={PaymentScreen} />
       <Stack.Screen name={Strings.ServicesScreen} component={ServicesScreen} />
+      <Stack.Screen name={Strings.FeedbackScreen} component={FeedbackScreen} />
     </Stack.Navigator>
   );
 };

@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   Image,
   Animated,
+  Alert,
 } from "react-native";
 import { connect } from "react-redux";
 import {
@@ -18,6 +19,7 @@ import {
   Menu,
   Button,
   MenuItem,
+  Fab,
 } from "material-bread";
 import {
   FontAwesome,
@@ -25,10 +27,11 @@ import {
   Octicons,
   Entypo,
   MaterialIcons,
+  AntDesign,
 } from "@expo/vector-icons";
 import Colors from "../constants/Colors";
 import Layouts from "../constants/Layouts";
-import { ScrollView } from "react-native-gesture-handler";
+import { ScrollView, TouchableHighlight } from "react-native-gesture-handler";
 import Carousel from "../components/Carousel";
 import { banner_1, banner_2, banner_3 } from "../constants/Images";
 import { RootReducerI } from "../redux/reducers";
@@ -38,12 +41,16 @@ import HeaderComponent from "../components/HeaderComponent";
 import Strings from "../constants/Strings";
 import { useNavigation } from "@react-navigation/native";
 import LwscButton from "../components/LwscButton";
+import { ThemeType } from "../types/theme";
 
-const HomeScreen = () => {
+interface HomeI {
+  theme: ThemeType;
+}
+
+const HomeScreen = ({ theme }: HomeI) => {
   const {
     container,
     scrollViewStyle,
-    carousel,
     btnsBox,
     btnStyle,
     iconContainer,
@@ -88,7 +95,7 @@ const HomeScreen = () => {
             itemsPerInterval={1}
             items={[
               {
-                label: "Sanitization is Health!",
+                label: "Sanitisation is Health!",
                 value: 2,
                 image: banner_2,
               },
@@ -126,40 +133,38 @@ const HomeScreen = () => {
           ))}
         </View>
       </ScrollView>
+      <View
+        style={{
+          position: "absolute",
+          bottom: 10,
+          right: 10,
+        }}
+      >
+        <TouchableHighlight
+          onPress={() => navigation.navigate(Strings.FeedbackScreen)}
+          underlayColor={`${Colors.LwscBlue}aa`}
+          style={{
+            backgroundColor: theme.backgroundColor,
+            width: 60,
+            height: 60,
+            alignItems: "center",
+            justifyContent: "center",
+            shadowColor: "#333",
+            elevation: 6,
+            shadowOpacity: 0.8,
+            shadowOffset: { width: 3, height: 3 },
+            shadowRadius: 5,
+            borderRadius: 30,
+          }}
+        >
+          <View>
+            <AntDesign size={30} name="message1" color={theme.textColor} />
+          </View>
+        </TouchableHighlight>
+      </View>
     </SafeAreaView>
   );
 };
-
-{
-  /* <Button */
-}
-//   key={btn.component}
-//   onPress={() => navigation.navigate(btn.component)}
-//   style={{
-//     height: Layouts.window.width / 2 - 80,
-//     width: Layouts.window.width / 2 - 80,
-//     flexDirection: "column",
-//     marginRight: 24,
-//     padding: 20,
-//     backgroundColor: "#fff",
-//     shadowColor: Colors.LwscBlue,
-//     shadowOffset: {
-//       width: 0,
-//       height: 2,
-//     },
-//     shadowOpacity: 0.25,
-//     shadowRadius: 3.84,
-
-//     elevation: 5,
-//     marginBottom: 25,
-//     borderColor: "white",
-//   }}
-//   type={"outlined"}
-//   borderSize={0}
-//   radius={10}
-// >
-
-// </Button>
 
 const btns = [
   {
@@ -249,7 +254,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const mapStateToProps = ({ theme }: RootReducerI) => ({ theme });
+const mapStateToProps = ({ theme }: RootReducerI) => ({ theme: theme.theme });
 
 const mapDispatchToProps = (dispatch: any) =>
   bindActionCreators(
