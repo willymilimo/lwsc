@@ -11,17 +11,6 @@ import {
 } from "react-native";
 import { connect } from "react-redux";
 import {
-  Appbar,
-  Badge,
-  IconButton,
-  Paper,
-  BodyText,
-  Menu,
-  Button,
-  MenuItem,
-  Fab,
-} from "material-bread";
-import {
   FontAwesome,
   MaterialCommunityIcons,
   Octicons,
@@ -33,18 +22,17 @@ import Colors from "../constants/Colors";
 import Layouts from "../constants/Layouts";
 import { ScrollView, TouchableHighlight } from "react-native-gesture-handler";
 import Carousel from "../components/Carousel";
-import { banner_1, banner_2, banner_3 } from "../constants/Images";
 import { RootReducerI } from "../redux/reducers";
 import { bindActionCreators } from "redux";
 import { setTheme } from "../redux/actions/theme";
-import HeaderComponent from "../components/HeaderComponent";
+import { banner_1, banner_2, banner_3 } from "../constants/Images";
 import Strings from "../constants/Strings";
 import { useNavigation } from "@react-navigation/native";
 import LwscButton from "../components/LwscButton";
-import { ThemeType } from "../types/theme";
+import { ThemeReducer } from "../types/theme";
 
 interface HomeI {
-  theme: ThemeType;
+  theme: ThemeReducer;
 }
 
 const HomeScreen = ({ theme }: HomeI) => {
@@ -77,41 +65,28 @@ const HomeScreen = ({ theme }: HomeI) => {
 
   return (
     <SafeAreaView style={container}>
-      {/* <HeaderComponent title="LWSC" /> */}
       <ScrollView style={scrollViewStyle}>
-        <Paper
-          style={{
-            height: 166,
-            width: Layouts.window.width - 30,
-            marginTop: 15,
-            borderRadius: 10,
-            alignItems: "center",
-            alignSelf: "center",
-          }}
-          elevation={2}
-        >
-          <Carousel
-            style="stats"
-            itemsPerInterval={1}
-            items={[
-              {
-                label: "Sanitisation is Health!",
-                value: 2,
-                image: banner_2,
-              },
-              {
-                label: "Rehabilitation of Kaunda Square ponds.",
-                value: 3,
-                image: banner_3,
-              },
-              {
-                label: "Water is Life... Value it!",
-                value: 1,
-                image: banner_1,
-              },
-            ]}
-          />
-        </Paper>
+        <Carousel
+          style="stats"
+          itemsPerInterval={1}
+          items={[
+            {
+              label: "Sanitation is Health!",
+              value: 2,
+              image: banner_2,
+            },
+            {
+              label: "Rehabilitation of Kaunda Square ponds.",
+              value: 3,
+              image: banner_3,
+            },
+            {
+              label: "Water is Life... Value it!",
+              value: 1,
+              image: banner_1,
+            },
+          ]}
+        />
         <View style={btnsBox}>
           {btns.map((btn) => (
             <LwscButton
@@ -143,23 +118,26 @@ const HomeScreen = ({ theme }: HomeI) => {
         <TouchableHighlight
           onPress={() => navigation.navigate(Strings.FeedbackScreen)}
           underlayColor={`${Colors.LwscBlue}aa`}
-          style={{
-            backgroundColor: theme.backgroundColor,
-            width: 60,
-            height: 60,
-            alignItems: "center",
-            justifyContent: "center",
-            shadowColor: "#333",
-            elevation: 6,
-            shadowOpacity: 0.8,
-            shadowOffset: { width: 3, height: 3 },
-            shadowRadius: 5,
-            borderRadius: 30,
-          }}
+          style={[
+            {
+              backgroundColor: theme.theme.backgroundColor,
+              width: 60,
+              height: 60,
+              alignItems: "center",
+              justifyContent: "center",
+              shadowColor: "#333",
+              elevation: 6,
+              shadowOpacity: 0.8,
+              shadowOffset: { width: 3, height: 3 },
+              shadowRadius: 5,
+              borderRadius: 30,
+            },
+            theme.name === Strings.WHITE_THEME
+              ? { borderWidth: 0.75, borderColor: `${Colors.LwscBlue}44` }
+              : {},
+          ]}
         >
-          <View>
-            <AntDesign size={30} name="message1" color={theme.textColor} />
-          </View>
+          <AntDesign size={30} name="message1" color={theme.theme.textColor} />
         </TouchableHighlight>
       </View>
     </SafeAreaView>
@@ -254,7 +232,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const mapStateToProps = ({ theme }: RootReducerI) => ({ theme: theme.theme });
+const mapStateToProps = ({ theme }: RootReducerI) => ({ theme });
 
 const mapDispatchToProps = (dispatch: any) =>
   bindActionCreators(

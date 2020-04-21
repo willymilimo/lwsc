@@ -7,6 +7,7 @@ import ManageAccounts from "../screens/ManageAccounts";
 import PaymentScreen from "../screens/PaymentScreen";
 import PaymentMethodScreen from "../screens/PaymentMethodScreen";
 import ServicesScreen from "../screens/ServicesScreen";
+import FeedbackScreen from "../screens/FeedbackScreen";
 import Strings from "../constants/Strings";
 import HeaderComponent from "../components/HeaderComponent";
 import { AsyncStorage } from "react-native";
@@ -16,7 +17,6 @@ import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
 import { ThemeReducer } from "../types/theme";
 import { ActionI } from "../redux/Actions";
-import FeedbackScreen from "../screens/FeedbackScreen";
 
 const Stack = createStackNavigator();
 

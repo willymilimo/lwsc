@@ -1,11 +1,12 @@
 import React from "react";
-import { GestureResponderEvent } from "react-native";
-import { Button } from "material-bread";
 import Layouts from "../constants/Layouts";
 import Colors from "../constants/Colors";
+import { Button } from "react-native-paper";
+import { StyleSheet } from "react-native";
+import { TouchableHighlight } from "react-native-gesture-handler";
 
 interface LwscButtonI {
-  onPress(e: GestureResponderEvent): void;
+  onPress(): void;
   height?: number;
   width?: number;
   shadowColor?: string;
@@ -26,37 +27,38 @@ const LwscButton = ({
   style,
 }: LwscButtonI) => {
   style = style || {};
+  const { container } = styles;
   return (
-    <Button
-      fullWidth={true}
+    <TouchableHighlight
       onPress={onPress}
-      style={[
-        {
-          flexDirection: "column",
-          padding: 20,
-          backgroundColor: "#fff",
-          shadowColor: shadowColor || Colors.LwscBlue,
-          shadowOffset: {
-            width: 0,
-            height: 2,
-          },
-          shadowOpacity: 0.25,
-          shadowRadius: 3.84,
-
-          elevation: 5,
-          marginBottom: 25,
-          borderColor: "white",
-        },
-        height ? { height } : {},
-        width ? { width } : {},
-      ]}
-      type={"outlined"}
-      borderSize={0}
-      radius={10}
+      underlayColor="#55555533"
+      style={[container, height ? { height } : {}, width ? { width } : {}]}
     >
       {content}
-    </Button>
+    </TouchableHighlight>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+    marginBottom: 25,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    shadowColor: Colors.LwscBlue,
+
+    elevation: 5,
+
+    shadowOffset: {
+      width: 1,
+      height: 1,
+    },
+    shadowOpacity: 0.75,
+    shadowRadius: 3,
+  },
+});
 
 export default LwscButton;

@@ -9,10 +9,10 @@ import {
 } from "react-native";
 import { FlatList, TouchableHighlight } from "react-native-gesture-handler";
 import { NotificationI } from "../models/notification";
-import { Divider, Heading, Subtitle } from "material-bread";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { NotificationType, NotificationStatus } from "../types/notification";
 import Colors from "../constants/Colors";
+import { Divider } from "react-native-paper";
 
 function Icon(type: NotificationType) {
   switch (type) {

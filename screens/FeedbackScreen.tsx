@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { TextField } from "material-bread";
+import { TextInput } from "react-native-paper";
 
 const FeedbackScreen = () => {
   const { container } = styles;
@@ -8,19 +8,20 @@ const FeedbackScreen = () => {
   const [message, setMessage] = React.useState("");
   return (
     <View style={container}>
-      <TextField
-        type={"outlined"}
+      <TextInput
+        autoFocus={true}
+        mode="outlined"
         label={"Full Name"}
         value={fullName}
         onChangeText={(value) => setFullName(value)}
       />
-      <TextField
-        containerStyle={{ marginTop: 20 }}
+      <TextInput
         multiline={true}
-        type={"outlined"}
+        numberOfLines={4}
+        mode="outlined"
         label={"Your feedback"}
         value={message}
-        helperText={"There is an error"}
+        // helperText={"There is an error"}
         error={true}
         onChangeText={(value) => setMessage(value)}
       />

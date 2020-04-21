@@ -2,16 +2,6 @@ import React from "react";
 import Colors from "../constants/Colors";
 import { StyleSheet, View, StatusBar, Text, Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import {
-  Appbar,
-  // Menu,
-  Badge,
-  // Button,
-  IconButton,
-  BodyText,
-  // Switch,
-  // MenuItem,
-} from "material-bread";
 import Menu, { MenuItem } from "react-native-material-menu";
 import { RootReducerI } from "../redux/reducers";
 import { connect } from "react-redux";
@@ -22,6 +12,7 @@ import { bindActionCreators } from "redux";
 import Strings from "../constants/Strings";
 import { TouchableHighlight, Switch } from "react-native-gesture-handler";
 import Layouts from "../constants/Layouts";
+import { IconButton, Badge } from "react-native-paper";
 
 interface HeaderComponentI {
   navigation: any;
@@ -70,15 +61,15 @@ const HeaderComponent = ({
             justifyContent: "space-between",
           }}
         >
-          {previous && (
+          {/* {previous && (
             <IconButton
               onPress={navigation.goBack}
-              name={`${Platform.OS === "ios" ? "ios" : "md"}-arrow-back`}
+              icon={`${Platform.OS === "ios" ? "ios" : "md"}-arrow-back`}
               size={24}
               color={theme.textColor}
-              iconComponent={Ionicons}
+              // iconComponent={Ionicons}
             />
-          )}
+          )} */}
           <Text
             style={{
               marginLeft: 20,
@@ -122,9 +113,27 @@ const HeaderComponent = ({
                 height: 50,
                 padding: 10,
                 borderRadius: 25,
+                justifyContent: "center",
               }}
             >
-              <Badge
+              <View
+                style={{
+                  display: "flex",
+                  flex: 1,
+                  flexDirection: "row",
+                  position: "relative",
+                  // backgroundColor: 'pink',
+                  alignItems: 'flex-end'
+                }}
+              >
+                <Ionicons
+                  color={theme.textColor}
+                  name={`${Platform.OS === "ios" ? "ios" : "md"}-notifications`}
+                  size={24}
+                />
+                <Badge style={{ position: "absolute", right: -3, top: -3 }}>13</Badge>
+              </View>
+              {/* <Badge
                 style={{
                   backgroundColor: Colors.LwscRed,
                 }}
@@ -138,7 +147,7 @@ const HeaderComponent = ({
                   size={24}
                   color={theme.textColor}
                 />
-              </Badge>
+              </Badge> */}
             </TouchableHighlight>
           </View>
         </View>
