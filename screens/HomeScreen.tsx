@@ -3,11 +3,7 @@ import {
   StyleSheet,
   Text,
   View,
-  StatusBar,
   SafeAreaView,
-  Image,
-  Animated,
-  Alert,
 } from "react-native";
 import { connect } from "react-redux";
 import {
@@ -23,8 +19,6 @@ import Layouts from "../constants/Layouts";
 import { ScrollView, TouchableHighlight } from "react-native-gesture-handler";
 import Carousel from "../components/Carousel";
 import { RootReducerI } from "../redux/reducers";
-import { bindActionCreators } from "redux";
-import { setTheme } from "../redux/actions/theme";
 import { banner_1, banner_2, banner_3 } from "../constants/Images";
 import Strings from "../constants/Strings";
 import { useNavigation } from "@react-navigation/native";
@@ -44,24 +38,6 @@ const HomeScreen = ({ theme }: HomeI) => {
     iconContainer,
   } = styles;
   const navigation = useNavigation();
-
-  const [marginLeft, setMarginLeft] = React.useState(new Animated.Value(0));
-
-  const animateMarginLeft = (size: number, iteration = 1) => {
-    const modulo = iteration % size;
-    const end = isNaN(modulo) ? 0 : -(modulo * Layouts.window.width);
-
-    Animated.sequence([
-      Animated.delay(iteration === 1 ? 0 : 7000),
-      Animated.timing(marginLeft, {
-        toValue: end,
-        duration: 500,
-        // useNativeDriver: true,
-      }),
-    ]).start(() => {
-      animateMarginLeft(size, iteration + 1);
-    });
-  };
 
   return (
     <SafeAreaView style={container}>
@@ -234,12 +210,4 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = ({ theme }: RootReducerI) => ({ theme });
 
-const mapDispatchToProps = (dispatch: any) =>
-  bindActionCreators(
-    {
-      setTheme,
-    },
-    dispatch
-  );
-
-export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
+export default connect(mapStateToProps)(HomeScreen);

@@ -16,8 +16,9 @@ const FeedbackScreen = () => {
         onChangeText={(value) => setFullName(value)}
       />
       <TextInput
+        style={{ marginTop: 10 }}
         multiline={true}
-        numberOfLines={4}
+        numberOfLines={10}
         mode="outlined"
         label={"Your feedback"}
         value={message}

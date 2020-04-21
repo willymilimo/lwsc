@@ -13,6 +13,7 @@ import Strings from "../constants/Strings";
 import { TouchableHighlight, Switch } from "react-native-gesture-handler";
 import Layouts from "../constants/Layouts";
 import { IconButton, Badge } from "react-native-paper";
+import LswsIconButton from "./LswsIconButton";
 
 interface HeaderComponentI {
   navigation: any;
@@ -34,6 +35,7 @@ const HeaderComponent = ({
 }: HeaderComponentT) => {
   const { name, theme } = themeReducer;
   const [activeTheme, setActiveTheme] = React.useState(name);
+  console.log(name)
 
   React.useEffect(() => {
     let is_subscribed = true;
@@ -61,15 +63,18 @@ const HeaderComponent = ({
             justifyContent: "space-between",
           }}
         >
-          {/* {previous && (
-            <IconButton
+          {previous && (
+            <LswsIconButton
               onPress={navigation.goBack}
-              icon={`${Platform.OS === "ios" ? "ios" : "md"}-arrow-back`}
-              size={24}
-              color={theme.textColor}
-              // iconComponent={Ionicons}
+              content={
+                <Ionicons
+                  icon={`${Platform.OS === "ios" ? "ios" : "md"}-arrow-back`}
+                  size={24}
+                  color={theme.textColor}
+                />
+              }
             />
-          )} */}
+          )}
           <Text
             style={{
               marginLeft: 20,
@@ -105,50 +110,32 @@ const HeaderComponent = ({
               }}
               value={activeTheme === Strings.WHITE_THEME}
             />
-            <TouchableHighlight
+            <LswsIconButton
               onPress={() => navigation.navigate(Strings.NotificationsScreen)}
-              underlayColor="#55555544"
-              style={{
-                width: 50,
-                height: 50,
-                padding: 10,
-                borderRadius: 25,
-                justifyContent: "center",
-              }}
-            >
-              <View
-                style={{
-                  display: "flex",
-                  flex: 1,
-                  flexDirection: "row",
-                  position: "relative",
-                  // backgroundColor: 'pink',
-                  alignItems: 'flex-end'
-                }}
-              >
-                <Ionicons
-                  color={theme.textColor}
-                  name={`${Platform.OS === "ios" ? "ios" : "md"}-notifications`}
-                  size={24}
-                />
-                <Badge style={{ position: "absolute", right: -3, top: -3 }}>13</Badge>
-              </View>
-              {/* <Badge
-                style={{
-                  backgroundColor: Colors.LwscRed,
-                }}
-                color={Colors.notificationRed}
-                textColor={"white"}
-                size={14}
-                content={77}
-              >
-                <IconButton
-                  name="notifications"
-                  size={24}
-                  color={theme.textColor}
-                />
-              </Badge> */}
-            </TouchableHighlight>
+              content={
+                <View
+                  style={{
+                    display: "flex",
+                    flex: 1,
+                    flexDirection: "row",
+                    position: "relative",
+                    // backgroundColor: 'pink',
+                    alignItems: "flex-end",
+                  }}
+                >
+                  <Ionicons
+                    color={theme.textColor}
+                    name={`${
+                      Platform.OS === "ios" ? "ios" : "md"
+                    }-notifications`}
+                    size={24}
+                  />
+                  <Badge style={{ position: "absolute", right: -3, top: -3 }}>
+                    13
+                  </Badge>
+                </View>
+              }
+            />
           </View>
         </View>
       </View>
@@ -201,3 +188,5 @@ const mapDispatchToProps = (dispatch: any) =>
   );
 
 export default connect(mapStateToProps, mapDispatchToProps)(HeaderComponent);
+
+//https://us04web.zoom.us/j/2957286000?status=success

@@ -1,0 +1,17 @@
+Menu
+
+1. Make Payment
+2. Pay Points
+3. Services
+4. Request connection under services 
+5. Meter Reading (replace request connection)
+6. Report Leakage
+7. Lodge Complaint
+
+Priority should be
+1. make Payment
+2. meter Reading
+3. services
+
+the other three to come down
+default to be blue but keep toggle option

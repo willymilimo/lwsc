@@ -28,7 +28,6 @@ export default function (state = initState, action: ActionI): ThemeReducer {
   }
 
   if (action.payload) {
-    console.log(action);
     AsyncStorage.setItem(Strings.THEME_STORAGE, JSON.stringify(state));
   }
 
