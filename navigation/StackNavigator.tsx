@@ -9,7 +9,7 @@ import PaymentMethodScreen from "../screens/PaymentMethodScreen";
 import ServicesScreen from "../screens/ServicesScreen";
 import FeedbackScreen from "../screens/FeedbackScreen";
 import Strings from "../constants/Strings";
-import HeaderComponent from "../components/HeaderComponent";
+import HeaderRightComponent from "../components/HeaderRightComponent";
 import { AsyncStorage } from "react-native";
 import { bindActionCreators } from "redux";
 import { setThemeReducer } from "../redux/actions/theme";
@@ -21,12 +21,14 @@ import { ActionI } from "../redux/Actions";
 const Stack = createStackNavigator();
 
 interface SNI {
+  themeReducer: ThemeReducer;
   setThemeReducer(themeReducer: ThemeReducer): ActionI;
 }
 
 type SNT = SNI;
 
-const StackNavigator = ({ setThemeReducer }: SNT) => {
+const StackNavigator = ({ setThemeReducer, themeReducer }: SNT) => {
+  const [activeTheme, setActiveTheme] = React.useState(themeReducer.theme);
   React.useEffect(() => {
     // Fetch the token from storage then navigate to our appropriate place
     const bootstrapAsync = async () => {
@@ -44,43 +46,39 @@ const StackNavigator = ({ setThemeReducer }: SNT) => {
       // screen will be unmounted and thrown away.
       // dispatch({ type: "RESTORE_TOKEN", token: userToken });
       if (theme) {
-        console.log(theme);
+        // console.log(theme);
         setThemeReducer(JSON.parse(theme));
+        setActiveTheme(JSON.parse(theme).theme);
       }
     };
 
     bootstrapAsync();
   }, []);
 
+  React.useEffect(() => {
+    let is_subscribed = true;
+
+    if (is_subscribed) {
+      setActiveTheme(themeReducer.theme);
+    }
+
+    return () => {
+      is_subscribed = false;
+    };
+  }, [themeReducer]);
+
   return (
     <Stack.Navigator
       initialRouteName={Strings.HomeTabNavigator}
       screenOptions={{
         headerStyle: {
-          backgroundColor: "red",
+          backgroundColor: activeTheme.backgroundColor,
         },
-        headerTintColor: "#fff",
+        headerTintColor: activeTheme.textColor,
         headerTitleStyle: {
           fontWeight: "bold",
         },
-        header: ({ scene, previous, navigation }) => {
-          const { options } = scene.descriptor;
-          const title =
-            options.headerTitle !== undefined
-              ? options.headerTitle
-              : options.title !== undefined
-              ? options.title
-              : scene.route.name;
-
-          return (
-            <HeaderComponent
-              title={title}
-              navigation={navigation}
-              previous={previous}
-              style={options.headerStyle}
-            />
-          );
-        },
+        headerRight: () => <HeaderRightComponent />,
       }}
     >
       <Stack.Screen
