@@ -13,6 +13,8 @@ import {
   Entypo,
   MaterialIcons,
   AntDesign,
+  SimpleLineIcons,
+  FontAwesome5,
 } from "@expo/vector-icons";
 import Colors from "../constants/Colors";
 import Layouts from "../constants/Layouts";
@@ -125,13 +127,19 @@ const btns = [
     icon: <FontAwesome name="credit-card" color="#00bb27" size={25} />,
     label: "Make Payment",
     color: `#00bb2723`,
-    component: Strings.ManageAccountsScreen,
+    component: Strings.MakePaymentScreen,
   },
   {
-    icon: <FontAwesome name="map-marker" color="maroon" size={40} />,
-    label: "Pay Points",
-    color: "#ff000023",
-    component: Strings.LocatePayPointScreen,
+    icon: (
+      <FontAwesome5
+        name="tachometer-alt"
+        color="#1081e9"
+        size={30}
+      />
+    ),
+    label: "Meter Reading",
+    color: "#1081e923",
+    component: "test",
   },
   {
     icon: <Octicons name="settings" color={Colors.LwscBlack} size={30} />,
@@ -140,16 +148,10 @@ const btns = [
     component: Strings.ServicesScreen,
   },
   {
-    icon: (
-      <MaterialCommunityIcons
-        name="pipe-disconnected"
-        color="#1081e9"
-        size={30}
-      />
-    ),
-    label: "Request Connection",
-    color: "#1081e923",
-    component: "test",
+    icon: <FontAwesome name="map-marker" color="maroon" size={40} />,
+    label: "Pay Points",
+    color: "#ff000023",
+    component: Strings.LocatePayPointScreen,
   },
   {
     icon: <Entypo name="drop" color="#1ac3ee" size={30} />,

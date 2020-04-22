@@ -1,10 +1,7 @@
 import React from "react";
-import { StyleSheet, Text, View, SafeAreaView, Platform } from "react-native";
-import { FlatList, TouchableHighlight } from "react-native-gesture-handler";
-import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { BillI } from "../models/bill";
-import Colors from "../constants/Colors";
+import { StyleSheet, SafeAreaView } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
+import BillComponent from "../components/BillComponent";
 
 const DATA = [
   {
@@ -229,70 +226,25 @@ const DATA = [
   },
 ];
 
-function Item({
-  name,
-  address,
-  account_number,
-  meter_number,
-  meter_reading,
-  usage,
-  amount_due,
-}: BillI) {
-  const { hightlightStyle, itemContainer, itemStyle, textStyle } = styles;
-  return (
-    <TouchableHighlight
-      onPress={() => console.log("pressed")}
-      underlayColor={`${Colors.LwscBlack}44`}
-      style={hightlightStyle}
-    >
-      <View style={itemContainer}>
-        <Text style={{ fontSize: 20, marginBottom: 5 }}>{name}</Text>
-        <View style={itemStyle}>
-          <Ionicons
-            color={Colors.LwscOrange}
-            size={20}
-            name={`${Platform.OS === "ios" ? "ios" : "md"}-home`}
-          />
-          <Text style={textStyle}>{address}</Text>
-        </View>
-        <View style={itemStyle}>
-          <Ionicons
-            color={Colors.LwscOrange}
-            size={20}
-            name={`${Platform.OS === "ios" ? "ios" : "md"}-speedometer`}
-          />
-          <Text style={textStyle}>{meter_number || account_number}</Text>
-        </View>
-        <View style={itemStyle}>
-          <MaterialCommunityIcons
-            color={Colors.LwscOrange}
-            size={20}
-            name={`water-pump`}
-          />
-          <Text style={textStyle}>{`${meter_reading || usage} Litres`}</Text>
-        </View>
-        <View style={itemStyle}>
-          <Ionicons
-            color={Colors.LwscOrange}
-            size={20}
-            name={`${Platform.OS === "ios" ? "ios" : "md"}-card`}
-          />
-          <Text style={textStyle}>{`ZMW ${amount_due
-            .toFixed(2)
-            .replace(/\d(?=(\d{3})+\.)/g, "$&,")}`}</Text>
-        </View>
-      </View>
-    </TouchableHighlight>
-  );
-}
-
 const BillsScreen = () => {
   const { container } = styles;
   return (
     <SafeAreaView style={container}>
       <FlatList
         data={DATA}
-        renderItem={({ item }) => Item(item)}
+        renderItem={({ item }) => (
+          <BillComponent
+            _id={item._id}
+            name={item.name}
+            address={item.address}
+            meter_number={item.meter_number}
+            account_number={item.account_number}
+            meter_reading={item.meter_reading}
+            usage={item.usage}
+            amount_due={item.amount_due}
+            onPress={() => console.log("clicked...")}
+          />
+        )}
         keyExtractor={(item) => item._id}
       />
     </SafeAreaView>
@@ -305,39 +257,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-  },
-  hightlightStyle: {
-    marginHorizontal: 10,
-    marginBottom: 10,
-    shadowColor: Colors.LwscBlue,
-
-    elevation: 5,
-
-    shadowOffset: {
-      width: 1,
-      height: 1,
-    },
-    shadowOpacity: 0.75,
-    shadowRadius: 6,
-  },
-  itemContainer: {
-    display: "flex",
-    flexDirection: "column",
-    backgroundColor: "#fff",
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-  },
-  itemStyle: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 6,
-    marginBottom: 2,
-  },
-  textStyle: {
-    marginLeft: 10,
-    fontSize: 15,
-    color: `${Colors.LwscBlack}bb`,
   },
 });

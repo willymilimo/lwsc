@@ -8,7 +8,8 @@ export default {
   ManageAccountsScreen: "Manage Accounts",
   NotificationScreen: "Notification",
   PaymentMethodScreen: "Payment Options",
-  PaymentScreen: "Make Payment",
+  MakePaymentScreen: "Make Payment",
+  // PaymentScreen: "Make Payment",
   ServicesScreen: "Services",
   FeedbackScreen: "Feedback",
 

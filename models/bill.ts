@@ -1,3 +1,5 @@
+import { GestureResponderEvent } from "react-native";
+
 export interface BillI {
   _id: string;
   name: string;
@@ -7,6 +9,7 @@ export interface BillI {
   meter_reading: number;
   usage: number;
   amount_due: number;
+  onPress(e: GestureResponderEvent): void;
 }
 
 export class Bill implements BillI {
@@ -18,6 +21,7 @@ export class Bill implements BillI {
   meter_reading: number;
   usage: number;
   amount_due: number;
+  onPress(e: GestureResponderEvent) {};
 
   constructor({
     _id,
