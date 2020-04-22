@@ -1,9 +1,28 @@
 import React from "react";
 import { BillI } from "../models/bill";
-import { StyleSheet, View, Text, Platform } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Platform,
+  GestureResponderEvent,
+} from "react-native";
 import { TouchableHighlight } from "react-native-gesture-handler";
 import Colors from "../constants/Colors";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+
+interface BillComponentI {
+  _id: string;
+  name: string;
+  address: string;
+  meter_number: string;
+  account_number: string;
+  meter_reading: number;
+  usage: number;
+  amount_due: number;
+  onPress?(e: GestureResponderEvent): void;
+  style?: object;
+}
 
 export default function BillComponent({
   name,
@@ -14,13 +33,17 @@ export default function BillComponent({
   usage,
   amount_due,
   onPress,
-}: BillI) {
+  style,
+}: BillComponentI) {
   const { hightlightStyle, itemStyle, textStyle } = styles;
+  style = style
+    ? { padding: 2, margin: 5, borderRadius: 5, ...style }
+    : { padding: 2, margin: 5, borderRadius: 5 };
   return (
     <TouchableHighlight
       onPress={onPress}
       underlayColor={`${Colors.LwscBlack}44`}
-      style={{ padding: 2, margin: 5, borderRadius: 5 }}
+      style={style}
     >
       <View style={hightlightStyle}>
         <Text style={{ fontSize: 20, marginBottom: 5 }}>{name}</Text>
