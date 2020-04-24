@@ -13,26 +13,30 @@ export default {
   ServicesScreen: "Services",
   FeedbackScreen: "Feedback",
 
+
+
+  /*************** Begin REDUCER TYPES *****************/
   WHITE_THEME: "WHITE_THEME",
   BLUE_THEME: "BLUE_THEME",
 
-  // stacks
-  HomeTabNavigator: "LWSC",
-  //   ProfileStack: "ProfileStack",
-  //   MoreStack: "MoreStack",
-  //   PromotionsStack: "PromotionsStackNavigator",
-  //   BalancesStack: "BalancesStackNavigator",
-  //   AirtimeTopUpStack: "AirtimeTopUpStack",
-  //   RegisterStack: "RegisterStack",
-  //   ContactUsStack: "ContactUsStack",
-  //   VisaStackNavigator: "VisaStackNavigator",
-  //   MinutesAndDataStackNavigator: "MinutesAndDataStackNavigator",
-  //   ValueAddedServicesStackNavigator: "ValueAddedServicesStackNavigator",
-  //   BuyForOtherStack: "BuyForOtherStack",
-  //   FeedbackHistoryStackNavigator: "FeedbackHistoryStackNavigator",
+  // SET_NOTIFICATIONS: 'SET_NOTIFICATIONS',
+  /*************** Eend REDUCER TYPES *****************/
 
-  // async storage
+
+
+  /*************** Begin Stack & Tab Navigators *****************/
+  HomeTabNavigator: "LWSC",
+  /*************** End Stack & Tab Navigators *****************/
+
+
+
+  /*************** Begin Storage Constants *****************/
   THEME_STORAGE: "THEME_STORAGE",
+  NOTIFICATIONS_STORAGE: 'NOTIFICATIONS_STORAGE',
+  /*************** End Storage Constants *****************/
+
+
+
 
   // API
   REQUEST_OTP:

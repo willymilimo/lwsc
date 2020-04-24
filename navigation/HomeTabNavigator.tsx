@@ -5,10 +5,11 @@ import HomeScreen from "../screens/HomeScreen";
 import ServicesScreen from "../screens/ServicesScreen";
 import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
-import { ThemeReducer, ThemeType } from "../types/theme";
+import { ThemeType } from "../types/theme";
 import BillsScreen from "../screens/BillsScreen";
 
 interface HTNI {
+  route: any;
   theme: ThemeType;
 }
 
@@ -16,7 +17,7 @@ type HTNT = HTNI;
 
 const Tab = createBottomTabNavigator();
 
-const HomeTabNavigator = ({ theme }: HTNT) => {
+const HomeTabNavigator = ({ route, theme }: HTNT) => {
   const [activeTheme, setActiveTheme] = React.useState(theme);
 
   React.useEffect(() => {
@@ -56,7 +57,11 @@ const HomeTabNavigator = ({ theme }: HTNT) => {
         inactiveBackgroundColor: activeTheme.backgroundColor,
       }}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        initialParams={route.params}
+      />
       <Tab.Screen name="Bills" component={BillsScreen} />
       {/* <Tab.Screen name="Accounts" component={ServicesScreen} /> */}
       <Tab.Screen name="History" component={ServicesScreen} />

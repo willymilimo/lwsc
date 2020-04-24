@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  SafeAreaView,
-} from "react-native";
+import { StyleSheet, Text, View, SafeAreaView } from "react-native";
 import { connect } from "react-redux";
 import {
   FontAwesome,
@@ -23,15 +18,16 @@ import Carousel from "../components/Carousel";
 import { RootReducerI } from "../redux/reducers";
 import { banner_1, banner_2, banner_3 } from "../constants/Images";
 import Strings from "../constants/Strings";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, Route } from "@react-navigation/native";
 import LwscButton from "../components/LwscButton";
 import { ThemeReducer } from "../types/theme";
 
 interface HomeI {
   theme: ThemeReducer;
+  route: Route<string>;
 }
 
-const HomeScreen = ({ theme }: HomeI) => {
+const HomeScreen = ({ theme, route }: HomeI) => {
   const {
     container,
     scrollViewStyle,
@@ -40,6 +36,30 @@ const HomeScreen = ({ theme }: HomeI) => {
     iconContainer,
   } = styles;
   const navigation = useNavigation();
+  // console.log(route);
+
+  React.useEffect(() => {
+    let is_subscribed = true;
+
+    console.log(
+      is_subscribed,
+      !!route.params,
+      (route.params as { toNotifications: boolean }).toNotifications
+    )
+
+    if (
+      is_subscribed &&
+      route.params &&
+      (route.params as { toNotifications: boolean }).toNotifications
+    ) {
+      console.log('here...')
+      navigation.navigate(Strings.NotificationsScreen);
+    }
+
+    return () => {
+      is_subscribed = false;
+    };
+  }, [route]);
 
   return (
     <SafeAreaView style={container}>
@@ -130,13 +150,7 @@ const btns = [
     component: Strings.MakePaymentScreen,
   },
   {
-    icon: (
-      <FontAwesome5
-        name="tachometer-alt"
-        color="#1081e9"
-        size={30}
-      />
-    ),
+    icon: <FontAwesome5 name="tachometer-alt" color="#1081e9" size={30} />,
     label: "Meter Reading",
     color: "#1081e923",
     component: "test",

@@ -17,16 +17,17 @@ import { useNavigation } from "@react-navigation/native";
 interface HeaderRightComponentI {
   setThemeReducer(theme: ThemeReducer): void;
   themeReducer: ThemeReducer;
+  notifications: number;
 }
 
 type HeaderRightComponentT = HeaderRightComponentI;
 
-const HeaderRightComponent = ({
-  setThemeReducer,
-  themeReducer,
-}: HeaderRightComponentT) => {
+const HeaderRightComponent = (props: HeaderRightComponentT) => {
+  const { setThemeReducer, themeReducer, notifications } = props;
+  // console.log(props);
   const { name, theme } = themeReducer;
   const [activeTheme, setActiveTheme] = React.useState(name);
+  const [notices, setNotices] = React.useState(notifications);
   const navigation = useNavigation();
 
   React.useEffect(() => {
@@ -41,6 +42,18 @@ const HeaderRightComponent = ({
     };
   }, [activeTheme]);
   // console.log(theme);
+
+  React.useEffect(() => {
+    let is_subscribed = true;
+
+    if (is_subscribed) {
+      setNotices(notifications);
+    }
+
+    return () => {
+      is_subscribed = false;
+    };
+  }, [notifications]);
 
   return (
     <View
@@ -77,8 +90,7 @@ const HeaderRightComponent = ({
               flex: 1,
               flexDirection: "row",
               position: "relative",
-              // backgroundColor: 'pink',
-              alignItems: "flex-end",
+              alignItems: notices === 0 ? "center" : "flex-end",
             }}
           >
             <Ionicons
@@ -86,8 +98,12 @@ const HeaderRightComponent = ({
               name={`${Platform.OS === "ios" ? "ios" : "md"}-notifications`}
               size={24}
             />
-            <Badge style={{ position: "absolute", right: -3, top: -3 }}>
-              13
+
+            <Badge
+              visible={notices !== 0}
+              style={{ position: "absolute", right: -3, top: -3 }}
+            >
+              {notices}
             </Badge>
           </View>
         }
@@ -96,7 +112,10 @@ const HeaderRightComponent = ({
   );
 };
 
-const mapStateToProps = ({ theme }: RootReducerI) => ({ themeReducer: theme });
+const mapStateToProps = ({ theme }: RootReducerI) => ({
+  themeReducer: theme,
+  // notifications,
+});
 
 const mapDispatchToProps = (dispatch: any) =>
   bindActionCreators(
@@ -106,6 +125,9 @@ const mapDispatchToProps = (dispatch: any) =>
     dispatch
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(HeaderRightComponent);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(HeaderRightComponent);
 
 //https://us04web.zoom.us/j/2957286000?status=success

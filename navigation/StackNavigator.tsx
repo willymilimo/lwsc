@@ -1,35 +1,97 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
+import { connect } from "react-redux";
+import { AsyncStorage, Vibration, Platform } from "react-native";
+import { bindActionCreators } from "redux";
+import { Notifications } from "expo";
+import * as Permissions from "expo-permissions";
+import Constants from "expo-constants";
+
 import HomeTabNavigator from "./HomeTabNavigator";
 import NotificationsScreen from "../screens/NotificationsScreen";
 import LocatePaypointScreen from "../screens/LocatePaypointScreen";
 import ManageAccounts from "../screens/ManageAccounts";
-import PaymentScreen from "../screens/PaymentScreen";
 import PaymentMethodScreen from "../screens/PaymentMethodScreen";
 import ServicesScreen from "../screens/ServicesScreen";
 import FeedbackScreen from "../screens/FeedbackScreen";
-import Strings from "../constants/Strings";
+import MakePaymentScreen from "../screens/MakePaymentScreen";
 import HeaderRightComponent from "../components/HeaderRightComponent";
-import { AsyncStorage } from "react-native";
-import { bindActionCreators } from "redux";
+import Strings from "../constants/Strings";
 import { setThemeReducer } from "../redux/actions/theme";
-import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
 import { ThemeReducer } from "../types/theme";
 import { ActionI } from "../redux/Actions";
-import MakePaymentScreen from "../screens/MakePaymentScreen";
+import { NotificationI } from "../models/notification";
+import {
+  setNotifications,
+  addNotification,
+} from "../redux/actions/notifications";
 
 const Stack = createStackNavigator();
 
 interface SNI {
   themeReducer: ThemeReducer;
   setThemeReducer(themeReducer: ThemeReducer): ActionI;
+  notifications: NotificationI[];
+  setNotifications(notifications: NotificationI[]): void;
+  addNotification(notifications: NotificationI): void;
 }
 
 type SNT = SNI;
 
-const StackNavigator = ({ setThemeReducer, themeReducer }: SNT) => {
+const StackNavigator = ({
+  setThemeReducer,
+  themeReducer,
+  notifications,
+  setNotifications,
+  addNotification,
+}: SNT) => {
+  const [pushToken, setPushToken] = React.useState("");
+  const [pushNotification, setPushNotification] = React.useState(null);
   const [activeTheme, setActiveTheme] = React.useState(themeReducer.theme);
+
+  const registerForPushNotificationsAsync = async () => {
+    if (Constants.isDevice) {
+      const { status: existingStatus } = await Permissions.getAsync(
+        Permissions.NOTIFICATIONS
+      );
+      let finalStatus = existingStatus;
+      if (existingStatus !== "granted") {
+        const { status } = await Permissions.askAsync(
+          Permissions.NOTIFICATIONS
+        );
+        finalStatus = status;
+      }
+      if (finalStatus !== "granted") {
+        alert("Failed to get push token for push notification!");
+        return;
+      }
+      const token = await Notifications.getExpoPushTokenAsync();
+      console.log(token);
+      setPushToken(token);
+    } else {
+      alert("Must use physical device for Push Notifications");
+    }
+
+    if (Platform.OS === "android") {
+      Notifications.createChannelAndroidAsync("default", {
+        name: "default",
+        sound: true,
+        priority: "max",
+        vibrate: [0, 250, 250, 250],
+      });
+    }
+  };
+
+  const handleNotification = React.useCallback(
+    (notification) => {
+      Vibration.vibrate(3);
+      setPushNotification(notification);
+      addNotification(notification);
+    },
+    []
+  );
+
   React.useEffect(() => {
     // Fetch the token from storage then navigate to our appropriate place
     const bootstrapAsync = async () => {
@@ -60,6 +122,18 @@ const StackNavigator = ({ setThemeReducer, themeReducer }: SNT) => {
     let is_subscribed = true;
 
     if (is_subscribed) {
+      setNotifications(notifications);
+    }
+
+    return () => {
+      is_subscribed = false;
+    };
+  }, [notifications]);
+
+  React.useEffect(() => {
+    let is_subscribed = true;
+
+    if (is_subscribed) {
       setActiveTheme(themeReducer.theme);
     }
 
@@ -67,6 +141,30 @@ const StackNavigator = ({ setThemeReducer, themeReducer }: SNT) => {
       is_subscribed = false;
     };
   }, [themeReducer]);
+
+  React.useEffect(() => {
+    let is_subscribed = true;
+
+    if (is_subscribed) {
+      registerForPushNotificationsAsync();
+    }
+
+    return () => {
+      is_subscribed = false;
+    };
+  }, []);
+
+  React.useEffect(() => {
+    let notificationSubscription = Notifications.addListener(
+      handleNotification
+    );
+
+    return () => {
+      notificationSubscription.remove();
+    };
+  }, [handleNotification]);
+
+  console.log(`json: ${JSON.stringify(pushNotification)}`);
 
   return (
     <Stack.Navigator
@@ -79,12 +177,15 @@ const StackNavigator = ({ setThemeReducer, themeReducer }: SNT) => {
         headerTitleStyle: {
           fontWeight: "bold",
         },
-        headerRight: () => <HeaderRightComponent />,
+        headerRight: () => (
+          <HeaderRightComponent notifications={notifications.length} />
+        ),
       }}
     >
       <Stack.Screen
         name={Strings.HomeTabNavigator}
         component={HomeTabNavigator}
+        initialParams={{ toNotifications: pushNotification ? true : false }}
         // options={{ headerTitle: (props) => <HeaderComponent {...props} /> }}
       />
       <Stack.Screen
@@ -105,17 +206,25 @@ const StackNavigator = ({ setThemeReducer, themeReducer }: SNT) => {
       />
       <Stack.Screen name={Strings.ServicesScreen} component={ServicesScreen} />
       <Stack.Screen name={Strings.FeedbackScreen} component={FeedbackScreen} />
-      <Stack.Screen name={Strings.MakePaymentScreen} component={MakePaymentScreen} />
+      <Stack.Screen
+        name={Strings.MakePaymentScreen}
+        component={MakePaymentScreen}
+      />
     </Stack.Navigator>
   );
 };
 
-const mapStateToProps = ({ theme }: RootReducerI) => ({ themeReducer: theme });
+const mapStateToProps = ({ theme, notifications }: RootReducerI) => ({
+  themeReducer: theme,
+  notifications,
+});
 
 const mapDispatchToProps = (dispatch: any) =>
   bindActionCreators(
     {
       setThemeReducer,
+      setNotifications,
+      addNotification,
     },
     dispatch
   );
