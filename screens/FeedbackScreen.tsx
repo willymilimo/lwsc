@@ -9,6 +9,7 @@ import { RequestI } from "../types/request";
 import Strings from "../constants/Strings";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import Animated, { Easing } from "react-native-reanimated";
+import LwscFAB from "../components/LwscFAB";
 
 const FeedbackScreen = () => {
   let _open = true;
@@ -157,27 +158,34 @@ const FeedbackScreen = () => {
         };
 
         return (
-          <Animated.View
-            style={[
-              buttonStyle,
-              style,
-              {
-                width: 50,
-                height: 50,
-                right: 25,
-                backgroundColor: bg,
-                borderColor: bg === Colors.whiteColor ? color : bg,
-              },
-            ]}
-          >
-            <IconButton
-              icon={({ size, color }) => (
-                <icon.type name={icon.name} color={color} size={23} />
-              )}
-              color={color}
-              onPress={() => handleButtonPress(icon.name, url)}
-            />
-          </Animated.View>
+          // <Animated.View
+          //   style={[
+          //     buttonStyle,
+          //     style,
+          //     {
+          //       width: 50,
+          //       height: 50,
+          //       right: 25,
+          //       backgroundColor: bg,
+          //       borderColor: bg === Colors.whiteColor ? color : bg,
+          //     },
+          //   ]}
+          // >
+          //   <IconButton
+          //     icon={({ size, color }) => (
+          //       <icon.type name={icon.name} color={color} size={23} />
+          //     )}
+          //     color={color}
+          //     onPress={() => handleButtonPress(icon.name, url)}
+          //   />
+          // </Animated.View>
+          <LwscFAB
+            style={style}
+            backgroundColor={bg}
+            color={color}
+            icon={icon}
+            onPress={() => handleButtonPress(icon.name, url)}
+          />
         );
       })}
 
@@ -286,5 +294,6 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: Colors.linkBlue,
     backgroundColor: `${Colors.linkBlue}22`,
+    zIndex: 999,
   },
 });

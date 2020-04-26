@@ -67,7 +67,7 @@ const StackNavigator = ({
         return;
       }
       const token = await Notifications.getExpoPushTokenAsync();
-      console.log(token);
+      // console.log(token);
       setPushToken(token);
     } else {
       alert("Must use physical device for Push Notifications");
@@ -164,7 +164,7 @@ const StackNavigator = ({
     };
   }, [handleNotification]);
 
-  console.log(`json: ${JSON.stringify(pushNotification)}`);
+  // console.log(`json: ${JSON.stringify(pushNotification)}`);
 
   return (
     <Stack.Navigator
@@ -185,7 +185,7 @@ const StackNavigator = ({
       <Stack.Screen
         name={Strings.HomeTabNavigator}
         component={HomeTabNavigator}
-        initialParams={{ toNotifications: pushNotification ? true : false }}
+        // initialParams={{ toNotifications: pushNotification ? true : false }}
         // options={{ headerTitle: (props) => <HeaderComponent {...props} /> }}
       />
       <Stack.Screen

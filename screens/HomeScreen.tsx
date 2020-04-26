@@ -38,28 +38,28 @@ const HomeScreen = ({ theme, route }: HomeI) => {
   const navigation = useNavigation();
   // console.log(route);
 
-  React.useEffect(() => {
-    let is_subscribed = true;
+  // React.useEffect(() => {
+  //   let is_subscribed = true;
 
-    console.log(
-      is_subscribed,
-      !!route.params,
-      (route.params as { toNotifications: boolean }).toNotifications
-    )
+  //   console.log(
+  //     is_subscribed,
+  //     !!route.params,
+  //     (route.params as { toNotifications: boolean }).toNotifications
+  //   )
 
-    if (
-      is_subscribed &&
-      route.params &&
-      (route.params as { toNotifications: boolean }).toNotifications
-    ) {
-      console.log('here...')
-      navigation.navigate(Strings.NotificationsScreen);
-    }
+  //   if (
+  //     is_subscribed &&
+  //     route.params &&
+  //     (route.params as { toNotifications: boolean }).toNotifications
+  //   ) {
+  //     console.log('here...')
+  //     navigation.navigate(Strings.NotificationsScreen);
+  //   }
 
-    return () => {
-      is_subscribed = false;
-    };
-  }, [route]);
+  //   return () => {
+  //     is_subscribed = false;
+  //   };
+  // }, [route]);
 
   return (
     <SafeAreaView style={container}>

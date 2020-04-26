@@ -37,16 +37,16 @@ export default function BillComponent({
 }: BillComponentI) {
   const { hightlightStyle, itemStyle, textStyle } = styles;
   style = style
-    ? { padding: 2, margin: 5, borderRadius: 5, ...style }
-    : { padding: 2, margin: 5, borderRadius: 5 };
+    ? { padding: 1, margin: 5, borderRadius: 5, ...style }
+    : { padding: 1, margin: 5, borderRadius: 5 };
   return (
     <TouchableHighlight
       onPress={onPress}
-      underlayColor={`${Colors.LwscBlack}44`}
+      underlayColor={`${Colors.LwscSelectedBlue}01`}
       style={style}
     >
       <View style={hightlightStyle}>
-        <Text style={{ fontSize: 20, marginBottom: 5 }}>{name}</Text>
+        <Text style={{ fontSize: 20, marginBottom: 5, color: Colors.LwscSelectedBlue, fontWeight: 'bold' }}>{name}</Text>
         <View style={itemStyle}>
           <Ionicons
             color={Colors.LwscOrange}
@@ -92,19 +92,19 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: `${Colors.linkBlue}11`,
     paddingHorizontal: 20,
     paddingVertical: 15,
-    shadowColor: Colors.LwscBlue,
+    shadowColor: `${Colors.linkBlue}22`,
 
-    elevation: 3,
+    elevation: 1,
 
     shadowOffset: {
       width: 1,
       height: 1,
     },
-    shadowOpacity: 0.75,
-    shadowRadius: 3,
+    shadowOpacity: 0.25,
+    shadowRadius: 1,
   },
   itemStyle: {
     display: "flex",
