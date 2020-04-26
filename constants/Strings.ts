@@ -33,6 +33,7 @@ export default {
   /*************** Begin Storage Constants *****************/
   THEME_STORAGE: "THEME_STORAGE",
   NOTIFICATIONS_STORAGE: 'NOTIFICATIONS_STORAGE',
+  ACCOUNTS_STORAGE: 'ACCOUNT_STORAGE',
   /*************** End Storage Constants *****************/
 
 

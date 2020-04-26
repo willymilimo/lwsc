@@ -17,6 +17,7 @@ interface LwscFABI {
   icon: LwscFABIcon;
   label?: string;
   labelStyle?: object;
+  visible?: boolean;
 }
 
 const LwscFAB = ({
@@ -27,6 +28,7 @@ const LwscFAB = ({
   icon,
   label,
   labelStyle,
+  visible = true,
 }: LwscFABI) => {
   const { buttonStyle, textStyle } = styles;
   return (
@@ -42,6 +44,7 @@ const LwscFAB = ({
           borderColor:
             backgroundColor === Colors.whiteColor ? color : backgroundColor,
         },
+        !visible ? { right: -1000 } : {},
       ]}
     >
       {label && (
