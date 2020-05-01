@@ -78,8 +78,8 @@ export default {
       "Please check your internet connection. Turn on your mobile data or WIFI.",
   },
 
-  INVALID_MSISDN: {
-    title: "Invalid LWSC Number",
+  ACCOUNT_NUMBER_NOT_FOUND: {
+    title: "Account Not Found",
     message: "Please input a valid LWSC Number (starting with 260)",
   },
 

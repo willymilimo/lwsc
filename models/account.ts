@@ -1,6 +1,7 @@
 export interface AccountI {
   ACCOUNT_NO?: string | number;
   METER_NO?: string | number;
+  CUSTKEY: string;
   CUSTOMER_ID: number;
   BOOK_NO: string;
   WALK_NO: number;
@@ -18,6 +19,7 @@ export interface AccountI {
 export class Account implements AccountI {
   ACCOUNT_NO?: string | number;
   METER_NO?: string | number;
+  CUSTKEY: string;
   CUSTOMER_ID: number;
   BOOK_NO: string;
   WALK_NO: number;
@@ -34,6 +36,7 @@ export class Account implements AccountI {
   constructor({
     ACCOUNT_NO,
     METER_NO,
+    CUSTKEY,
     CUSTOMER_ID,
     BOOK_NO,
     WALK_NO,
@@ -49,6 +52,7 @@ export class Account implements AccountI {
   }: AccountI) {
     this.ACCOUNT_NO = ACCOUNT_NO;
     this.METER_NO = METER_NO;
+    this.CUSTKEY = CUSTKEY;
     this.CUSTOMER_ID = CUSTOMER_ID;
     this.BOOK_NO = BOOK_NO;
     this.WALK_NO = WALK_NO;
