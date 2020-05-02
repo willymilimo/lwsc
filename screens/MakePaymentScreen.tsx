@@ -24,9 +24,10 @@ import { AccountI } from "../models/account";
 import { getCustomerByAccountNumber } from "../models/axios";
 import { AddType } from "../types/add-type";
 import Strings from "../constants/Strings";
+import { AccountReducerI } from "../redux/reducers/accounts";
 
 interface MakePaymentScreenI {
-  accounts: AccountI[];
+  accounts: AccountReducerI;
   addAccount(account: AccountI): void;
   deleteAccount(meter_account_no: string | number): void;
 }
@@ -45,76 +46,74 @@ const MakePaymentScreen = ({
     maText,
     radioLabelStyle,
   } = styles;
-  const [visible, setVisible] = React.useState(false);
+  const [showDialog, setShowDialog] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [type, setType] = React.useState<AddType>(AddType.account);
-  const [myAccounts, setMyAccounts] = React.useState(accounts);
-
-  React.useEffect(() => {
-    let is_subscribed = true;
-
-    if (is_subscribed) setMyAccounts(accounts);
-
-    return () => {
-      is_subscribed = false;
-    };
-  }, [accounts]);
 
   const handleAccountMeterSubmit = () => {
     if (meterAccountNo.length) {
-      setLoading(true);
-      getCustomerByAccountNumber(meterAccountNo, type)
-        .then((response) => {
-          const { data } = response;
+      if (!Object.keys(accounts).includes(meterAccountNo)) {
+        setLoading(true);
+        getCustomerByAccountNumber(meterAccountNo, type)
+          .then((response) => {
+            const { data } = response;
 
-          if (data.success) {
-            addAccount(data.payload);
+            if (data.success) {
+              addAccount({
+                ...data.payload,
+                IS_METERED: type == AddType.meter,
+              });
+              setShowDialog(false);
+              setMeterAccountNo("");
+              Alert.alert(
+                `${type} Added Successfully`,
+                `Your ${type} has been added successfully.`
+              );
+            } else {
+              Alert.alert(
+                `${type} not Added`,
+                data.error
+                  ? data.error.message
+                  : `Specified ${type} number not found`
+              );
+            }
+          })
+          .catch((err) => {
             Alert.alert(
-              `${type} Added Successfully`,
-              `Your ${type} has been added successfully.`
+              Strings.REPORT_PROBLEM.title,
+              Strings.REPORT_PROBLEM.message,
+              [{ onPress: () => {}, text: "Report" }]
             );
-          } else {
-            Alert.alert(
-              `${type} not Added`,
-              data.error
-                ? data.error.message
-                : `Specified ${type} number not found`
-            );
-          }
-        })
-        .catch((err) => {
-          Alert.alert(
-            Strings.REPORT_PROBLEM.title,
-            Strings.REPORT_PROBLEM.message,
-            [{ onPress: () => {}, text: "Report" }]
-          );
-        })
-        .finally(() => setLoading(false));
+          })
+          .finally(() => setLoading(false));
+      } else {
+        Alert.alert(
+          `${type} Already Added`,
+          `The specified ${type} number has already been added to your profile. Select it from the list of added ${type.toLowerCase()} numbers.`
+        );
+      }
     }
   };
 
+  const payItems = Object.values(accounts);
   return (
     <View style={container}>
       <ScrollView style={box}>
-        {myAccounts.length ? (
-          myAccounts.map((acc) => (
-            <Text key={acc.CUSTKEY}>
-              {acc.CUSTKEY}
-            </Text>
-          ))
+        {payItems.length ? (
+          payItems.map((acc) => <Text key={acc.CUSTKEY}>{acc.CUSTKEY}</Text>)
         ) : (
           <View style={missingAccount}>
             <Text style={maText}>
               You have not added any account/meter to your profile
             </Text>
-            <Button onPress={() => setVisible(true)} mode="contained">
+            <Button onPress={() => setShowDialog(true)} mode="contained">
               Add Account/Meter
             </Button>
           </View>
         )}
       </ScrollView>
       <Portal>
-        <Dialog visible={visible} onDismiss={() => setVisible(false)}>
+        <Dialog visible={showDialog} onDismiss={() => setShowDialog(false)}>
           <Dialog.Title>{`Add ${type}`}</Dialog.Title>
           <Dialog.Content>
             <RadioButton.Group
@@ -138,7 +137,8 @@ const MakePaymentScreen = ({
               keyboardType="number-pad"
               value={meterAccountNo}
               disabled={loading}
-              onChangeText={(text) => setMeterAccountNo(text)}
+              autoFocus={true}
+              onChangeText={(text) => setMeterAccountNo(text.trim())}
             />
           </Dialog.Content>
           <Dialog.Actions>
@@ -153,8 +153,8 @@ const MakePaymentScreen = ({
       </Portal>
 
       <LwscFAB
-        visible={!visible}
-        onPress={() => setVisible(true)}
+        visible={!showDialog}
+        onPress={() => setShowDialog(true)}
         label="Add Account/Meter"
         labelStyle={{ width: 145 }}
         icon={{
@@ -166,8 +166,8 @@ const MakePaymentScreen = ({
         color="white"
       />
       <LwscFAB
-        visible={!visible}
-        onPress={() => setVisible(true)}
+        visible={!showDialog}
+        onPress={() => setShowDialog(true)}
         label="Pay for Another"
         labelStyle={{ width: 120 }}
         icon={{

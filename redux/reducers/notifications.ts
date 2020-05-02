@@ -5,7 +5,7 @@ import Strings from "../../constants/Strings";
 
 const initState: NotificationI[] = [];
 
-export default function (state = initState, action: ActionI) {
+export default function (state = initState, action: ActionI<any>) {
   const { type, payload } = action;
 
   switch (type) {

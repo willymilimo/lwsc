@@ -26,15 +26,18 @@ import {
   setNotifications,
   addNotification,
 } from "../redux/actions/notifications";
+import { setAccounts } from "../redux/actions/accounts";
+import { AccountReducerI } from "../redux/reducers/accounts";
 
 const Stack = createStackNavigator();
 
 interface SNI {
   themeReducer: ThemeReducer;
-  setThemeReducer(themeReducer: ThemeReducer): ActionI;
+  setThemeReducer(themeReducer: ThemeReducer): void;
   notifications: NotificationI[];
   setNotifications(notifications: NotificationI[]): void;
   addNotification(notifications: NotificationI): void;
+  setAccounts(accounts: AccountReducerI): void;
 }
 
 type SNT = SNI;
@@ -45,6 +48,7 @@ const StackNavigator = ({
   notifications,
   setNotifications,
   addNotification,
+  setAccounts,
 }: SNT) => {
   const [pushToken, setPushToken] = React.useState("");
   const [pushNotification, setPushNotification] = React.useState(null);
@@ -83,22 +87,21 @@ const StackNavigator = ({
     }
   };
 
-  const handleNotification = React.useCallback(
-    (notification) => {
-      Vibration.vibrate(3);
-      setPushNotification(notification);
-      addNotification(notification);
-    },
-    []
-  );
+  const handleNotification = React.useCallback((notification) => {
+    Vibration.vibrate(3);
+    setPushNotification(notification);
+    addNotification(notification);
+  }, []);
 
   React.useEffect(() => {
     // Fetch the token from storage then navigate to our appropriate place
     const bootstrapAsync = async () => {
       let theme;
+      let accounts;
 
       try {
         theme = await AsyncStorage.getItem(Strings.THEME_STORAGE);
+        accounts = await AsyncStorage.getItem(Strings.ACCOUNTS_STORAGE);
       } catch (e) {
         // Restoring token failed
       }
@@ -112,6 +115,10 @@ const StackNavigator = ({
         // console.log(theme);
         setThemeReducer(JSON.parse(theme));
         setActiveTheme(JSON.parse(theme).theme);
+      }
+
+      if (accounts) {
+        setAccounts(JSON.parse(accounts));
       }
     };
 
@@ -225,6 +232,7 @@ const mapDispatchToProps = (dispatch: any) =>
       setThemeReducer,
       setNotifications,
       addNotification,
+      setAccounts,
     },
     dispatch
   );

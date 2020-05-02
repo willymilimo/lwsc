@@ -6,12 +6,12 @@ export const setThemeReducer = (payload: ThemeReducer) => ({
   payload,
 });
 
-export const setTheme = (theme: ThemeType): ActionI => ({
+export const setTheme = (theme: ThemeType): ActionI<ThemeType> => ({
   type: Actions.SET_THEME,
   payload: theme,
 });
 
-export const setName = (name: string): ActionI => ({
+export const setName = (name: string): ActionI<string> => ({
   type: Actions.SET_THEME_NAME,
   payload: name,
 });

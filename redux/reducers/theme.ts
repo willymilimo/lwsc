@@ -1,6 +1,6 @@
 import Actions, { ActionI } from "../Actions";
 import Styles from "../../constants/Styles";
-import { ThemeReducer } from "../../types/theme";
+import { ThemeReducer, ThemeType } from "../../types/theme";
 import Strings from "../../constants/Strings";
 import { AsyncStorage } from "react-native";
 
@@ -9,7 +9,7 @@ const initState = {
   theme: Styles[Strings.BLUE_THEME],
 };
 
-export default function (state = initState, action: ActionI): ThemeReducer {
+export default function (state = initState, action: ActionI<any>): ThemeReducer {
   switch (action.type) {
     case Actions.SET_THEME:
       state = {

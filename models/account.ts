@@ -1,3 +1,5 @@
+import { AddType } from "../types/add-type";
+
 export interface AccountI {
   ACCOUNT_NO?: string | number;
   METER_NO?: string | number;
@@ -14,6 +16,7 @@ export interface AccountI {
   SURNAME: string;
   CONSUMER_TYPE: string;
   BILLGROUP: string;
+  IS_METERED: boolean;
 }
 
 export class Account implements AccountI {
@@ -32,6 +35,7 @@ export class Account implements AccountI {
   SURNAME: string;
   CONSUMER_TYPE: string;
   BILLGROUP: string;
+  IS_METERED: boolean;
 
   constructor({
     ACCOUNT_NO,
@@ -49,6 +53,7 @@ export class Account implements AccountI {
     SURNAME,
     CONSUMER_TYPE,
     BILLGROUP,
+    IS_METERED,
   }: AccountI) {
     this.ACCOUNT_NO = ACCOUNT_NO;
     this.METER_NO = METER_NO;
@@ -65,5 +70,7 @@ export class Account implements AccountI {
     this.SURNAME = SURNAME;
     this.CONSUMER_TYPE = CONSUMER_TYPE;
     this.BILLGROUP = BILLGROUP;
+    this.IS_METERED =
+      typeof IS_METERED == "boolean" ? IS_METERED : IS_METERED == AddType.meter;
   }
 }

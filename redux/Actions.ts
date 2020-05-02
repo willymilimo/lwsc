@@ -1,6 +1,6 @@
-export interface ActionI {
+export interface ActionI<T> {
   type: string;
-  payload: any;
+  payload: T;
 }
 
 export default {
@@ -11,6 +11,7 @@ export default {
   SET_NOTIFICATIONS: "SET_NOTIFICATIONS",
   ADD_NOTIFICATIONS: "ADD_NOTIFICATIONS",
 
+  SET_ACCOUNTS: 'SET_ACCOUNTS',
   ADD_ACCOUNT: "SET_ACCOUNT",
   DELETE_ACCOUNT: "DELETE_ACCOUNT",
 };

@@ -3,24 +3,40 @@ import Actions, { ActionI } from "../Actions";
 import { AsyncStorage } from "react-native";
 import Strings from "../../constants/Strings";
 
-const initState: AccountI[] = [];
+export interface AccountReducerI {
+  [key: string]: AccountI;
+}
 
-export default function (state = initState, action: ActionI): AccountI[] {
-  const { type, payload } = action;
+const initState: AccountReducerI = {};
+
+export default function (
+  state = initState,
+  action: ActionI<AccountReducerI | AccountI | string>
+): AccountReducerI {
+  let { type, payload } = action;
 
   switch (type) {
+    case Actions.SET_ACCOUNTS:
+      state = payload as AccountReducerI;
+      break;
     case Actions.ADD_ACCOUNT:
-      state = [...state, payload];
+      payload = payload as AccountI;
+      state = { ...state, [payload.CUSTKEY]: payload };
       break;
     case Actions.DELETE_ACCOUNT:
-      state = state.filter(
-        (acct) => acct.ACCOUNT_NO !== payload && acct.METER_NO !== payload
-      );
+      payload = payload as string;
+      delete state[payload];
       break;
   }
 
-  if (payload) {
-    AsyncStorage.setItem(Strings.ACCOUNTS_STORAGE, JSON.stringify(initState));
+  if (
+    [
+      Actions.SET_ACCOUNTS,
+      Actions.ADD_ACCOUNT,
+      Actions.DELETE_ACCOUNT,
+    ].includes(type)
+  ) {
+    AsyncStorage.setItem(Strings.ACCOUNTS_STORAGE, JSON.stringify(state));
   }
 
   return state;
