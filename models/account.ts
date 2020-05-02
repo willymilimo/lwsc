@@ -12,11 +12,14 @@ export interface AccountI {
   UA_ADRESS1: string;
   UA_ADRESS2: string;
   UA_ADRESS3: string;
+  UA_ADRESS4?: string;
+  ADDRESS: string;
   INITIAL: string;
   SURNAME: string;
   CONSUMER_TYPE: string;
   BILLGROUP: string;
   IS_METERED: boolean;
+  FULL_NAME: string;
 }
 
 export class Account implements AccountI {
@@ -31,11 +34,13 @@ export class Account implements AccountI {
   UA_ADRESS1: string;
   UA_ADRESS2: string;
   UA_ADRESS3: string;
+  ADDRESS: string;
   INITIAL: string;
   SURNAME: string;
   CONSUMER_TYPE: string;
   BILLGROUP: string;
   IS_METERED: boolean;
+  FULL_NAME: string;
 
   constructor({
     ACCOUNT_NO,
@@ -49,6 +54,7 @@ export class Account implements AccountI {
     UA_ADRESS1,
     UA_ADRESS2,
     UA_ADRESS3,
+    UA_ADRESS4,
     INITIAL,
     SURNAME,
     CONSUMER_TYPE,
@@ -72,5 +78,8 @@ export class Account implements AccountI {
     this.BILLGROUP = BILLGROUP;
     this.IS_METERED =
       typeof IS_METERED == "boolean" ? IS_METERED : IS_METERED == AddType.meter;
+    this.FULL_NAME =
+      INITIAL && SURNAME ? `${INITIAL} ${SURNAME}` : INITIAL || SURNAME;
+    this.ADDRESS = UA_ADRESS4 ? `${UA_ADRESS3} ${UA_ADRESS4}` : UA_ADRESS3;
   }
 }

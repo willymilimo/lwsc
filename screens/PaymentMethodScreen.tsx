@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
-import BillComponent from "../components/BillComponent";
+import BillComponent, { BillComponentI } from "../components/BillComponent";
 import Colors from "../constants/Colors";
 import {
   airtel_money,
@@ -11,23 +11,36 @@ import {
 import { Button, IconButton, RadioButton } from "react-native-paper";
 import { ScrollView, TouchableHighlight } from "react-native-gesture-handler";
 import { PaymentType } from "../types/payment";
+import { NavType } from "../types/nav-type";
 
-const PaymentMethodScreen = () => {
+interface PaymentMethodScreenI {
+  navigation: NavType;
+  route: {
+    params: BillComponentI;
+  };
+}
+
+const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
   const { container } = styles;
   const [checked, setChecked] = React.useState(PaymentType["Airtel Money"]);
+
+  const {
+    is_metered,
+    meter_number,
+    account_number,
+    name,
+    address,
+  } = route.params;
 
   return (
     <ScrollView style={container}>
       <BillComponent
-        account_number="2323232323"
-        address="32 Becker Street"
-        usage={89}
-        _id="92FA9D4C-F498-CDA7-A1DC-51ABB1C36712"
-        meter_number="232323232323"
-        meter_reading={2}
-        name="Some Random Dude"
-        amount_due={23}
-        style={{ height: 160 }}
+        is_metered={is_metered}
+        account_number={account_number}
+        address={address}
+        meter_number={meter_number}
+        name={name}
+        // style={{ height: 160 }}
       />
       <Text
         style={{

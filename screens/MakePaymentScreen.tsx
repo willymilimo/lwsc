@@ -1,13 +1,10 @@
 import React from "react";
 import { StyleSheet, View, Platform, Alert } from "react-native";
 import {
-  Modal,
   Portal,
   Text,
   Button,
-  Provider,
   Dialog,
-  Paragraph,
   TextInput,
   RadioButton,
 } from "react-native-paper";
@@ -20,19 +17,23 @@ import Colors from "../constants/Colors";
 import LwscFAB from "../components/LwscFAB";
 import { RootReducerI } from "../redux/reducers";
 import { addAccount, deleteAccount } from "../redux/actions/accounts";
-import { AccountI } from "../models/account";
+import { AccountI, Account } from "../models/account";
 import { getCustomerByAccountNumber } from "../models/axios";
 import { AddType } from "../types/add-type";
 import Strings from "../constants/Strings";
 import { AccountReducerI } from "../redux/reducers/accounts";
+import BillComponent, { BillComponentI } from "../components/BillComponent";
+import { NavType } from "../types/nav-type";
 
 interface MakePaymentScreenI {
+  navigation: NavType;
   accounts: AccountReducerI;
   addAccount(account: AccountI): void;
   deleteAccount(meter_account_no: string | number): void;
 }
 
 const MakePaymentScreen = ({
+  navigation,
   accounts,
   addAccount,
   deleteAccount,
@@ -59,10 +60,12 @@ const MakePaymentScreen = ({
             const { data } = response;
 
             if (data.success) {
-              addAccount({
-                ...data.payload,
-                IS_METERED: type == AddType.meter,
-              });
+              addAccount(
+                new Account({
+                  ...data.payload,
+                  IS_METERED: type == AddType.meter,
+                })
+              );
               setShowDialog(false);
               setMeterAccountNo("");
               Alert.alert(
@@ -96,11 +99,37 @@ const MakePaymentScreen = ({
   };
 
   const payItems = Object.values(accounts);
+
   return (
     <View style={container}>
       <ScrollView style={box}>
         {payItems.length ? (
-          payItems.map((acc) => <Text key={acc.CUSTKEY}>{acc.CUSTKEY}</Text>)
+          payItems.map((acc) => (
+            <BillComponent
+              key={`${acc.CUSTKEY} - ${acc.ID_NO} - ${acc.CUSTOMER_ID}`}
+              is_metered={acc.IS_METERED}
+              meter_number={acc.CUSTKEY}
+              account_number={acc.CUSTKEY}
+              name={acc.FULL_NAME}
+              address={acc.ADDRESS}
+              onPress={() => {
+                // setPayingFor({
+                //   is_metered: acc.IS_METERED,
+                //   meter_number: acc.CUSTKEY,
+                //   account_number: acc.CUSTKEY,
+                //   name: acc.FULL_NAME,
+                //   address: acc.ADDRESS,
+                // })
+                navigation.navigate(Strings.PaymentMethodScreen, {
+                  is_metered: acc.IS_METERED,
+                  meter_number: acc.CUSTKEY,
+                  account_number: acc.CUSTKEY,
+                  name: acc.FULL_NAME,
+                  address: acc.ADDRESS,
+                });
+              }}
+            />
+          ))
         ) : (
           <View style={missingAccount}>
             <Text style={maText}>

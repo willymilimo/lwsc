@@ -10,28 +10,26 @@ import {
 import { TouchableHighlight } from "react-native-gesture-handler";
 import Colors from "../constants/Colors";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Account } from "../models/account";
 
-interface BillComponentI {
-  _id: string;
-  name: string;
+export interface BillComponentI {
   address: string;
-  meter_number: string;
-  account_number: string;
-  meter_reading: number;
-  usage: number;
-  amount_due: number;
+  name: string;
+  is_metered: boolean;
+  meter_number?: string;
+  account_number?: string;
   onPress?(e: GestureResponderEvent): void;
   style?: object;
 }
 
+export type BillComponentT = BillComponentI;
+
 export default function BillComponent({
-  name,
-  address,
-  account_number,
   meter_number,
-  meter_reading,
-  usage,
-  amount_due,
+  account_number,
+  is_metered,
+  address,
+  name,
   onPress,
   style,
 }: BillComponentI) {
@@ -46,7 +44,14 @@ export default function BillComponent({
       style={style}
     >
       <View style={hightlightStyle}>
-        <Text style={{ fontSize: 20, marginBottom: 5, color: Colors.LwscSelectedBlue, fontWeight: 'bold' }}>{name}</Text>
+        <Text
+          style={{
+            fontSize: 20,
+            marginBottom: 5,
+            color: Colors.LwscSelectedBlue,
+            fontWeight: "bold",
+          }}
+        >{name}</Text>
         <View style={itemStyle}>
           <Ionicons
             color={Colors.LwscOrange}
@@ -63,15 +68,15 @@ export default function BillComponent({
           />
           <Text style={textStyle}>{meter_number || account_number}</Text>
         </View>
-        <View style={itemStyle}>
+        {/* <View style={itemStyle}>
           <MaterialCommunityIcons
             color={Colors.LwscOrange}
             size={20}
             name={`water-pump`}
           />
           <Text style={textStyle}>{`${meter_reading || usage} Litres`}</Text>
-        </View>
-        <View style={itemStyle}>
+        </View> */}
+        {/* <View style={itemStyle}>
           <Ionicons
             color={Colors.LwscOrange}
             size={20}
@@ -80,7 +85,7 @@ export default function BillComponent({
           <Text style={textStyle}>{`ZMW ${amount_due
             .toFixed(2)
             .replace(/\d(?=(\d{3})+\.)/g, "$&,")}`}</Text>
-        </View>
+        </View> */}
       </View>
     </TouchableHighlight>
   );
