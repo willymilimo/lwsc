@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
-import BillComponent, { BillComponentI } from "../components/BillComponent";
+import BillComponent from "../components/BillComponent";
 import Colors from "../constants/Colors";
 import {
   airtel_money,
@@ -12,11 +12,12 @@ import { Button, IconButton, RadioButton } from "react-native-paper";
 import { ScrollView, TouchableHighlight } from "react-native-gesture-handler";
 import { PaymentType } from "../types/payment";
 import { NavType } from "../types/nav-type";
+import { AccountI } from "../models/account";
 
 interface PaymentMethodScreenI {
   navigation: NavType;
   route: {
-    params: BillComponentI;
+    params: AccountI;
   };
 }
 
@@ -24,23 +25,12 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
   const { container } = styles;
   const [checked, setChecked] = React.useState(PaymentType["Airtel Money"]);
 
-  const {
-    is_metered,
-    meter_number,
-    account_number,
-    name,
-    address,
-  } = route.params;
+  const account = route.params;
 
   return (
     <ScrollView style={container}>
       <BillComponent
-        is_metered={is_metered}
-        account_number={account_number}
-        address={address}
-        meter_number={meter_number}
-        name={name}
-        // style={{ height: 160 }}
+        account={account}
       />
       <Text
         style={{
@@ -74,7 +64,6 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
                 borderTopWidth: index !== 0 ? 0 : 0.5,
                 borderColor: Colors.lightGray,
                 paddingHorizontal: 10,
-                // paddingVertical: 8,
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",

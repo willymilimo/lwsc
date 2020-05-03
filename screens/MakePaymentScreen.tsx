@@ -50,6 +50,7 @@ const MakePaymentScreen = ({
   const [showDialog, setShowDialog] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [type, setType] = React.useState<AddType>(AddType.account);
+  const [isBuyForAnother, setIsBuyForAnother] = React.useState(false);
 
   const handleAccountMeterSubmit = () => {
     if (meterAccountNo.length) {
@@ -107,27 +108,10 @@ const MakePaymentScreen = ({
           payItems.map((acc) => (
             <BillComponent
               key={`${acc.CUSTKEY} - ${acc.ID_NO} - ${acc.CUSTOMER_ID}`}
-              is_metered={acc.IS_METERED}
-              meter_number={acc.CUSTKEY}
-              account_number={acc.CUSTKEY}
-              name={acc.FULL_NAME}
-              address={acc.ADDRESS}
-              onPress={() => {
-                // setPayingFor({
-                //   is_metered: acc.IS_METERED,
-                //   meter_number: acc.CUSTKEY,
-                //   account_number: acc.CUSTKEY,
-                //   name: acc.FULL_NAME,
-                //   address: acc.ADDRESS,
-                // })
-                navigation.navigate(Strings.PaymentMethodScreen, {
-                  is_metered: acc.IS_METERED,
-                  meter_number: acc.CUSTKEY,
-                  account_number: acc.CUSTKEY,
-                  name: acc.FULL_NAME,
-                  address: acc.ADDRESS,
-                });
-              }}
+              account={acc}
+              onPress={() =>
+                navigation.navigate(Strings.PaymentMethodScreen, acc)
+              }
             />
           ))
         ) : (
@@ -183,7 +167,10 @@ const MakePaymentScreen = ({
 
       <LwscFAB
         visible={!showDialog}
-        onPress={() => setShowDialog(true)}
+        onPress={() => {
+          setIsBuyForAnother(false);
+          setShowDialog(true);
+        }}
         label="Add Account/Meter"
         labelStyle={{ width: 145 }}
         icon={{
@@ -196,7 +183,10 @@ const MakePaymentScreen = ({
       />
       <LwscFAB
         visible={!showDialog}
-        onPress={() => setShowDialog(true)}
+        onPress={() => {
+          setIsBuyForAnother(true);
+          setShowDialog(true);
+        }}
         label="Pay for Another"
         labelStyle={{ width: 120 }}
         icon={{

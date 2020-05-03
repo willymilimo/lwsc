@@ -10,14 +10,10 @@ import {
 import { TouchableHighlight } from "react-native-gesture-handler";
 import Colors from "../constants/Colors";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Account } from "../models/account";
+import { AccountI } from "../models/account";
 
 export interface BillComponentI {
-  address: string;
-  name: string;
-  is_metered: boolean;
-  meter_number?: string;
-  account_number?: string;
+  account: AccountI;
   onPress?(e: GestureResponderEvent): void;
   style?: object;
 }
@@ -25,11 +21,7 @@ export interface BillComponentI {
 export type BillComponentT = BillComponentI;
 
 export default function BillComponent({
-  meter_number,
-  account_number,
-  is_metered,
-  address,
-  name,
+  account,
   onPress,
   style,
 }: BillComponentI) {
@@ -51,14 +43,16 @@ export default function BillComponent({
             color: Colors.LwscSelectedBlue,
             fontWeight: "bold",
           }}
-        >{name}</Text>
+        >
+          {account.FULL_NAME}
+        </Text>
         <View style={itemStyle}>
           <Ionicons
             color={Colors.LwscOrange}
             size={20}
             name={`${Platform.OS === "ios" ? "ios" : "md"}-home`}
           />
-          <Text style={textStyle}>{address}</Text>
+          <Text style={textStyle}>{account.ADDRESS}</Text>
         </View>
         <View style={itemStyle}>
           <Ionicons
@@ -66,7 +60,7 @@ export default function BillComponent({
             size={20}
             name={`${Platform.OS === "ios" ? "ios" : "md"}-speedometer`}
           />
-          <Text style={textStyle}>{meter_number || account_number}</Text>
+          <Text style={textStyle}>{account.CUSTKEY}</Text>
         </View>
         {/* <View style={itemStyle}>
           <MaterialCommunityIcons
