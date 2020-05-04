@@ -29,6 +29,7 @@ import {
 import { setAccounts } from "../redux/actions/accounts";
 import { AccountReducerI } from "../redux/reducers/accounts";
 import PaymentScreen from "../screens/PaymentScreen";
+import WebviewScreen from "../screens/WebviewScreen";
 
 const Stack = createStackNavigator();
 
@@ -219,6 +220,7 @@ const StackNavigator = ({
         component={MakePaymentScreen}
       />
       <Stack.Screen name={Strings.PaymentScreen} component={PaymentScreen} />
+      <Stack.Screen name={Strings.WebviewScreen} component={WebviewScreen} />
     </Stack.Navigator>
   );
 };

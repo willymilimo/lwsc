@@ -26,6 +26,7 @@ import Regex from "../constants/Regex";
 import { toFixed } from "../helpers/functions";
 import { makePayment } from "../models/axios";
 import { Payment } from "../models/payment";
+import Strings from "../constants/Strings";
 
 interface PaymentScreenI {
   navigation: NavType;
@@ -94,6 +95,9 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
         const { success, error, payload, message } = res.data;
 
         if (success) {
+          if (method === PaymentType.VISA) {
+            navigation.navigate(Strings.WebviewScreen, payload);
+          }
         } else {
           Alert.alert(
             "Payment Not Approved",
@@ -110,7 +114,7 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
   return (
     <ScrollView style={container}>
       <Modal animationType="slide" transparent={true} visible={loading}>
-        <View style={[styles.centeredView, {backgroundColor: '#00000077'}]}>
+        <View style={[styles.centeredView, { backgroundColor: "#00000077" }]}>
           <View style={styles.modalView}>
             <ActivityIndicator size="large" color={Colors.LwscOrange} />
           </View>
@@ -233,6 +237,7 @@ const Items = {
   [PaymentType.VISA]: {
     image: debit_card,
     placeholder: "0968271892",
+    regex: Regex.ZAMTEL_NUMBER,
   },
 };
 

@@ -12,6 +12,7 @@ export default {
   PaymentScreen: "Payment Screen",
   ServicesScreen: "Services",
   FeedbackScreen: "Feedback",
+  WebviewScreen: "Debit/ATM Card",
 
 
 
