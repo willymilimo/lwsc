@@ -29,6 +29,7 @@ export default {
   limeBgColor: '#f0fff4',
   colorBlack: '#000',
   colorDanger: '#ff0008',
+  errorColor: '#721c24',
 
   LwscBlue,
   LwscOrange,

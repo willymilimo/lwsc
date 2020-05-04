@@ -9,7 +9,7 @@ export default {
   NotificationScreen: "Notification",
   PaymentMethodScreen: "Payment Options",
   MakePaymentScreen: "Make Payment",
-  // PaymentScreen: "Make Payment",
+  PaymentScreen: "Payment Screen",
   ServicesScreen: "Services",
   FeedbackScreen: "Feedback",
 

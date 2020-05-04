@@ -22,7 +22,7 @@ import { getCustomerByAccountNumber } from "../models/axios";
 import { AddType } from "../types/add-type";
 import Strings from "../constants/Strings";
 import { AccountReducerI } from "../redux/reducers/accounts";
-import BillComponent, { BillComponentI } from "../components/BillComponent";
+import BillComponent from "../components/BillComponent";
 import { NavType } from "../types/nav-type";
 
 interface MakePaymentScreenI {

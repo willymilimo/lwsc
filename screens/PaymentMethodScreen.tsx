@@ -8,11 +8,13 @@ import {
   zampay,
   debit_card,
 } from "../constants/Images";
-import { Button, IconButton, RadioButton } from "react-native-paper";
+import { Button, IconButton, RadioButton, Dialog } from "react-native-paper";
 import { ScrollView, TouchableHighlight } from "react-native-gesture-handler";
 import { PaymentType } from "../types/payment";
 import { NavType } from "../types/nav-type";
 import { AccountI } from "../models/account";
+import { Payment } from "../models/payment";
+import Strings from "../constants/Strings";
 
 interface PaymentMethodScreenI {
   navigation: NavType;
@@ -22,16 +24,13 @@ interface PaymentMethodScreenI {
 }
 
 const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
-  const { container } = styles;
-  const [checked, setChecked] = React.useState(PaymentType["Airtel Money"]);
-
   const account = route.params;
+  const { container } = styles;
+  const [checked, setChecked] = React.useState(PaymentType.AIRTEL_MONEY);
 
   return (
     <ScrollView style={container}>
-      <BillComponent
-        account={account}
-      />
+      <BillComponent account={account} />
       <Text
         style={{
           marginHorizontal: 10,
@@ -47,7 +46,7 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
         value={checked}
         onValueChange={(value) => setChecked(value as PaymentType)}
       >
-        {paymentMethods.map(({ image, name }, index) => (
+        {Object.values(paymentMethods).map(({ image, name }, index) => (
           <TouchableHighlight
             underlayColor={Colors.lightBorderColor}
             onPress={() => setChecked(name)}
@@ -113,9 +112,15 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
       </RadioButton.Group>
       <Button
         disabled={!(checked in PaymentType)}
-        style={{ marginHorizontal: 10, marginVertical: 20 }}
+        style={{ marginHorizontal: 10, marginVertical: 20, paddingVertical: 5 }}
+        labelStyle={{ fontSize: 17 }}
         mode="contained"
-        onPress={() => console.log(checked)}
+        onPress={() =>
+          navigation.navigate(Strings.PaymentScreen, {
+            method: checked,
+            account,
+          })
+        }
       >
         Proceed
       </Button>
@@ -125,24 +130,24 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
 
 export default PaymentMethodScreen;
 
-const paymentMethods = [
-  {
-    name: PaymentType["Airtel Money"],
+const paymentMethods = {
+  [PaymentType.AIRTEL_MONEY]: {
+    name: PaymentType.AIRTEL_MONEY,
     image: airtel_money,
   },
-  {
-    name: PaymentType["MTN Money"],
+  [PaymentType.MTN_MONEY]: {
+    name: PaymentType.MTN_MONEY,
     image: mtn_money,
   },
-  {
-    name: PaymentType.Zampay,
+  [PaymentType.ZAMTEL_KWACHA]: {
+    name: PaymentType.ZAMTEL_KWACHA,
     image: zampay,
   },
-  {
-    name: PaymentType["Debit/ATM Card"],
+  [PaymentType.VISA]: {
+    name: PaymentType.VISA,
     image: debit_card,
   },
-];
+};
 
 const styles = StyleSheet.create({
   container: {
