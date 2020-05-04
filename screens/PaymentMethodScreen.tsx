@@ -8,18 +8,18 @@ import {
   zampay,
   debit_card,
 } from "../constants/Images";
-import { Button, IconButton, RadioButton, Dialog } from "react-native-paper";
+import { Button, IconButton, RadioButton } from "react-native-paper";
 import { ScrollView, TouchableHighlight } from "react-native-gesture-handler";
 import { PaymentType } from "../types/payment";
 import { NavType } from "../types/nav-type";
-import { AccountI } from "../models/account";
-import { Payment } from "../models/payment";
+import { AccountI, Account } from "../models/account";
 import Strings from "../constants/Strings";
+import { ServiceRequestI } from "../models/service-request";
 
 interface PaymentMethodScreenI {
   navigation: NavType;
   route: {
-    params: AccountI;
+    params: AccountI | ServiceRequestI;
   };
 }
 
@@ -30,7 +30,11 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
 
   return (
     <ScrollView style={container}>
-      <BillComponent account={account} />
+      {account instanceof Account ? (
+        <BillComponent account={account} />
+      ) : (
+        <View />
+      )}
       <Text
         style={{
           marginHorizontal: 10,

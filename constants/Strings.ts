@@ -13,6 +13,8 @@ export default {
   ServicesScreen: "Services",
   FeedbackScreen: "Feedback",
   WebviewScreen: "Debit/ATM Card",
+  BowserForm: "Bowser Quotation",
+  OpenAccountForm: "Open Account",
 
 
 

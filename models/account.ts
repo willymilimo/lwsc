@@ -22,6 +22,8 @@ export interface AccountI {
   FULL_NAME: string;
 }
 
+export type AccountT = AccountI;
+
 export class Account implements AccountI {
   ACCOUNT_NO?: string | number;
   METER_NO?: string | number;

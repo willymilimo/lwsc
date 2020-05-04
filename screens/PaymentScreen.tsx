@@ -27,6 +27,7 @@ import { toFixed } from "../helpers/functions";
 import { makePayment } from "../models/axios";
 import { Payment } from "../models/payment";
 import Strings from "../constants/Strings";
+import { ControlI } from "../models/control";
 
 interface PaymentScreenI {
   navigation: NavType;
@@ -36,11 +37,6 @@ interface PaymentScreenI {
       method: any;
     };
   };
-}
-
-interface ControlI {
-  value: string;
-  error: boolean;
 }
 
 const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
@@ -88,10 +84,11 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
       email: email.value,
     });
     // makePayment
+    console.log(payment);
     setLoading(true);
     makePayment(payment)
       .then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         const { success, error, payload, message } = res.data;
 
         if (success) {

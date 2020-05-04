@@ -16,11 +16,14 @@ import ServicesScreen from "../screens/ServicesScreen";
 import FeedbackScreen from "../screens/FeedbackScreen";
 import MakePaymentScreen from "../screens/MakePaymentScreen";
 import HeaderRightComponent from "../components/HeaderRightComponent";
+import AccountOpeningDomestic from "../screens/service_forms/AccountOpeningDomestic";
+import Boswer from "../screens/service_forms/Boswer";
+import PaymentScreen from "../screens/PaymentScreen";
+import WebviewScreen from "../screens/WebviewScreen";
 import Strings from "../constants/Strings";
 import { setThemeReducer } from "../redux/actions/theme";
 import { RootReducerI } from "../redux/reducers";
 import { ThemeReducer } from "../types/theme";
-import { ActionI } from "../redux/Actions";
 import { NotificationI } from "../models/notification";
 import {
   setNotifications,
@@ -28,8 +31,7 @@ import {
 } from "../redux/actions/notifications";
 import { setAccounts } from "../redux/actions/accounts";
 import { AccountReducerI } from "../redux/reducers/accounts";
-import PaymentScreen from "../screens/PaymentScreen";
-import WebviewScreen from "../screens/WebviewScreen";
+import { Account } from "../models/account";
 
 const Stack = createStackNavigator();
 
@@ -120,7 +122,14 @@ const StackNavigator = ({
       }
 
       if (accounts) {
-        setAccounts(JSON.parse(accounts));
+        accounts = JSON.parse(accounts);
+        for (const key in accounts) {
+          if (accounts.hasOwnProperty(key)) {
+            const element = accounts[key];
+            accounts[key] = new Account(element);
+          }
+        }
+        setAccounts(accounts);
       }
     };
 
@@ -221,6 +230,8 @@ const StackNavigator = ({
       />
       <Stack.Screen name={Strings.PaymentScreen} component={PaymentScreen} />
       <Stack.Screen name={Strings.WebviewScreen} component={WebviewScreen} />
+      <Stack.Screen name={Strings.BowserForm} component={Boswer} />
+      <Stack.Screen name={Strings.OpenAccountForm} component={AccountOpeningDomestic} />
     </Stack.Navigator>
   );
 };
