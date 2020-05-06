@@ -1,4 +1,4 @@
 export interface ControlI {
-  value: string;
+  value: string | number;
   error: boolean;
 }

@@ -14,24 +14,26 @@ import { PaymentType } from "../types/payment";
 import { NavType } from "../types/nav-type";
 import { AccountI, Account } from "../models/account";
 import Strings from "../constants/Strings";
-import { ServiceRequestI } from "../models/service-request";
+import { BowserI, Bowser } from "../models/bowser";
 
 interface PaymentMethodScreenI {
   navigation: NavType;
   route: {
-    params: AccountI | ServiceRequestI;
+    params: AccountI | BowserI;
   };
 }
 
 const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
-  const account = route.params;
+  const { params } = route;
   const { container } = styles;
   const [checked, setChecked] = React.useState(PaymentType.AIRTEL_MONEY);
 
   return (
     <ScrollView style={container}>
-      {account instanceof Account ? (
-        <BillComponent account={account} />
+      {params instanceof Account ? (
+        <BillComponent account={params} />
+      ) : params instanceof Bowser ? (
+        <View>{JSON.stringify(params)}</View>
       ) : (
         <View />
       )}
@@ -122,7 +124,7 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
         onPress={() =>
           navigation.navigate(Strings.PaymentScreen, {
             method: checked,
-            account,
+            params,
           })
         }
       >

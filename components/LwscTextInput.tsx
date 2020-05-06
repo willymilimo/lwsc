@@ -8,7 +8,8 @@ import { toFixed } from "../helpers/functions";
 interface LwscTextInputI {
   prefixStyle?: object;
   textInputStype?: object;
-  prefix: string;
+  prefix?: string;
+  suffix?: string;
   loading?: boolean;
   label?: string;
   placeholder?: string;
@@ -16,11 +17,13 @@ interface LwscTextInputI {
   money?: boolean;
   validator?: RegExp;
   onChangeText(text: string): void;
+  style: object;
 }
 
 const LwscTextInput = ({
   prefixStyle,
   prefix,
+  suffix,
   loading,
   onChangeText,
   label,
@@ -28,8 +31,8 @@ const LwscTextInput = ({
   textInputStype,
   keyboardType,
   money,
-  disabled,
   validator,
+  style,
 }: LwscTextInputI) => {
   let textInputRef: any;
   const { flexRow } = styles;
@@ -45,21 +48,24 @@ const LwscTextInput = ({
       style={[
         flexRow,
         value.error ? { borderColor: RNPColor.redA700, borderWidth: 2.5 } : {},
+        style
       ]}
       onPress={() => {
         setTextInputActive(true);
         textInputRef.focus();
       }}
     >
-      <Text
-        style={[
-          { fontSize: 18 },
-          value.value !== "" || textInputActive ? { marginTop: 20 } : {},
-          prefixStyle,
-        ]}
-      >
-        {prefix}
-      </Text>
+      {prefix && (
+        <Text
+          style={[
+            { fontSize: 18 },
+            value.value !== "" || textInputActive ? { marginTop: 20 } : {},
+            prefixStyle,
+          ]}
+        >
+          {prefix}
+        </Text>
+      )}
       <TextInput
         ref={(ref) => (textInputRef = ref)}
         label={label}
@@ -94,6 +100,17 @@ const LwscTextInput = ({
           });
         }}
       />
+      {suffix && (
+        <Text
+          style={[
+            { fontSize: 18 },
+            value.value !== "" || textInputActive ? { marginTop: 20 } : {},
+            prefixStyle,
+          ]}
+        >
+          {suffix}
+        </Text>
+      )}
     </TouchableWithoutFeedback>
   );
 };
@@ -114,5 +131,6 @@ const styles = StyleSheet.create({
     borderColor: `${Colors.LwscBlack}55`,
     borderWidth: 1.5,
     paddingHorizontal: 10,
+    backgroundColor: 'white'
   },
 });
