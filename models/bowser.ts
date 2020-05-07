@@ -9,6 +9,7 @@ export interface BowserI {
   litres: number;
   deliveryType: DeliveryType;
   costPerLitre: number;
+  totalPrice?: number;
 }
 
 export class Bowser implements BowserI {
@@ -39,5 +40,9 @@ export class Bowser implements BowserI {
     this.litres = litres;
     this.deliveryType = deliveryType;
     this.costPerLitre = costPerLitre;
+  }
+
+  public get totalPrice(): number {
+    return this.litres * this.costPerLitre;
   }
 }

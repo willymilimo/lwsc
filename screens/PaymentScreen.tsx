@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { NavType } from "../types/nav-type";
-import { AccountI } from "../models/account";
+import { AccountI, Account } from "../models/account";
 import { PaymentType } from "../types/payment";
 import BillComponent from "../components/BillComponent";
 import {
@@ -27,13 +27,14 @@ import { toFixed } from "../helpers/functions";
 import { makePayment } from "../models/axios";
 import { Payment } from "../models/payment";
 import Strings from "../constants/Strings";
-import { ControlI } from "../models/control";
+import { ControlIT } from "../models/control";
+import { BowserI, Bowser } from "../models/bowser";
 
 interface PaymentScreenI {
   navigation: NavType;
   route: {
     params: {
-      account: AccountI;
+      params: AccountI | BowserI;
       method: any;
     };
   };
@@ -41,12 +42,31 @@ interface PaymentScreenI {
 
 const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
   const { container, methodStyle, formContainer, flexRow, prefix } = styles;
-  const { account, method } = route.params;
+  const { params, method } = route.params;
   const { image, placeholder, regex } = Items[method];
-  const [phone, setPhone] = useState<ControlI>({ value: "", error: false });
-  const [email, setEmail] = useState<ControlI>({ value: "", error: false });
-  const [amount, setAmount] = useState("");
+  const [phone, setPhone] = useState<ControlIT<string>>({
+    value: "",
+    error: false,
+  });
+  const [email, setEmail] = useState<ControlIT<string>>({
+    value: "",
+    error: false,
+  });
+  const [amount, setAmount] = useState(
+    params instanceof Bowser ? params.totalPrice.toString() : ""
+  );
   const [loading, setLoading] = useState(false);
+  console.log((params as BowserI).totalPrice);
+
+  const confirmDetails =
+    params instanceof Bowser
+      ? {
+          name: params.fullName,
+          address: params.address,
+        }
+      : params instanceof Account
+      ? { name: params.FULL_NAME, address: params.ADDRESS }
+      : { name: "", address: "" };
 
   const confirmPayment = () => {
     if (!(phone.error || !/^\d+$/.test(amount) || email.error)) {
@@ -58,9 +78,9 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
       Alert.alert(
         "Make Payment?",
         `You are paying the amount of ZMW ${toFixed(amount)} for ${
-          account.FULL_NAME
+          confirmDetails.name
         } at ${
-          account.ADDRESS
+          confirmDetails.address
         } using ${methodDetails}. Are you sure you want to continue with the payment?`,
         [
           {
@@ -77,7 +97,7 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
 
   async function makePaymentRequest() {
     const payment = new Payment({
-      account_number: account.CUSTKEY,
+      account_number: params instanceof Account ? params.CUSTKEY : undefined,
       payment_type: method,
       amount,
       customer_phone_number: phone.value,
@@ -110,7 +130,7 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
 
   return (
     <ScrollView style={container}>
-      <Modal animationType="slide" transparent={true} visible={loading}>
+      <Modal animationType="slide" visible={loading}>
         <View style={[styles.centeredView, { backgroundColor: "#00000077" }]}>
           <View style={styles.modalView}>
             <ActivityIndicator size="large" color={Colors.LwscOrange} />
@@ -118,7 +138,11 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
         </View>
       </Modal>
 
-      <BillComponent account={account} />
+      {params instanceof Account ? (
+        <BillComponent account={params} />
+      ) : (
+        <View />
+      )}
       <View style={methodStyle}>
         <View
           style={{
@@ -154,11 +178,13 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
       <View style={formContainer}>
         <LwscTextInput
           onChangeText={setAmount}
+          defaultValue={amount}
           prefix="ZMW"
           label="Amount"
           money={true}
           validator={/^\d+$/}
           loading={loading}
+          disabled={params instanceof Bowser}
         />
 
         <TextInput

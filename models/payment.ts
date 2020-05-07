@@ -1,7 +1,7 @@
 import { PaymentType } from "../types/payment";
 
 export interface PaymentI {
-  account_number: string;
+  account_number?: string;
   amount: number | string;
   payment_type: PaymentType;
   customer_phone_number?: string;
@@ -11,7 +11,7 @@ export interface PaymentI {
 export type PaymentT = PaymentI;
 
 export class Payment implements PaymentI {
-  account_number: string;
+  account_number?: string;
   amount: number | string;
   payment_type: PaymentType;
   customer_phone_number?: string;

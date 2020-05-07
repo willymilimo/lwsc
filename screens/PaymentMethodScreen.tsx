@@ -15,7 +15,6 @@ import { NavType } from "../types/nav-type";
 import { AccountI, Account } from "../models/account";
 import Strings from "../constants/Strings";
 import { BowserI, Bowser } from "../models/bowser";
-import { toFixed } from "../helpers/functions";
 import { BowserPaySummary } from "./service_forms/Boswer";
 
 interface PaymentMethodScreenI {

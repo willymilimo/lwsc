@@ -17,7 +17,9 @@ interface LwscTextInputI {
   money?: boolean;
   validator?: RegExp;
   onChangeText(text: string): void;
-  style: object;
+  style?: object;
+  disabled: boolean;
+  defaultValue?: string;
 }
 
 const LwscTextInput = ({
@@ -33,11 +35,13 @@ const LwscTextInput = ({
   money,
   validator,
   style,
+  disabled,
+  defaultValue,
 }: LwscTextInputI) => {
   let textInputRef: any;
   const { flexRow } = styles;
   const [value, setValue] = useState<{ value: string; error: boolean }>({
-    value: "",
+    value: defaultValue || "",
     error: false,
   });
   const [textInputActive, setTextInputActive] = useState(false);
@@ -48,7 +52,7 @@ const LwscTextInput = ({
       style={[
         flexRow,
         value.error ? { borderColor: RNPColor.redA700, borderWidth: 2.5 } : {},
-        style
+        style,
       ]}
       onPress={() => {
         setTextInputActive(true);
@@ -73,9 +77,9 @@ const LwscTextInput = ({
         placeholder={placeholder}
         value={value.value}
         error={value.error}
-        disabled={loading}
+        disabled={loading || disabled}
         underlineColor="#fff"
-        style={[{ backgroundColor: "white", flex: 1 }, textInputStype]}
+        style={[{ backgroundColor: "white", flex: 1 },  textInputStype]}
         onFocus={() => {
           setTextInputActive(true);
           if (money && value.value.length) {
@@ -131,6 +135,6 @@ const styles = StyleSheet.create({
     borderColor: `${Colors.LwscBlack}55`,
     borderWidth: 1.5,
     paddingHorizontal: 10,
-    backgroundColor: 'white'
+    backgroundColor: "white",
   },
 });
