@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Platform } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { TextInput, Button, RadioButton, Colors } from "react-native-paper";
 import { ControlI } from "../../models/control";
@@ -13,11 +13,102 @@ import { connect } from "react-redux";
 import { toFixed } from "../../helpers/functions";
 import { DeliveryType } from "../../types/delivery-type";
 import { Bowser } from "../../models/bowser";
+import {
+  Entypo,
+  Foundation,
+  Fontisto,
+  MaterialCommunityIcons,
+  Ionicons,
+} from "@expo/vector-icons";
 
 interface BoswerI {
   navigation: NavType;
   costPerLitre: number;
 }
+
+export const BowserPaySummary = ({
+  fullName,
+  address,
+  phone,
+  email,
+  deliveryType,
+  litres,
+  costPerLitre,
+}: Bowser) => {
+  const { flexRow } = styles;
+  return (
+    <View
+      style={{
+        backgroundColor: `#fff`,
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        borderBottomWidth: 0.5,
+        shadowColor: `${Colors.lightBlue100}22`,
+        elevation: 5,
+        shadowOffset: {
+          width: 0,
+          height: 1,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 1,
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 19,
+          marginBottom: 5,
+          fontWeight: "bold",
+          color: "#444",
+        }}
+      >
+        Bowser Quotation
+      </Text>
+      <View style={flexRow}>
+        <Text style={{ marginLeft: 10 }}>{fullName}</Text>
+      </View>
+      <View style={flexRow}>
+        <Entypo
+          name="address"
+          size={20}
+          style={{ marginRight: 7, marginLeft: 6 }}
+        />
+        <Text>{address}</Text>
+      </View>
+      <View style={flexRow}>
+        <Foundation
+          name="telephone"
+          size={20}
+          style={{ marginRight: 10, marginLeft: 8 }}
+        />
+        <Text>{phone}</Text>
+      </View>
+      <View style={flexRow}>
+        <Fontisto
+          name="email"
+          size={20}
+          style={{ marginRight: 10, marginLeft: 5 }}
+        />
+        <Text>{email}</Text>
+      </View>
+      <View style={flexRow}>
+        <MaterialCommunityIcons
+          name="truck-delivery"
+          size={20}
+          style={{ marginRight: 10, marginLeft: 5 }}
+        />
+        <Text>{deliveryType}</Text>
+      </View>
+      <View style={flexRow}>
+        <Ionicons
+          size={20}
+          style={{ marginRight: 10, marginLeft: 5 }}
+          name={`${Platform.OS === "ios" ? "ios" : "md"}-pricetags`}
+        />
+        <Text>{`ZMW ${toFixed(litres * costPerLitre)}`}</Text>
+      </View>
+    </View>
+  );
+};
 
 const BoswerForm = ({ navigation, costPerLitre }: BoswerI) => {
   const { container, flexRow, radioLabelStyle, headerStyle } = styles;
@@ -94,7 +185,7 @@ const BoswerForm = ({ navigation, costPerLitre }: BoswerI) => {
         onChangeText={(text) =>
           setPhone({
             value: text,
-            error: text.trim().length < 9,
+            error: !/^\d{9,20}$/.test(text),
           })
         }
       />
@@ -185,6 +276,7 @@ const BoswerForm = ({ navigation, costPerLitre }: BoswerI) => {
               address: address.value as string,
               litres,
               deliveryType,
+              costPerLitre,
             })
           )
         }
@@ -198,8 +290,6 @@ const BoswerForm = ({ navigation, costPerLitre }: BoswerI) => {
 const mapStateToProps = ({ serviceConstants }: RootReducerI) => ({
   costPerLitre: serviceConstants.costPerLitre,
 });
-
-
 
 export default connect(mapStateToProps)(BoswerForm);
 

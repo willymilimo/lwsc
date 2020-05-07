@@ -37,6 +37,7 @@ export default {
   THEME_STORAGE: "THEME_STORAGE",
   NOTIFICATIONS_STORAGE: 'NOTIFICATIONS_STORAGE',
   ACCOUNTS_STORAGE: 'ACCOUNT_STORAGE',
+  PAYPOINTS_STORAGE: 'PAYPOINT_STORAGE',
   /*************** End Storage Constants *****************/
 
 

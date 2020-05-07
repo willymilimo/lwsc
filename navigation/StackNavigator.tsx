@@ -32,6 +32,8 @@ import {
 import { setAccounts } from "../redux/actions/accounts";
 import { AccountReducerI } from "../redux/reducers/accounts";
 import { Account } from "../models/account";
+import { setPayPoints } from "../redux/actions/pay-points";
+import { PayPointI, PayPoint } from "../models/pay-point";
 
 const Stack = createStackNavigator();
 
@@ -42,6 +44,7 @@ interface SNI {
   setNotifications(notifications: NotificationI[]): void;
   addNotification(notifications: NotificationI): void;
   setAccounts(accounts: AccountReducerI): void;
+  setPayPoints(paypoints: PayPointI[]): void;
 }
 
 type SNT = SNI;
@@ -53,6 +56,7 @@ const StackNavigator = ({
   setNotifications,
   addNotification,
   setAccounts,
+  setPayPoints,
 }: SNT) => {
   const [pushToken, setPushToken] = React.useState("");
   const [pushNotification, setPushNotification] = React.useState(null);
@@ -102,10 +106,12 @@ const StackNavigator = ({
     const bootstrapAsync = async () => {
       let theme;
       let accounts;
+      let paypoints;
 
       try {
         theme = await AsyncStorage.getItem(Strings.THEME_STORAGE);
         accounts = await AsyncStorage.getItem(Strings.ACCOUNTS_STORAGE);
+        paypoints = await AsyncStorage.getItem(Strings.PAYPOINTS_STORAGE);
       } catch (e) {
         // Restoring token failed
       }
@@ -130,6 +136,10 @@ const StackNavigator = ({
           }
         }
         setAccounts(accounts);
+      }
+
+      if (paypoints) {
+        setPayPoints(JSON.parse(paypoints).map((pp: any) => new PayPoint(pp)));
       }
     };
 
@@ -231,7 +241,10 @@ const StackNavigator = ({
       <Stack.Screen name={Strings.PaymentScreen} component={PaymentScreen} />
       <Stack.Screen name={Strings.WebviewScreen} component={WebviewScreen} />
       <Stack.Screen name={Strings.BowserForm} component={Boswer} />
-      <Stack.Screen name={Strings.OpenAccountForm} component={AccountOpeningDomestic} />
+      <Stack.Screen
+        name={Strings.OpenAccountForm}
+        component={AccountOpeningDomestic}
+      />
     </Stack.Navigator>
   );
 };
@@ -248,6 +261,7 @@ const mapDispatchToProps = (dispatch: any) =>
       setNotifications,
       addNotification,
       setAccounts,
+      setPayPoints,
     },
     dispatch
   );

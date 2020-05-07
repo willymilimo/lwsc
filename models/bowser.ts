@@ -8,6 +8,7 @@ export interface BowserI {
   address: string;
   litres: number;
   deliveryType: DeliveryType;
+  costPerLitre: number;
 }
 
 export class Bowser implements BowserI {
@@ -18,6 +19,7 @@ export class Bowser implements BowserI {
   address: string;
   litres: number;
   deliveryType: DeliveryType;
+  costPerLitre: number;
 
   constructor({
     referenceId,
@@ -27,6 +29,7 @@ export class Bowser implements BowserI {
     address,
     litres,
     deliveryType,
+    costPerLitre,
   }: BowserI) {
     this.referenceId = referenceId;
     this.fullName = fullName;
@@ -35,5 +38,6 @@ export class Bowser implements BowserI {
     this.address = address;
     this.litres = litres;
     this.deliveryType = deliveryType;
+    this.costPerLitre = costPerLitre;
   }
 }
