@@ -16,6 +16,7 @@ export default {
   BowserForm: "Bowser Quotation",
   OpenAccountForm: "Open Account",
   MeterReadingScreen: "Meter Reading",
+  PaymentHistoryScreen: "Payment History",
 
   /*************** Begin REDUCER TYPES *****************/
   WHITE_THEME: "WHITE_THEME",

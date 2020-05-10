@@ -2,11 +2,11 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import HomeScreen from "../screens/HomeScreen";
-import ServicesScreen from "../screens/ServicesScreen";
 import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
 import { ThemeType } from "../types/theme";
 import BillsScreen from "../screens/BillsScreen";
+import PaymentHistoryScreen from "../screens/PaymentHistoryScreen";
 
 interface HTNI {
   route: any;
@@ -36,7 +36,7 @@ const HomeTabNavigator = ({ route, theme }: HTNT) => {
     <Tab.Navigator
       screenOptions={({ route }: any) => ({
         tabBarIcon: ({ focused, color, size }: any) => {
-          let iconName;
+          let iconName = "";
 
           if (route.name === "Home") {
             iconName = focused ? "ios-home" : "md-home";
@@ -64,9 +64,13 @@ const HomeTabNavigator = ({ route, theme }: HTNT) => {
       />
       <Tab.Screen name="Bills" component={BillsScreen} />
       {/* <Tab.Screen name="Accounts" component={ServicesScreen} /> */}
-      <Tab.Screen name="History" component={ServicesScreen} />
+      <Tab.Screen name="History" component={PaymentHistoryScreen} />
     </Tab.Navigator>
   );
+};
+
+HomeTabNavigator.navigationOptions = {
+  header: null,
 };
 
 const mapStateToProps = ({ theme }: RootReducerI) => ({ theme: theme.theme });

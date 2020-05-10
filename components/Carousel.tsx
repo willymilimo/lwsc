@@ -16,7 +16,6 @@ const Stat = (props: any) => {
   return (
     <View style={styles.stat}>
       <ImageBackground
-        borderRadius={12}
         style={styles.statImage}
         source={typeof image === "string" ? { uri: image } : image}
       >
@@ -147,17 +146,16 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     backgroundColor: "#fbfbfb",
-    borderColor: "#ebebeb",
-    borderWidth: 1,
-    borderRadius: 8,
-    shadowColor: "#fcfcfc",
-    shadowOpacity: 1,
-    // marginTop: 10,
-    // marginVertical: 5,
+    shadowColor: "#fff",
+
+    elevation: 8,
+
     shadowOffset: {
-      width: 0,
+      width: 1,
       height: 5,
     },
+    shadowOpacity: 0.75,
+    shadowRadius: 5,
   },
   scrollView: {
     display: "flex",
@@ -179,9 +177,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   stat: {
-    // paddingHorizontal: 20,
-    // paddingBottom: 10,
-    // paddingTop: 30,
     flexBasis: "50%",
     flex: 1,
     maxWidth: "50%",
@@ -195,12 +190,10 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   statImage: {
-    borderRadius: 10,
-    width: Layouts.window.width - 30,
-    height: (448 * (Layouts.window.width - 30)) / 1024,
+    width: Layouts.window.width,
+    height: (448 * Layouts.window.width) / 1024,
     alignItems: "center",
     justifyContent: "center",
-    // alignSelf: "center",
   },
   statText: {
     width: "100%",
@@ -213,8 +206,6 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   statLabel: {
-    // width: "100%",
-    // textAlign: "left",
     fontSize: 18,
     fontWeight: "600",
     paddingTop: 5,

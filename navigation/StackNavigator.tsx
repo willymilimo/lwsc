@@ -215,7 +215,7 @@ const StackNavigator = ({
         name={Strings.HomeTabNavigator}
         component={HomeTabNavigator}
         // initialParams={{ toNotifications: pushNotification ? true : false }}
-        // options={{ headerTitle: (props) => <HeaderComponent {...props} /> }}
+        options={{ header: (props) => null }}
       />
       <Stack.Screen
         name={Strings.NotificationsScreen}

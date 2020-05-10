@@ -158,28 +158,8 @@ const FeedbackScreen = () => {
         };
 
         return (
-          // <Animated.View
-          //   style={[
-          //     buttonStyle,
-          //     style,
-          //     {
-          //       width: 50,
-          //       height: 50,
-          //       right: 25,
-          //       backgroundColor: bg,
-          //       borderColor: bg === Colors.whiteColor ? color : bg,
-          //     },
-          //   ]}
-          // >
-          //   <IconButton
-          //     icon={({ size, color }) => (
-          //       <icon.type name={icon.name} color={color} size={23} />
-          //     )}
-          //     color={color}
-          //     onPress={() => handleButtonPress(icon.name, url)}
-          //   />
-          // </Animated.View>
           <LwscFAB
+            key={icon.name}
             style={style}
             backgroundColor={bg}
             color={color}
@@ -194,7 +174,7 @@ const FeedbackScreen = () => {
           {
             borderWidth: 0.5,
             borderColor: Colors.linkBlue,
-            backgroundColor: `${Colors.linkBlue}22`,
+            backgroundColor: `#deeffd`,
           },
           buttonStyle,
         ]}

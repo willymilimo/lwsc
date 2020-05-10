@@ -87,22 +87,89 @@ const HomeScreen = ({ theme, route }: HomeI) => {
         />
         <View style={btnsBox}>
           {btns.map((btn) => (
-            <LwscButton
-              height={Layouts.window.width / 2 - 80}
-              width={Layouts.window.width / 2 - 80}
-              key={btn.component}
-              onPress={() => navigation.navigate(btn.component)}
-              content={
-                <React.Fragment>
-                  <View style={[iconContainer, { backgroundColor: btn.color }]}>
-                    {btn.icon}
-                  </View>
-                  <Text style={{ fontWeight: "600", textAlign: "center" }}>
-                    {btn.label}
-                  </Text>
-                </React.Fragment>
-              }
-            />
+            <View
+              key={btn.label}
+              style={{
+                width: Layouts.window.width / 3,
+                height: Layouts.window.width / 3,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <View
+                style={{
+                  width: "82%",
+                  height: "82%",
+                  borderRadius: 10,
+                  backgroundColor: "#fff",
+                  shadowColor: `${Colors.linkBlue}22`,
+
+                  elevation: 5,
+
+                  shadowOffset: {
+                    width: 1,
+                    height: 1,
+                  },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 1,
+                }}
+              >
+                <TouchableHighlight
+                  underlayColor="#55555533"
+                  onPress={() => navigation.navigate(btn.component)}
+                  style={{
+                    padding: 5,
+                    height: "100%",
+                    borderRadius: 10,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <React.Fragment>
+                    <View
+                      style={[
+                        iconContainer,
+                        {
+                          height: "55%",
+                          width: "55%",
+                          backgroundColor: btn.color,
+                        },
+                      ]}
+                    >
+                      {btn.icon}
+                    </View>
+                    <Text
+                      style={{
+                        marginHorizontal: 5,
+                        fontWeight: "600",
+                        textAlign: "center",
+                      }}
+                    >
+                      {btn.label}
+                    </Text>
+                  </React.Fragment>
+                </TouchableHighlight>
+              </View>
+              {/* <LwscButton
+                height={Layouts.window.width / 3 - 40}
+                width={Layouts.window.width / 3 - 40}
+                style={{ margin: 0 }}
+                key={btn.component}
+                onPress={() => navigation.navigate(btn.component)}
+                content={
+                  <React.Fragment>
+                    <View
+                      style={[iconContainer, { backgroundColor: btn.color }]}
+                    >
+                      {btn.icon}
+                    </View>
+                    <Text style={{ fontWeight: "600", textAlign: "center" }}>
+                      {btn.label}
+                    </Text>
+                  </React.Fragment>
+                }
+              /> */}
+            </View>
           ))}
         </View>
       </ScrollView>
@@ -144,31 +211,31 @@ const HomeScreen = ({ theme, route }: HomeI) => {
 
 const btns = [
   {
-    icon: <FontAwesome name="credit-card" color="#00bb27" size={25} />,
+    icon: <FontAwesome name="credit-card" color="#00bb27" size={20} />,
     label: "Make Payment",
     color: `#00bb2723`,
     component: Strings.MakePaymentScreen,
   },
   {
-    icon: <FontAwesome5 name="tachometer-alt" color="#1081e9" size={30} />,
+    icon: <FontAwesome5 name="tachometer-alt" color="#1081e9" size={25} />,
     label: "Meter Reading",
     color: "#1081e923",
     component: Strings.MeterReadingScreen,
   },
   {
-    icon: <Octicons name="settings" color={Colors.LwscBlack} size={30} />,
+    icon: <Octicons name="settings" color={Colors.LwscBlack} size={25} />,
     label: "Services",
     color: "#00000023",
     component: Strings.ServicesScreen,
   },
   {
-    icon: <FontAwesome name="map-marker" color="maroon" size={40} />,
+    icon: <FontAwesome name="map-marker" color="maroon" size={30} />,
     label: "Pay Points",
     color: "#ff000023",
     component: Strings.LocatePayPointScreen,
   },
   {
-    icon: <Entypo name="drop" color="#1ac3ee" size={30} />,
+    icon: <Entypo name="drop" color="#1ac3ee" size={25} />,
     label: "Report Leakage",
     color: "#1ac3ee23",
     component: "test2",
@@ -178,7 +245,7 @@ const btns = [
       <MaterialIcons
         name="report-problem"
         color={Colors.LwscOrange}
-        size={30}
+        size={25}
       />
     ),
     label: "Lodge Complaint",
@@ -186,6 +253,8 @@ const btns = [
     component: "test3",
   },
 ];
+
+const columnSize = (numCols: number) => Layouts.window.width / numCols;
 
 const styles = StyleSheet.create({
   container: {
@@ -201,13 +270,13 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
-    marginHorizontal: 50,
+    // marginHorizontal: 50,
     justifyContent: "space-between",
     paddingTop: 20,
   },
   btnStyle: {
-    height: 120,
-    width: 120,
+    // height: 120,
+    // width: 120,
     marginBottom: 25,
     borderRadius: 10,
     paddingHorizontal: 10,
