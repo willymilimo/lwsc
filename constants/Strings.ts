@@ -15,8 +15,7 @@ export default {
   WebviewScreen: "Debit/ATM Card",
   BowserForm: "Bowser Quotation",
   OpenAccountForm: "Open Account",
-
-
+  MeterReadingScreen: "Meter Reading",
 
   /*************** Begin REDUCER TYPES *****************/
   WHITE_THEME: "WHITE_THEME",
@@ -25,23 +24,16 @@ export default {
   // SET_NOTIFICATIONS: 'SET_NOTIFICATIONS',
   /*************** Eend REDUCER TYPES *****************/
 
-
-
   /*************** Begin Stack & Tab Navigators *****************/
   HomeTabNavigator: "LWSC",
   /*************** End Stack & Tab Navigators *****************/
 
-
-
   /*************** Begin Storage Constants *****************/
   THEME_STORAGE: "THEME_STORAGE",
-  NOTIFICATIONS_STORAGE: 'NOTIFICATIONS_STORAGE',
-  ACCOUNTS_STORAGE: 'ACCOUNT_STORAGE',
-  PAYPOINTS_STORAGE: 'PAYPOINT_STORAGE',
+  NOTIFICATIONS_STORAGE: "NOTIFICATIONS_STORAGE",
+  ACCOUNTS_STORAGE: "ACCOUNT_STORAGE",
+  PAYPOINTS_STORAGE: "PAYPOINT_STORAGE",
   /*************** End Storage Constants *****************/
-
-
-
 
   // API
   REQUEST_OTP:

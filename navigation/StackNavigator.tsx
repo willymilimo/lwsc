@@ -34,6 +34,7 @@ import { AccountReducerI } from "../redux/reducers/accounts";
 import { Account } from "../models/account";
 import { setPayPoints } from "../redux/actions/pay-points";
 import { PayPointI, PayPoint } from "../models/pay-point";
+import MeterReadingScreen from "../screens/MeterReadingScreen";
 
 const Stack = createStackNavigator();
 
@@ -205,9 +206,9 @@ const StackNavigator = ({
         headerTitleStyle: {
           fontWeight: "bold",
         },
-        headerRight: () => (
-          <HeaderRightComponent notifications={notifications.length} />
-        ),
+        // headerRight: () => (
+        //   <HeaderRightComponent notifications={notifications.length} />
+        // ),
       }}
     >
       <Stack.Screen
@@ -244,6 +245,10 @@ const StackNavigator = ({
       <Stack.Screen
         name={Strings.OpenAccountForm}
         component={AccountOpeningDomestic}
+      />
+      <Stack.Screen
+        name={Strings.MeterReadingScreen}
+        component={MeterReadingScreen}
       />
     </Stack.Navigator>
   );
