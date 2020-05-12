@@ -150,25 +150,6 @@ const HomeScreen = ({ theme, route }: HomeI) => {
                   </React.Fragment>
                 </TouchableHighlight>
               </View>
-              {/* <LwscButton
-                height={Layouts.window.width / 3 - 40}
-                width={Layouts.window.width / 3 - 40}
-                style={{ margin: 0 }}
-                key={btn.component}
-                onPress={() => navigation.navigate(btn.component)}
-                content={
-                  <React.Fragment>
-                    <View
-                      style={[iconContainer, { backgroundColor: btn.color }]}
-                    >
-                      {btn.icon}
-                    </View>
-                    <Text style={{ fontWeight: "600", textAlign: "center" }}>
-                      {btn.label}
-                    </Text>
-                  </React.Fragment>
-                }
-              /> */}
             </View>
           ))}
         </View>

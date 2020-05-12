@@ -17,4 +17,22 @@ the other three to come down
 default to be blue but keep toggle option
 
 
-Lee
+1.      Leak Detection investigation
+
+2.      Meter Test
+
+3.      Pipe Locating
+
+4.      Change of Connection
+
+5.      Private Sewer unblocking
+
+6.      Meter Separation
+
+7.      New water connection
+
+8.      New Sewer Connection
+
+9.      Onsite Sanitation Services
+
+10.     Feacal Sludge Management

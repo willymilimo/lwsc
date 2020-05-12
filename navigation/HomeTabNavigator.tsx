@@ -5,7 +5,6 @@ import HomeScreen from "../screens/HomeScreen";
 import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
 import { ThemeType } from "../types/theme";
-import BillsScreen from "../screens/BillsScreen";
 import PaymentHistoryScreen from "../screens/PaymentHistoryScreen";
 import NotificationsScreen from "../screens/NotificationsScreen";
 import MakePaymentScreen from "../screens/MakePaymentScreen";
