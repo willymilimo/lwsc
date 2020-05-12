@@ -34,6 +34,7 @@ export default {
   NOTIFICATIONS_STORAGE: "NOTIFICATIONS_STORAGE",
   ACCOUNTS_STORAGE: "ACCOUNT_STORAGE",
   PAYPOINTS_STORAGE: "PAYPOINT_STORAGE",
+  PAYMENT_HISTORY_STORAGE: 'PAYMENT_HISTORY_STORAGE',
   /*************** End Storage Constants *****************/
 
   // API
@@ -54,6 +55,8 @@ export default {
   // VOUCHER CREDENTIALS
   VOUCHER_API_USERNAME: "",
   VOUCHER_API_PASSWORD: "",
+
+  GOOGLE_MAP_API_KEY: "AIzaSyCz8BEsSB8Xs1e7B8pTizryIM8-wzNDEP0",
 
   // error message
   Exception:

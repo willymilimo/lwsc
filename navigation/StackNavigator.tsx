@@ -15,7 +15,6 @@ import PaymentMethodScreen from "../screens/PaymentMethodScreen";
 import ServicesScreen from "../screens/ServicesScreen";
 import FeedbackScreen from "../screens/FeedbackScreen";
 import MakePaymentScreen from "../screens/MakePaymentScreen";
-import HeaderRightComponent from "../components/HeaderRightComponent";
 import AccountOpeningDomestic from "../screens/service_forms/AccountOpeningDomestic";
 import Boswer from "../screens/service_forms/Boswer";
 import PaymentScreen from "../screens/PaymentScreen";
@@ -35,6 +34,8 @@ import { Account } from "../models/account";
 import { setPayPoints } from "../redux/actions/pay-points";
 import { PayPointI, PayPoint } from "../models/pay-point";
 import MeterReadingScreen from "../screens/MeterReadingScreen";
+import { setPaymentHistory } from "../redux/actions/payment-history";
+import { PaymentHistory } from "../models/payment-history";
 
 const Stack = createStackNavigator();
 
@@ -108,11 +109,15 @@ const StackNavigator = ({
       let theme;
       let accounts;
       let paypoints;
+      let paymentHistory;
 
       try {
         theme = await AsyncStorage.getItem(Strings.THEME_STORAGE);
         accounts = await AsyncStorage.getItem(Strings.ACCOUNTS_STORAGE);
         paypoints = await AsyncStorage.getItem(Strings.PAYPOINTS_STORAGE);
+        paymentHistory = await AsyncStorage.getItem(
+          Strings.PAYMENT_HISTORY_STORAGE
+        );
       } catch (e) {
         // Restoring token failed
       }
@@ -141,6 +146,12 @@ const StackNavigator = ({
 
       if (paypoints) {
         setPayPoints(JSON.parse(paypoints).map((pp: any) => new PayPoint(pp)));
+      }
+
+      if (paymentHistory) {
+        setPaymentHistory(
+          JSON.parse(paymentHistory).map((ph: any) => new PaymentHistory(ph))
+        );
       }
     };
 

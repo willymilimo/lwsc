@@ -14,9 +14,9 @@ const Stat = (props: any) => {
   const { label, value, image } = props;
 
   return (
-    <View style={styles.stat}>
+    <View style={[styles.stat, {height: Layouts.window.height * 0.35}]}>
       <ImageBackground
-        style={styles.statImage}
+        style={[styles.statImage, {height: Layouts.window.height * 0.35}]}
         source={typeof image === "string" ? { uri: image } : image}
       >
         <Text style={styles.statLabel}>{label}</Text>
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   },
   statImage: {
     width: Layouts.window.width,
-    height: (448 * Layouts.window.width) / 1024,
+    height: Layouts.window.height * .35, // (448 * Layouts.window.width) / 1024,
     alignItems: "center",
     justifyContent: "center",
   },

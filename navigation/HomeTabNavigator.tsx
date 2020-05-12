@@ -7,6 +7,8 @@ import { RootReducerI } from "../redux/reducers";
 import { ThemeType } from "../types/theme";
 import BillsScreen from "../screens/BillsScreen";
 import PaymentHistoryScreen from "../screens/PaymentHistoryScreen";
+import NotificationsScreen from "../screens/NotificationsScreen";
+import MakePaymentScreen from "../screens/MakePaymentScreen";
 
 interface HTNI {
   route: any;
@@ -39,11 +41,13 @@ const HomeTabNavigator = ({ route, theme }: HTNT) => {
           let iconName = "";
 
           if (route.name === "Home") {
-            iconName = focused ? "ios-home" : "md-home";
-          } else if (route.name === "Bills") {
-            iconName = focused ? "ios-speedometer" : "md-speedometer";
+            iconName = `${focused ? "ios" : "md"}-home`;
+          } else if (route.name === "Notices") {
+            iconName = `${focused ? "ios" : "md"}-notifications`;
+          } else if (route.name === "Accounts") {
+            iconName = `${focused ? "ios" : "md"}-speedometer`;
           } else if (route.name === "History") {
-            iconName = focused ? "ios-time" : "md-time";
+            iconName = `${focused ? "ios" : "md"}-time`;
           }
 
           // You can return any component that you like here!
@@ -62,8 +66,8 @@ const HomeTabNavigator = ({ route, theme }: HTNT) => {
         component={HomeScreen}
         initialParams={route.params}
       />
-      <Tab.Screen name="Bills" component={BillsScreen} />
-      {/* <Tab.Screen name="Accounts" component={ServicesScreen} /> */}
+      <Tab.Screen name="Notices" component={NotificationsScreen} />
+      <Tab.Screen name="Accounts" component={MakePaymentScreen} />
       <Tab.Screen name="History" component={PaymentHistoryScreen} />
     </Tab.Navigator>
   );
