@@ -219,7 +219,7 @@ const btns = [
     icon: <Entypo name="drop" color="#1ac3ee" size={25} />,
     label: "Report Leakage",
     color: "#1ac3ee23",
-    component: "test2",
+    component: Strings.ReportLeakageScreen,
   },
   {
     icon: (
@@ -231,7 +231,7 @@ const btns = [
     ),
     label: "Lodge Complaint",
     color: "#fdd02333",
-    component: "test3",
+    component: Strings.LodgeComplaintScreen,
   },
 ];
 

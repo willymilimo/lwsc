@@ -36,6 +36,8 @@ import { PayPointI, PayPoint } from "../models/pay-point";
 import MeterReadingScreen from "../screens/MeterReadingScreen";
 import { setPaymentHistory } from "../redux/actions/payment-history";
 import { PaymentHistory } from "../models/payment-history";
+import ReportLeakageScreen from "../screens/ReportLeakageScreen";
+import LodgeComplaintScreen from "../screens/LodgeComplaintScreen";
 
 const Stack = createStackNavigator();
 
@@ -260,6 +262,14 @@ const StackNavigator = ({
       <Stack.Screen
         name={Strings.MeterReadingScreen}
         component={MeterReadingScreen}
+      />
+      <Stack.Screen
+        name={Strings.ReportLeakageScreen}
+        component={ReportLeakageScreen}
+      />
+      <Stack.Screen
+        name={Strings.LodgeComplaintScreen}
+        component={LodgeComplaintScreen}
       />
     </Stack.Navigator>
   );

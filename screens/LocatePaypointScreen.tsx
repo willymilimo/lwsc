@@ -172,3 +172,109 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
 });
+
+/**
+import React from "react";
+import { StyleSheet, Text, View, Dimensions, Alert } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
+import * as Location from "expo-location";
+import MapView from "react-native-maps";
+import MapViewDirections from "react-native-maps-directions";
+import Strings from "../constants/Strings";
+const { width, height } = Dimensions.get("window");
+
+const origin = { latitude: -15.412123, longitude: 28.303703 };
+const destination = { latitude: -15.37496, longitude: 28.382121 };
+const ASPECT_RATIO = width / height;
+const LATITUDE = -15.37496;
+const LONGITUDE = 28.382121;
+const LATITUDE_DELTA = 0.0922;
+const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+
+const ReportLeakageScreen = () => {
+  const { container, map } = styles;
+  const [region, setRegion] = React.useState({
+    latitude: LATITUDE,
+    longitude: LONGITUDE,
+    latitudeDelta: LATITUDE_DELTA,
+    longitudeDelta: LONGITUDE_DELTA,
+  });
+
+  const getLocationAsync = async () => {
+    let { status } = await Location.requestPermissionsAsync();
+    if (status !== "granted") {
+      // setErrorMsg("Permission to access location was denied");
+      Alert.alert(
+        "Location Permission",
+        "We require permission access to show you the nearest paypoints.",
+        [{ text: "OK", onPress: async () => await getLocationAsync() }],
+        { cancelable: false }
+      );
+    } else {
+      let location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.BestForNavigation,
+      });
+      console.log(location.coords);
+      // console.log(this.state.region);
+      setRegion({
+        ...region,
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+    }
+  };
+
+  React.useEffect(() => {
+    getLocationAsync();
+  }, []);
+
+  return (
+    <View style={container}>
+      <MapView initialRegion={region} style={styles.map}>
+        <MapViewDirections
+          origin={region}
+          destination={destination}
+          apikey={Strings.GOOGLE_MAP_API_KEY}
+        />
+      </MapView>
+    </View>
+  );
+};
+
+export default ReportLeakageScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    ...StyleSheet.absoluteFillObject,
+    // flex: 1,
+    // justifyContent: "flex-end",
+    // alignItems: "center",
+    backgroundColor: "red",
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  bubble: {
+    backgroundColor: "rgba(255,255,255,0.7)",
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 20,
+  },
+  latlng: {
+    width: 200,
+    alignItems: "stretch",
+  },
+  button: {
+    width: 80,
+    paddingHorizontal: 12,
+    alignItems: "center",
+    marginHorizontal: 10,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    marginVertical: 20,
+    backgroundColor: "transparent",
+  },
+});
+
+ */

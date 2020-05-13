@@ -17,6 +17,8 @@ export default {
   OpenAccountForm: "Open Account",
   MeterReadingScreen: "Meter Reading",
   PaymentHistoryScreen: "Payment History",
+  ReportLeakageScreen: "Report Leakage",
+  LodgeComplaintScreen: "Lodge Complaint",
 
   /*************** Begin REDUCER TYPES *****************/
   WHITE_THEME: "WHITE_THEME",

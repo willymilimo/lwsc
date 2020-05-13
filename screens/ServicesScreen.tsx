@@ -17,6 +17,9 @@ import { NavType } from "../types/nav-type";
 import WaterTruck from "../assets/water_truck.svg";
 import WaterTap from "../assets/water_tap.svg";
 import SewerHome from "../assets/sewer_home.svg";
+import SewerConnection from "../assets/sewer_connection.svg";
+import FeacalSludgeMgt from "../assets/feacal_sludge_mgt.svg";
+import OnsiteSanitation from "../assets/onsite_sanitation.svg";
 
 interface ServicesI {
   navigation: NavType;
@@ -144,31 +147,31 @@ const btns = [
     component: "test2",
   },
   {
-    icon: <SewerHome width={120} height={40} fill="#00bb27" />,
+    icon: <SewerHome width={40} height={28} fill="#00bb27" />,
     label: "Sewer Unblocking",
-    color: "#1ac3ee23",
+    color: "#1ac3ee23", // brown
     component: "test2",
   },
   {
-    icon: <WaterTruck width={120} height={40} fill="#00bb27" />,
+    icon: <WaterTap width={40} height={28} fill="#00bb27" />,
     label: "Water Connection",
     color: "#1ac3ee23",
     component: "test2",
   },
   {
-    icon: <WaterTruck width={120} height={40} fill="#00bb27" />,
+    icon: <SewerConnection width={28} height={28} fill="#00bb27" />,
     label: "Sewer Connection",
     color: "#1ac3ee23",
     component: "test2",
   },
   {
-    icon: <WaterTruck width={120} height={40} fill="#00bb27" />,
+    icon: <OnsiteSanitation width={28} height={28} fill="#00bb27" />,
     label: "Onsite Sanitation",
     color: "#1ac3ee23",
     component: "test2",
   },
   {
-    icon: <WaterTruck width={120} height={40} fill="#00bb27" />,
+    icon: <FeacalSludgeMgt width={28} height={28} fill="#00bb27" />,
     label: "Feacal Sludge Mgt",
     color: "#1ac3ee23",
     component: "test2",
