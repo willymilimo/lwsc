@@ -38,6 +38,8 @@ import { setPaymentHistory } from "../redux/actions/payment-history";
 import { PaymentHistory } from "../models/payment-history";
 import ReportLeakageScreen from "../screens/ReportLeakageScreen";
 import LodgeComplaintScreen from "../screens/LodgeComplaintScreen";
+import GeneralServiceForm from "../screens/service_forms/GeneralServiceForm";
+import ReConnection from "../screens/service_forms/ReConnection";
 
 const Stack = createStackNavigator();
 
@@ -271,6 +273,11 @@ const StackNavigator = ({
         name={Strings.LodgeComplaintScreen}
         component={LodgeComplaintScreen}
       />
+      <Stack.Screen
+        name={Strings.GeneralServiceForm}
+        component={GeneralServiceForm}
+      />
+      <Stack.Screen name={Strings.ReConnection} component={ReConnection} />
     </Stack.Navigator>
   );
 };

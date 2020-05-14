@@ -20,6 +20,8 @@ import SewerHome from "../assets/sewer_home.svg";
 import SewerConnection from "../assets/sewer_connection.svg";
 import FeacalSludgeMgt from "../assets/feacal_sludge_mgt.svg";
 import OnsiteSanitation from "../assets/onsite_sanitation.svg";
+import ChangeConnection from "../assets/change_connection.svg";
+import { ServiceType } from "../types/service-type";
 
 interface ServicesI {
   navigation: NavType;
@@ -60,7 +62,12 @@ const ServicesScreen = ({ navigation }: ServicesI) => {
             >
               <TouchableHighlight
                 underlayColor="#55555533"
-                onPress={() => navigation.navigate(btn.component)}
+                onPress={() =>
+                  navigation.navigate(btn.component, {
+                    title: btn.label,
+                    type: ServiceType,
+                  })
+                }
                 style={{
                   padding: 5,
                   height: "100%",
@@ -102,12 +109,13 @@ const ServicesScreen = ({ navigation }: ServicesI) => {
 };
 
 const btns = [
-  {
-    icon: <WaterTruck width={100} height={33} fill="#1081e9" />,
-    label: "Bowser",
-    color: `#1081e923`,
-    component: Strings.BowserForm,
-  },
+  // {
+  //   icon: <WaterTruck width={100} height={33} fill="#1081e9" />,
+  //   label: "Bowser",
+  //   color: `#1081e923`,
+  //   component: Strings.BowserForm,
+  //   type: ServiceType.Bowser,
+  // },
   // {
   //   icon: (
   //     <FontAwesome5 name="tachometer-alt" color={Colors.LwscBlack} size={26} />
@@ -117,10 +125,24 @@ const btns = [
   //   component: Strings.OpenAccountForm,
   // },
   {
-    icon: <Entypo name="drop" color="#1ac3ee" size={25} />,
+    icon: (
+      <MaterialCommunityIcons
+        size={27}
+        color="#7d7d7d"
+        name="pipe-disconnected"
+      />
+    ),
+    label: "Re- Connection",
+    color: "#adadad23",
+    component: Strings.ReConnection,
+    type: ServiceType.LeakDetection,
+  },
+  {
+    icon: <MaterialCommunityIcons color="#1ac3ee" name="pipe-leak" size={25} />,
     label: "Leak Detection",
     color: "#1ac3ee23",
-    component: Strings.ServicesScreen,
+    component: Strings.GeneralServiceForm,
+    type: ServiceType.LeakDetection,
   },
   {
     icon: (
@@ -133,48 +155,49 @@ const btns = [
     label: "Meter Test",
     color: "#00000023",
     component: Strings.LocatePayPointScreen,
+    type: ServiceType.MeterTest,
   },
   {
-    icon: (
-      <MaterialCommunityIcons
-        size={27}
-        color="#1081e9"
-        name="pipe-disconnected"
-      />
-    ),
+    icon: <ChangeConnection width={30} height={30} fill='#a25d1a' />,
     label: "Change of Connection",
-    color: "#1ac3ee23",
-    component: "test2",
+    color: "#adadad23",
+    component: Strings.GeneralServiceForm,
+    type: ServiceType.ChangeOfConnection,
   },
   {
     icon: <SewerHome width={40} height={28} fill="#00bb27" />,
     label: "Sewer Unblocking",
     color: "#1ac3ee23", // brown
-    component: "test2",
+    component: Strings.GeneralServiceForm,
+    type: ServiceType.SewerUnblocking,
   },
   {
-    icon: <WaterTap width={40} height={28} fill="#00bb27" />,
+    icon: <WaterTap width={40} height={28} fill="#9f8771" />,
     label: "Water Connection",
-    color: "#1ac3ee23",
-    component: "test2",
+    color: "#9f877123",
+    component: Strings.GeneralServiceForm,
+    type: ServiceType.WaterConnection,
   },
   {
-    icon: <SewerConnection width={28} height={28} fill="#00bb27" />,
+    icon: <SewerConnection width={28} height={28} fill="#0190d4" />,
     label: "Sewer Connection",
     color: "#1ac3ee23",
-    component: "test2",
+    component: Strings.GeneralServiceForm,
+    type: ServiceType.SewerConnection,
   },
   {
-    icon: <OnsiteSanitation width={28} height={28} fill="#00bb27" />,
+    icon: <OnsiteSanitation width={28} height={28} fill={Colors.LwscOrange} />,
     label: "Onsite Sanitation",
-    color: "#1ac3ee23",
-    component: "test2",
+    color: `${Colors.LwscOrange}19`,
+    component: Strings.GeneralServiceForm,
+    type: ServiceType.OnsiteSanitation,
   },
   {
-    icon: <FeacalSludgeMgt width={28} height={28} fill="#00bb27" />,
+    icon: <FeacalSludgeMgt width={28} height={28} fill="#a25d1a" />,
     label: "Feacal Sludge Mgt",
-    color: "#1ac3ee23",
-    component: "test2",
+    color: "#a25d1a23",
+    component: Strings.GeneralServiceForm,
+    type: ServiceType.FeacalSludgeMgt,
   },
 ];
 /**
@@ -188,6 +211,14 @@ const btns = [
 8.      New Sewer Connection
 9.      Onsite Sanitation Services
 10.     Feacal Sludge Management
+
+(
+      <MaterialCommunityIcons
+        size={27}
+        color="#7d7d7d"
+        name="pipe-disconnected"
+      />
+    )
  */
 export default ServicesScreen;
 

@@ -38,7 +38,6 @@ const MakePaymentScreen = ({
   addAccount,
   deleteAccount,
 }: MakePaymentScreenI) => {
-  const [meterAccountNo, setMeterAccountNo] = React.useState("");
   const {
     container,
     box,
@@ -51,6 +50,7 @@ const MakePaymentScreen = ({
   const [loading, setLoading] = React.useState(false);
   const [type, setType] = React.useState<AddType>(AddType.account);
   const [isBuyForAnother, setIsBuyForAnother] = React.useState(false);
+  const [meterAccountNo, setMeterAccountNo] = React.useState("");
 
   const handleAccountMeterSubmit = () => {
     if (meterAccountNo.length) {
@@ -119,7 +119,20 @@ const MakePaymentScreen = ({
             <Text style={maText}>
               You have not added any account/meter to your profile
             </Text>
-            <Button onPress={() => setShowDialog(true)} mode="contained">
+            <Button
+              style={{ marginTop: 15 }}
+              contentStyle={{
+                borderColor: Colors.linkBlue,
+                borderWidth: 0.75,
+                borderRadius: 5,
+                backgroundColor: `${Colors.linkBlue}22`,
+              }}
+              color={`${Colors.LwscBlue}bb`}
+              //   loading={loading}
+              //   icon="send"
+              mode="outlined"
+              onPress={() => setShowDialog(true)}
+            >
               Add Account/Meter
             </Button>
           </View>

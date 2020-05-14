@@ -1,13 +1,18 @@
 import React from "react";
 import { StyleSheet, Text, View, Dimensions, Alert } from "react-native";
+import { ServiceType } from "../../types/service-type";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
-import * as Location from "expo-location";
 import MapView, { Marker } from "react-native-maps";
-import Strings from "../constants/Strings";
-import Colors from "../constants/Colors";
-import { TextInput, Button } from "react-native-paper";
-import { ControlIT } from "../models/control";
+import * as Location from "expo-location";
+import Colors from "../../constants/Colors";
+import { Button, TextInput } from "react-native-paper";
+import { ControlIT } from "../../models/control";
 const { width, height } = Dimensions.get("window");
+
+interface GeneralServiceFormI {
+  navigation: any;
+  route: { params: { title: string; type: ServiceType } };
+}
 
 const ASPECT_RATIO = width / height;
 const LATITUDE = -15.37496;
@@ -15,7 +20,8 @@ const LONGITUDE = 28.382121;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = 0.0421; //LATITUDE_DELTA * ASPECT_RATIO;
 
-const ReportLeakageScreen = () => {
+const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
+  const { title, type } = route.params;
   const { container, mapContainer, map } = styles;
   const [region, setRegion] = React.useState({
     latitude: LATITUDE,
@@ -23,6 +29,7 @@ const ReportLeakageScreen = () => {
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   });
+  const [loading, setLoading] = React.useState(false);
   const [fullName, setFullName] = React.useState<ControlIT<string>>({
     value: "",
     error: false,
@@ -31,6 +38,28 @@ const ReportLeakageScreen = () => {
     value: "",
     error: false,
   });
+  const [email, setEmail] = React.useState<ControlIT<string>>({
+    value: "",
+    error: false,
+  });
+  const [address, setAddress] = React.useState<ControlIT<string>>({
+    value: "",
+    error: false,
+  });
+  const [account_meter, setAccountMeter] = React.useState<ControlIT<string>>({
+    value: "",
+    error: false,
+  });
+  const [description, setDescription] = React.useState<ControlIT<string>>({
+    value: "",
+    error: false,
+  });
+
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: title,
+    });
+  }, [navigation]);
 
   const getLocationAsync = async () => {
     let { status } = await Location.requestPermissionsAsync();
@@ -102,9 +131,7 @@ const ReportLeakageScreen = () => {
             onPress={async () => await getLocationAsync()}
             style={styles.bubble}
           >
-            <Text style={styles.bubbleText}>
-              Tap to center to your location
-            </Text>
+            <Text style={styles.bubbleText}>Tap to center to my location</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -116,7 +143,7 @@ const ReportLeakageScreen = () => {
           placeholder="e.g. Moses Chinthalima"
           value={fullName.value}
           error={fullName.error}
-          disabled={false}
+          disabled={loading}
           onChangeText={(text) => {}}
         />
 
@@ -127,7 +154,55 @@ const ReportLeakageScreen = () => {
           placeholder="e.g. +260950039290"
           value={phone.value}
           error={phone.error}
-          disabled={false}
+          disabled={loading}
+          onChangeText={(text) => {}}
+        />
+
+        <TextInput
+          style={{ marginTop: 10 }}
+          mode="outlined"
+          label="Email Address"
+          placeholder="e.g. mchola@lwsc.co.zm"
+          value={email.value}
+          error={email.error}
+          disabled={loading}
+          onChangeText={(text) => {}}
+        />
+
+        <TextInput
+          style={{ marginTop: 10 }}
+          multiline={true}
+          numberOfLines={3}
+          mode="outlined"
+          label="Residential Address"
+          placeholder="e.g. Plot 5, off Alick Nkhata Road"
+          value={address.value}
+          error={address.error}
+          disabled={loading}
+          onChangeText={(text) => {}}
+        />
+
+        <TextInput
+          style={{ marginTop: 10 }}
+          mode="outlined"
+          label="Account/Meter Number (optional)"
+          placeholder="e.g. 1020893"
+          value={account_meter.value}
+          error={account_meter.error}
+          disabled={loading}
+          onChangeText={(text) => {}}
+        />
+
+        <TextInput
+          style={{ marginTop: 10 }}
+          multiline={true}
+          numberOfLines={3}
+          mode="outlined"
+          label="Description (optional)"
+          placeholder="e.g. Requesting service xxxx and xxxx due to such and such"
+          value={description.value}
+          error={description.error}
+          disabled={loading}
           onChangeText={(text) => {}}
         />
 
@@ -140,19 +215,19 @@ const ReportLeakageScreen = () => {
             backgroundColor: `${Colors.linkBlue}22`,
           }}
           color={`${Colors.LwscBlue}bb`}
-          //   loading={loading}
+          loading={loading}
           //   icon="send"
           mode="outlined"
           onPress={() => {}}
         >
-          Submit Report
+          Request Service
         </Button>
       </View>
     </ScrollView>
   );
 };
 
-export default ReportLeakageScreen;
+export default GeneralServiceForm;
 
 const styles = StyleSheet.create({
   container: {
@@ -163,7 +238,7 @@ const styles = StyleSheet.create({
   mapContainer: {
     justifyContent: "space-between",
     alignItems: "center",
-    height: height * 0.55,
+    height: height * 0.5,
   },
   map: {
     ...StyleSheet.absoluteFillObject,

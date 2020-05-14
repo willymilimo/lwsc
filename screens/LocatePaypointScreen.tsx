@@ -122,7 +122,7 @@ const LocatePaypointScreen = ({ provider }: any) => {
           }}
           style={styles.bubble}
         >
-          <Text>Tap to center to my location</Text>
+          <Text>Tap to center to your location</Text>
         </TouchableOpacity>
       </View>
     </View>

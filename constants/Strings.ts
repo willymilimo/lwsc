@@ -19,6 +19,8 @@ export default {
   PaymentHistoryScreen: "Payment History",
   ReportLeakageScreen: "Report Leakage",
   LodgeComplaintScreen: "Lodge Complaint",
+  GeneralServiceForm: "Request Service",
+  ReConnection: "Reconnection",
 
   /*************** Begin REDUCER TYPES *****************/
   WHITE_THEME: "WHITE_THEME",
