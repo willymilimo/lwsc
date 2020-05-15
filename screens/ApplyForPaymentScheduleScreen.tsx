@@ -32,7 +32,7 @@ const ApplyForPaymentScheduleScreen = ({
 
   return (
     <ScrollView style={styles.container}>
-      <BillComponent account={params} />
+      <BillComponent test={10} style={{test: "value"}} account={params} onPress={() => Alert.alert('test')} />
       <TextInput
         style={{ marginTop: 10, marginHorizontal: 7 }}
         mode="outlined"

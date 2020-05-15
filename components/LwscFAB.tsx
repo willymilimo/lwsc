@@ -39,7 +39,6 @@ const LwscFAB = ({
         {
           width: 50,
           height: 50,
-          right: 25,
           backgroundColor: backgroundColor,
           borderColor:
             backgroundColor === Colors.whiteColor ? color : backgroundColor,
@@ -86,7 +85,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     position: "absolute",
     bottom: 15,
-    right: 15,
+    right: 25,
     borderWidth: 0.5,
     borderColor: Colors.linkBlue,
     backgroundColor: `${Colors.linkBlue}22`,

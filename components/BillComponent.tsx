@@ -9,13 +9,16 @@ import {
 } from "react-native";
 import { TouchableHighlight } from "react-native-gesture-handler";
 import Colors from "../constants/Colors";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons, Entypo } from "@expo/vector-icons";
 import { AccountI } from "../models/account";
+import LwscFAB from "./LwscFAB";
 
 export interface BillComponentI {
   account: AccountI;
   onPress?(e: GestureResponderEvent): void;
   style?: object;
+  onRemove?(e: GestureResponderEvent): void;
+  onEdit?(e: GestureResponderEvent): void;
 }
 
 export type BillComponentT = BillComponentI;
@@ -24,7 +27,10 @@ export default function BillComponent({
   account,
   onPress,
   style,
+  onEdit,
+  onRemove,
 }: BillComponentI) {
+  console.log(onEdit, onRemove)
   const { hightlightStyle, itemStyle, textStyle } = styles;
   style = style
     ? { padding: 1, margin: 5, borderRadius: 5, ...style }
@@ -81,6 +87,22 @@ export default function BillComponent({
             "$&,"
           )}`}</Text>
         </View>
+        {onRemove && (
+          <LwscFAB
+            style={{ right: 15, top: 15 }}
+            icon={{ name: "cross", type: Entypo }}
+            backgroundColor={Colors.danger.background}
+            color={Colors.danger.color}
+            onPress={() => onRemove()}
+          />
+        )}
+        <LwscFAB
+            style={{ right: 15, top: 15 }}
+            icon={{ name: "edit", type: Entypo }}
+            backgroundColor={Colors.info.background}
+            color={Colors.info.color}
+            onPress={() => onEdit()}
+          />
       </View>
     </TouchableHighlight>
   );
