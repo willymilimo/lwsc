@@ -21,6 +21,7 @@ export default {
   LodgeComplaintScreen: "Lodge Complaint",
   GeneralServiceForm: "Request Service",
   ReConnection: "Reconnection",
+  ApplyForPaymentScheduleScreen: "Apply for Payment Schedule",
 
   /*************** Begin REDUCER TYPES *****************/
   WHITE_THEME: "WHITE_THEME",

@@ -70,16 +70,17 @@ export default function BillComponent({
           />
           <Text style={textStyle}>{`${meter_reading || usage} Litres`}</Text>
         </View> */}
-        {/* <View style={itemStyle}>
+        <View style={itemStyle}>
           <Ionicons
             color={Colors.LwscOrange}
             size={20}
             name={`${Platform.OS === "ios" ? "ios" : "md"}-card`}
           />
-          <Text style={textStyle}>{`ZMW ${amount_due
-            .toFixed(2)
-            .replace(/\d(?=(\d{3})+\.)/g, "$&,")}`}</Text>
-        </View> */}
+          <Text style={textStyle}>{`ZMW ${account.BALANCE.toFixed(2).replace(
+            /\d(?=(\d{3})+\.)/g,
+            "$&,"
+          )}`}</Text>
+        </View>
       </View>
     </TouchableHighlight>
   );

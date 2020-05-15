@@ -14,6 +14,7 @@ import Strings from "../../constants/Strings";
 import { Account } from "../../models/account";
 import Colors from "../../constants/Colors";
 import { useNavigation } from "@react-navigation/native";
+import BillComponent from "../../components/BillComponent";
 
 const ReConnection = () => {
   const {
@@ -47,10 +48,11 @@ const ReConnection = () => {
             );
             setShowDialog(false);
             setMeterAccountNo("");
-            Alert.alert(
-              `${type} Added Successfully`,
-              `Your ${type} has been added successfully.`
-            );
+            setShowDialog(false);
+            // Alert.alert(
+            //   `${type} Added Successfully`,
+            //   `Your ${type} has been added successfully.`
+            // );
           } else {
             Alert.alert(
               `${type} not Added`,
@@ -103,10 +105,7 @@ const ReConnection = () => {
             />
           </Dialog.Content>
           <Dialog.Actions>
-            <Button
-              loading={loading}
-              onPress={() => navigation.goBack()}
-            >
+            <Button loading={loading} onPress={() => navigation.goBack()}>
               Cancel
             </Button>
             <Button
@@ -119,6 +118,8 @@ const ReConnection = () => {
         </Dialog>
       </Portal>
 
+      {account != undefined && <BillComponent account={account} />}
+
       <Button
         style={{ marginTop: 15 }}
         contentStyle={{
@@ -128,9 +129,10 @@ const ReConnection = () => {
           backgroundColor: `${Colors.linkBlue}22`,
         }}
         color={`${Colors.LwscBlue}bb`}
+        disabled={account == undefined}
         loading={loading}
         mode="outlined"
-        onPress={() => {}}
+        onPress={() => navigation.navigate(Strings.PaymentMethodScreen, account)}
       >
         Make Payment
       </Button>
@@ -143,11 +145,12 @@ const ReConnection = () => {
           borderRadius: 5,
           backgroundColor: `${Colors.linkBlue}22`,
         }}
+        disabled={account == undefined}
         color={`${Colors.LwscBlue}bb`}
         loading={loading}
         mode="outlined"
         onPress={() =>
-          navigation.navigate(Strings.PaymentMethodScreen, account)
+          navigation.navigate(Strings.ApplyForPaymentScheduleScreen, account)
         }
       >
         Apply for payment schedule

@@ -40,6 +40,7 @@ import ReportLeakageScreen from "../screens/ReportLeakageScreen";
 import LodgeComplaintScreen from "../screens/LodgeComplaintScreen";
 import GeneralServiceForm from "../screens/service_forms/GeneralServiceForm";
 import ReConnection from "../screens/service_forms/ReConnection";
+import ApplyForPaymentScheduleScreen from "../screens/ApplyForPaymentScheduleScreen";
 
 const Stack = createStackNavigator();
 
@@ -278,6 +279,10 @@ const StackNavigator = ({
         component={GeneralServiceForm}
       />
       <Stack.Screen name={Strings.ReConnection} component={ReConnection} />
+      <Stack.Screen
+        name={Strings.ApplyForPaymentScheduleScreen}
+        component={ApplyForPaymentScheduleScreen}
+      />
     </Stack.Navigator>
   );
 };

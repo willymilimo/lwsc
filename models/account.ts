@@ -20,6 +20,7 @@ export interface AccountI {
   BILLGROUP: string;
   IS_METERED: boolean;
   FULL_NAME: string;
+  BALANCE: number;
 }
 
 export type AccountT = AccountI;
@@ -43,6 +44,7 @@ export class Account implements AccountI {
   BILLGROUP: string;
   IS_METERED: boolean;
   FULL_NAME: string;
+  BALANCE: number;
 
   constructor({
     ACCOUNT_NO,
@@ -62,10 +64,11 @@ export class Account implements AccountI {
     CONSUMER_TYPE,
     BILLGROUP,
     IS_METERED,
+    BALANCE,
   }: AccountI) {
-    this.ACCOUNT_NO = ACCOUNT_NO;
+    this.ACCOUNT_NO = Array.isArray(ACCOUNT_NO) ? ACCOUNT_NO[0] : ACCOUNT_NO;
     this.METER_NO = METER_NO;
-    this.CUSTKEY = CUSTKEY;
+    this.CUSTKEY = Array.isArray(CUSTKEY) ? CUSTKEY[0] : CUSTKEY;
     this.CUSTOMER_ID = CUSTOMER_ID;
     this.BOOK_NO = BOOK_NO;
     this.WALK_NO = WALK_NO;
@@ -83,5 +86,6 @@ export class Account implements AccountI {
     this.FULL_NAME =
       INITIAL && SURNAME ? `${INITIAL} ${SURNAME}` : INITIAL || SURNAME;
     this.ADDRESS = UA_ADRESS4 ? `${UA_ADRESS3} ${UA_ADRESS4}` : UA_ADRESS3;
+    this.BALANCE = BALANCE;
   }
 }
