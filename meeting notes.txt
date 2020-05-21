@@ -36,3 +36,38 @@ default to be blue but keep toggle option
 9.      Onsite Sanitation Services
 
 10.     Feacal Sludge Management
+
+
+Meeting 15/05
+1. Replace Debit with VISA/Master Card
+
+
+
+2. Leaks and faults to be channeled per area
+3. Bill groups to shared with Lee (when applying for service)
+4. Should be able to filter by area
+5. Lodge complaint add optional field to add location
+6. Leak Reporting enable image capture. Make account number optional
+7. Ensure all requests have reference ids
+8. LWSC Staff and Customer Meter read options (LWSC or Self Meter Read)
+    - capture location to determine zone (only for staff)
+    - to capture identification number of meter reader. Verify reader of the meter and proceed
+    - think of way to ensure some claiming app in unusable in particular area for staff
+    - possibily to capturing in offline mode
+    - capture information as to be provided by Nseluka
+    - also capture image
+9. case for paypoint use location (or choose based select location in list provided)
+1o. consider dashboard ui
+
+Bill Component
+add labels icons
+call amount as bill balance
+
+
+- increase size on notices
+- payment history to be modal
+- reconnection only for account holders ( remove meter number only add account number)azzzzzzzzzzzzz@s@s@s@s@s@s@s@s@s@s@s@s@s@s@s@s@ on notices
+- payment history to be modal
+- reconnection only for account holders ( remove meter number only add account number)@ on notices
+- payment history to be modal
+- reconnection only for account holders ( remove meter number only add account number)

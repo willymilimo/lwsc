@@ -17,8 +17,8 @@ export interface BillComponentI {
   account: AccountI;
   onPress?(e: GestureResponderEvent): void;
   style?: object;
-  onRemove?(e: GestureResponderEvent): void;
-  onEdit?(e: GestureResponderEvent): void;
+  onRemove?(): void;
+  onEdit?(): void;
 }
 
 export type BillComponentT = BillComponentI;
@@ -30,8 +30,14 @@ export default function BillComponent({
   onEdit,
   onRemove,
 }: BillComponentI) {
-  console.log(onEdit, onRemove)
-  const { hightlightStyle, itemStyle, textStyle } = styles;
+  console.log(onEdit, onRemove);
+  const {
+    hightlightStyle,
+    itemStyle,
+    textStyle,
+    itemContainer,
+    itemTitle,
+  } = styles;
   style = style
     ? { padding: 1, margin: 5, borderRadius: 5, ...style }
     : { padding: 1, margin: 5, borderRadius: 5 };
@@ -52,21 +58,29 @@ export default function BillComponent({
         >
           {account.FULL_NAME}
         </Text>
-        <View style={itemStyle}>
-          <Ionicons
-            color={Colors.LwscOrange}
-            size={20}
-            name={`${Platform.OS === "ios" ? "ios" : "md"}-home`}
-          />
-          <Text style={textStyle}>{account.ADDRESS}</Text>
+        <View style={itemContainer}>
+          <Text style={itemTitle}>Home Address</Text>
+          <View style={itemStyle}>
+            <Ionicons
+              color={Colors.LwscOrange}
+              size={20}
+              name={`${Platform.OS === "ios" ? "ios" : "md"}-home`}
+            />
+            <Text style={textStyle}>{account.ADDRESS}</Text>
+          </View>
         </View>
-        <View style={itemStyle}>
-          <Ionicons
-            color={Colors.LwscOrange}
-            size={20}
-            name={`${Platform.OS === "ios" ? "ios" : "md"}-speedometer`}
-          />
-          <Text style={textStyle}>{account.CUSTKEY}</Text>
+        <View style={itemContainer}>
+          <Text style={itemTitle}>{`${
+            account.IS_METERED ? "Meter" : "Account"
+          } Number`}</Text>
+          <View style={itemStyle}>
+            <Ionicons
+              color={Colors.LwscOrange}
+              size={20}
+              name={`${Platform.OS === "ios" ? "ios" : "md"}-speedometer`}
+            />
+            <Text style={textStyle}>{account.CUSTKEY}</Text>
+          </View>
         </View>
         {/* <View style={itemStyle}>
           <MaterialCommunityIcons
@@ -76,16 +90,19 @@ export default function BillComponent({
           />
           <Text style={textStyle}>{`${meter_reading || usage} Litres`}</Text>
         </View> */}
-        <View style={itemStyle}>
-          <Ionicons
-            color={Colors.LwscOrange}
-            size={20}
-            name={`${Platform.OS === "ios" ? "ios" : "md"}-card`}
-          />
-          <Text style={textStyle}>{`ZMW ${account.BALANCE.toFixed(2).replace(
-            /\d(?=(\d{3})+\.)/g,
-            "$&,"
-          )}`}</Text>
+        <View style={itemContainer}>
+          <Text style={itemTitle}>Bill Balance</Text>
+          <View style={itemStyle}>
+            <Ionicons
+              color={Colors.LwscOrange}
+              size={20}
+              name={`${Platform.OS === "ios" ? "ios" : "md"}-card`}
+            />
+            <Text style={textStyle}>{`ZMW ${account.BALANCE.toFixed(2).replace(
+              /\d(?=(\d{3})+\.)/g,
+              "$&,"
+            )}`}</Text>
+          </View>
         </View>
         {onRemove && (
           <LwscFAB
@@ -96,13 +113,15 @@ export default function BillComponent({
             onPress={() => onRemove()}
           />
         )}
-        <LwscFAB
+        {onEdit && (
+          <LwscFAB
             style={{ right: 15, top: 15 }}
             icon={{ name: "edit", type: Entypo }}
             backgroundColor={Colors.info.background}
             color={Colors.info.color}
             onPress={() => onEdit()}
           />
+        )}
       </View>
     </TouchableHighlight>
   );
@@ -128,6 +147,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 1,
   },
+  itemContainer: {},
   itemStyle: {
     display: "flex",
     flexDirection: "row",
@@ -135,6 +155,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     marginBottom: 2,
   },
+  itemTitle: {},
   textStyle: {
     marginLeft: 10,
     fontSize: 15,
