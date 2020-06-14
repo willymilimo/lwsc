@@ -84,7 +84,7 @@ const LodgeComplaintScreen = () => {
     <ScrollView style={container}>
       <View style={mapContainer}>
         <MapView
-          ref={(ref) => (map = ref)}
+          ref={(ref) => (map = ref as MapView)}
           zoomEnabled={true}
           showsUserLocation={true}
           region={region}
@@ -168,7 +168,7 @@ const LodgeComplaintScreen = () => {
             ]}
           >
             <Text style={styles.bubbleText}>
-              Drag marker to location of the leak
+              Drag marker to location of the complaint (optional)
             </Text>
           </TouchableOpacity>
         </View>

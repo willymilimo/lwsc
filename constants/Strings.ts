@@ -119,4 +119,14 @@ export default {
     title: "Coming Soon",
     message: "Coming to LWSCConnect. Watch the space.",
   },
+
+  CAMERA_ROLL_PERMISSION: {
+    title: "Permission",
+    message: 'Sorry, we need camera roll permissions to make this work!'
+  },
+
+  LOCATION_PERMISSION: {
+    title: "Location Permission",
+    message: "Sorry, we need location permission to quickly address the address!"
+  }
 };

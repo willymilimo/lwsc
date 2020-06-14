@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, SafeAreaView } from "react-native";
 import { connect } from "react-redux";
 import {
@@ -36,6 +36,8 @@ const HomeScreen = ({ theme, route }: HomeI) => {
     iconContainer,
   } = styles;
   const navigation = useNavigation();
+  
+
   // console.log(route);
 
   // React.useEffect(() => {
