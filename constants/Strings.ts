@@ -39,7 +39,7 @@ export default {
   NOTIFICATIONS_STORAGE: "NOTIFICATIONS_STORAGE",
   ACCOUNTS_STORAGE: "ACCOUNT_STORAGE",
   PAYPOINTS_STORAGE: "PAYPOINT_STORAGE",
-  PAYMENT_HISTORY_STORAGE: 'PAYMENT_HISTORY_STORAGE',
+  PAYMENT_HISTORY_STORAGE: "PAYMENT_HISTORY_STORAGE",
   /*************** End Storage Constants *****************/
 
   // API
@@ -120,13 +120,19 @@ export default {
     message: "Coming to LWSCConnect. Watch the space.",
   },
 
+  CAMERA_PERMISSION: {
+    title: "Camera Permission",
+    message: "Sorry, we need camera permissions to make this work!",
+  },
+
   CAMERA_ROLL_PERMISSION: {
     title: "Permission",
-    message: 'Sorry, we need camera roll permissions to make this work!'
+    message: "Sorry, we need camera roll permissions to make this work!",
   },
 
   LOCATION_PERMISSION: {
     title: "Location Permission",
-    message: "Sorry, we need location permission to quickly address the address!"
-  }
+    message:
+      "Sorry, we need location permission to quickly address the address!",
+  },
 };

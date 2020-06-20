@@ -6,20 +6,23 @@ import {
   Dimensions,
   Alert,
   Platform,
+  Image,
+  BackHandler,
 } from "react-native";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import * as Location from "expo-location";
 import MapView, { Marker } from "react-native-maps";
 import Colors from "../constants/Colors";
-import { TextInput, Button } from "react-native-paper";
+import { TextInput, Button, FAB } from "react-native-paper";
 import { ControlIT } from "../models/control";
 import { Ionicons } from "@expo/vector-icons";
 import Strings from "../constants/Strings";
 const { width, height } = Dimensions.get("window");
 
 import * as ImagePicker from "expo-image-picker";
-import * as Permissions from "expo-permissions";
-import * as ImageManipulator from "expo-image-manipulator";
+import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
+import { useNavigation } from "@react-navigation/native";
+import Regex from "../constants/Regex";
 
 const ASPECT_RATIO = width / height;
 const LATITUDE = -15.37496;
@@ -29,6 +32,7 @@ const LONGITUDE_DELTA = 0.0421; //LATITUDE_DELTA * ASPECT_RATIO;
 
 const ReportLeakageScreen = () => {
   let map: MapView;
+  const navigator = useNavigation();
   const { container, mapContainer, mapStyle, flexRow } = styles;
   const [region, setRegion] = React.useState({
     latitude: LATITUDE,
@@ -50,56 +54,67 @@ const ReportLeakageScreen = () => {
     value: "",
     error: false,
   });
+  const [image, setImage] = useState<
+    (ImagePicker.ImagePickerResult & ImageInfo) | null
+  >(null);
   const [loading, setLoading] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
 
   const requestCameraPermissionAsync = async () => {
     var { status } = await ImagePicker.requestCameraPermissionsAsync(); // Permissions.askAsync(Permissions.CAMERA);
     if (status !== "granted") {
-      Alert.alert(
-        "Camera Permission",
-        "Sorry, we need camera permissions to make this work!",
-        [
-          {
-            text: "Grant Permission",
-            onPress: async () =>
-              await ImagePicker.requestCameraPermissionsAsync() // Permissions.askAsync(Permissions.CAMERA)
-          }
-        ]
-      );
+      const { title, message } = Strings.CAMERA_PERMISSION;
+      Alert.alert(title, message, [
+        {
+          text: "Grant Permission",
+          onPress: async () =>
+            await ImagePicker.requestCameraPermissionsAsync(), // Permissions.askAsync(Permissions.CAMERA)
+        },
+        { text: "Deny", onPress: () => BackHandler.exitApp() },
+      ]);
     }
   };
 
   const requestCameraRollPermissionAsync = async () => {
     var { status } = await ImagePicker.requestCameraRollPermissionsAsync(); //Permissions.askAsync(Permissions.CAMERA_ROLL);
     if (status !== "granted") {
-      Alert.alert(
-        "Camera Roll Permission",
-        "Sorry, we need camera roll permissions to make this work!",
-        [
-          {
-            text: "Grant Permission",
-            onPress: async () =>
-              await ImagePicker.requestCameraRollPermissionsAsync() // Permissions.askAsync(Permissions.CAMERA_ROLL)
-          }
-        ]
-      );
+      const { title, message } = Strings.CAMERA_ROLL_PERMISSION;
+      Alert.alert(title, message, [
+        {
+          text: "Grant Permission",
+          onPress: async () =>
+            await ImagePicker.requestCameraRollPermissionsAsync(), // Permissions.askAsync(Permissions.CAMERA_ROLL)
+        },
+        { text: "Deny", onPress: () => BackHandler.exitApp() },
+      ]);
     }
   };
 
   const requestCameraPermission = async () => {
     if (Platform.OS === "ios") {
-      await requestCameraPermissionAsync();
-
-      await requestCameraRollPermissionAsync();
+      try {
+        await requestCameraPermissionAsync();
+        await requestCameraRollPermissionAsync();
+      } catch (err) {
+        const { title, message } = Strings.SELF_REPORTING_PROBLEM;
+        Alert.alert(title, message, [
+          { text: "Ok", onPress: () => navigator.goBack() },
+        ]);
+      }
     }
   };
 
   const captureImage = async () => {
-    const granted = await requestCameraPermission();
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      base64: true,
+    });
 
-    if (granted) {
-
+    if (!result.cancelled && result.base64) {
+      // console.log(result.base64);
+      // setImage("data:image/jpeg;base64," + result.base64);
+      // setImage(result.base64);
+      setImage(result);
     }
   };
 
@@ -108,7 +123,13 @@ const ReportLeakageScreen = () => {
       let { status } = await Location.requestPermissionsAsync();
       if (status !== "granted") {
         const { title, message } = Strings.LOCATION_PERMISSION;
-        Alert.alert(title, message);
+        Alert.alert(title, message, [
+          {
+            text: "Grant Permission",
+            onPress: async () => await getLocationAsync(),
+          },
+          { text: "Deny", onPress: () => BackHandler.exitApp() },
+        ]);
       } else {
         let location = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.BestForNavigation,
@@ -118,14 +139,17 @@ const ReportLeakageScreen = () => {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
         });
+        await requestCameraPermission();
       }
     } catch (error) {
-      // report error
+      const { title, message } = Strings.SELF_REPORTING_PROBLEM;
+      Alert.alert(title, message, [
+        { text: "Ok", onPress: () => navigator.goBack() },
+      ]);
     }
   };
 
   useEffect(() => {
-    // requestCameraPermission();
     getLocationAsync();
   }, []);
 
@@ -183,39 +207,55 @@ const ReportLeakageScreen = () => {
 
       <View style={{ paddingVertical: 15, paddingHorizontal: 15 }}>
         <View>
-          <Button
-            contentStyle={{
-              borderColor: Colors.linkBlue,
-              borderWidth: 0.75,
-              borderRadius: 5,
-              backgroundColor: `${Colors.linkBlue}22`,
-            }}
-            color={`${Colors.LwscBlue}bb`}
-            //   loading={loading}
-            icon={({ color }) => (
-              <Ionicons
-                color={color}
-                size={22}
-                name={`${Platform.OS === "ios" ? "ios" : "md"}-camera`}
+          {image ? (
+            <View
+              style={{
+                position: "relative",
+                borderRadius: 3,
+                alignSelf: "center",
+                borderWidth: 3,
+                borderColor: "#00000022",
+              }}
+            >
+              <FAB
+                style={styles.fab}
+                small
+                icon="delete-forever"
+                onPress={() => setImage(null)}
               />
-            )}
-            mode="outlined"
-            onPress={() => requestCameraPermission()}
-          >
-            CAPTURE LEAK
-          </Button>
+              <Image
+                style={{
+                  width: (300 * image.width) / image.height,
+                  height: 300,
+                  resizeMode: "stretch",
+                }}
+                source={{ uri: image.uri }}
+              />
+            </View>
+          ) : (
+            <Button
+              contentStyle={{
+                borderColor: Colors.linkBlue,
+                borderWidth: 0.75,
+                borderRadius: 5,
+                backgroundColor: `${Colors.linkBlue}22`,
+              }}
+              color={`${Colors.LwscBlue}bb`}
+              //   loading={loading}
+              icon={({ color }) => (
+                <Ionicons
+                  color={color}
+                  size={22}
+                  name={`${Platform.OS === "ios" ? "ios" : "md"}-camera`}
+                />
+              )}
+              mode="outlined"
+              onPress={async () => await captureImage()}
+            >
+              CAPTURE LEAK
+            </Button>
+          )}
         </View>
-        {/* <TouchableOpacity>
-          <View
-            style={[flexRow, { backgroundColor: "red", alignItems: "center" }]}
-          >
-            <Ionicons
-              size={30}
-              name={`${Platform.OS === "ios" ? "ios" : "md"}-camera`}
-            />
-            <Text>Capture Leakage</Text>
-          </View>
-        </TouchableOpacity> */}
         <TextInput
           style={{ marginTop: 10 }}
           mode="outlined"
@@ -224,7 +264,12 @@ const ReportLeakageScreen = () => {
           value={fullName.value}
           error={fullName.error}
           disabled={false}
-          onChangeText={(text) => {}}
+          onChangeText={(value) => {
+            setFullName({
+              value,
+              error: Regex.NAME.test(value),
+            });
+          }}
         />
 
         <TextInput
@@ -235,7 +280,12 @@ const ReportLeakageScreen = () => {
           value={phone.value}
           error={phone.error}
           disabled={false}
-          onChangeText={(text) => {}}
+          onChangeText={(value) => {
+            setPhone({
+              value,
+              error: Regex.PHONE_NUMBER.test(value),
+            });
+          }}
         />
         <TextInput
           style={{ marginTop: 10 }}
@@ -245,7 +295,10 @@ const ReportLeakageScreen = () => {
           value={meterAccountNumber.value}
           error={meterAccountNumber.error}
           onChangeText={(value) =>
-            setMeterAccountNumber({ value, error: false })
+            setMeterAccountNumber({
+              value,
+              error: value.length > 0 && value.length < 5,
+            })
           }
         />
 
@@ -260,6 +313,13 @@ const ReportLeakageScreen = () => {
           color={`${Colors.LwscBlue}bb`}
           //   loading={loading}
           //   icon="send"
+          disabled={
+            meterAccountNumber.error ||
+            phone.error ||
+            phone.value.length === 0 ||
+            fullName.error ||
+            fullName.value.length === 0
+          }
           mode="outlined"
           onPress={() => {}}
         >
@@ -313,5 +373,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginVertical: 20,
     backgroundColor: "transparent",
+  },
+  fab: {
+    backgroundColor: "red",
+    position: "absolute",
+    zIndex: 999,
+    margin: 16,
+    right: 0,
+    top: 0,
   },
 });
