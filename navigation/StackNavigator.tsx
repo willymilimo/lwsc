@@ -41,6 +41,8 @@ import LodgeComplaintScreen from "../screens/LodgeComplaintScreen";
 import GeneralServiceForm from "../screens/service_forms/GeneralServiceForm";
 import ReConnection from "../screens/service_forms/ReConnection";
 import ApplyForPaymentScheduleScreen from "../screens/ApplyForPaymentScheduleScreen";
+import ReadMeterScreen from "../screens/ReadMeterScreen";
+import LwscStaffAuthScreen from "../screens/LwscStaffAuthScreen";
 
 const Stack = createStackNavigator();
 
@@ -282,6 +284,14 @@ const StackNavigator = ({
       <Stack.Screen
         name={Strings.ApplyForPaymentScheduleScreen}
         component={ApplyForPaymentScheduleScreen}
+      />
+      <Stack.Screen
+        name={Strings.ReadMeterScreen}
+        component={ReadMeterScreen}
+      />
+      <Stack.Screen
+        name={Strings.LwscStaffAuthScreen}
+        component={LwscStaffAuthScreen}
       />
     </Stack.Navigator>
   );

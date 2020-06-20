@@ -11,8 +11,13 @@ export default function permissions() {
   const [hasPermission, setHasPermission] = useState(false);
   const [type, setType] = useState(Camera.Constants.Type.back);
 
+  const requestCameraPermission = async () => {
+    const { status } = await Camera.requestPermissionsAsync();
+    setHasPermission(status === "granted");
+  };
+
   useEffect(() => {
-    requestCameraPermission(setHasPermission);
+    requestCameraPermission();
   }, []);
 
   return (

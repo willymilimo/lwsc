@@ -263,7 +263,7 @@ const ReportLeakageScreen = () => {
           placeholder="e.g. Moses Chinthalima"
           value={fullName.value}
           error={fullName.error}
-          disabled={false}
+          disabled={loading}
           onChangeText={(value) => {
             setFullName({
               value,
@@ -279,7 +279,7 @@ const ReportLeakageScreen = () => {
           placeholder="e.g. +260950039290"
           value={phone.value}
           error={phone.error}
-          disabled={false}
+          disabled={loading}
           onChangeText={(value) => {
             setPhone({
               value,
@@ -311,9 +311,10 @@ const ReportLeakageScreen = () => {
             backgroundColor: `${Colors.linkBlue}22`,
           }}
           color={`${Colors.LwscBlue}bb`}
-          //   loading={loading}
+          loading={loading}
           //   icon="send"
           disabled={
+            loading ||
             meterAccountNumber.error ||
             phone.error ||
             phone.value.length === 0 ||

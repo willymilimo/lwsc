@@ -22,6 +22,8 @@ export default {
   GeneralServiceForm: "Request Service",
   ReConnection: "Reconnection",
   ApplyForPaymentScheduleScreen: "Apply for Payment Schedule",
+  ReadMeterScreen: "Read Meter",
+  LwscStaffAuthScreen: "Login",
 
   /*************** Begin REDUCER TYPES *****************/
   WHITE_THEME: "WHITE_THEME",

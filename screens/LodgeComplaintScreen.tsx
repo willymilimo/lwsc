@@ -7,6 +7,7 @@ import Colors from "../constants/Colors";
 import MapView, { Marker } from "react-native-maps";
 import { TouchableOpacity, ScrollView } from "react-native-gesture-handler";
 import { Feather } from "@expo/vector-icons";
+import Regex from "../constants/Regex";
 const { width, height } = Dimensions.get("window");
 
 const ASPECT_RATIO = width / height;
@@ -26,6 +27,16 @@ const LodgeComplaintScreen = () => {
   });
   const [loading, setLoading] = React.useState(false);
   const [fullName, setFullName] = React.useState<InputItemType<string>>({
+    value: "",
+    error: false,
+  });
+  const [phone, setPhone] = React.useState<InputItemType<string>>({
+    value: "",
+    error: false,
+  });
+  const [meterAccountNumber, setMeterAccountNumber] = React.useState<
+    InputItemType<string>
+  >({
     value: "",
     error: false,
   });
@@ -191,38 +202,56 @@ const LodgeComplaintScreen = () => {
           mode="outlined"
           label={"Full Name"}
           value={fullName.value}
+          style={{ backgroundColor: "white" }}
           error={fullName.error}
-          onChangeText={(value) => setFullName({ value, error: false })}
+          onChangeText={(value) => {
+            setFullName({
+              value,
+              error: Regex.NAME.test(value),
+            });
+          }}
         />
         <TextInput
-          style={{ marginTop: 15 }}
+          style={{ marginTop: 15, backgroundColor: "white" }}
           disabled={loading}
           mode="outlined"
           label={"Account/Meter Number"}
-          value={fullName.value}
-          error={fullName.error}
-          onChangeText={(value) => setFullName({ value, error: false })}
+          value={meterAccountNumber.value}
+          error={meterAccountNumber.error}
+          onChangeText={(value) =>
+            setMeterAccountNumber({
+              value,
+              error: /\d{5,}/.test(value.length.toString()),
+            })
+          }
         />
         <TextInput
-          style={{ marginTop: 15 }}
+          style={{ marginTop: 15, backgroundColor: "white" }}
           disabled={loading}
           mode="outlined"
           label={"Phone Number"}
           placeholder="e.g. +2609548900"
-          value={fullName.value}
-          error={fullName.error}
-          onChangeText={(value) => setFullName({ value, error: false })}
+          value={phone.value}
+          error={phone.error}
+          onChangeText={(value) => {
+            setPhone({
+              value,
+              error: Regex.PHONE_NUMBER.test(value),
+            });
+          }}
         />
         <TextInput
           disabled={loading}
-          style={{ marginTop: 15 }}
+          style={{ marginTop: 15, backgroundColor: "white" }}
           multiline={true}
           numberOfLines={10}
           mode="outlined"
           label={"Your complaint"}
           value={message.value}
           error={message.error}
-          onChangeText={(value) => setMessage({ value, error: false })}
+          onChangeText={(value) =>
+            setMessage({ value, error: value.length < 10 })
+          }
         />
         <Button
           style={{ marginTop: 15 }}
@@ -234,6 +263,16 @@ const LodgeComplaintScreen = () => {
           }}
           color={`${Colors.LwscBlue}bb`}
           loading={loading}
+          disabled={
+            loading ||
+            meterAccountNumber.error ||
+            phone.error ||
+            phone.value.length === 0 ||
+            fullName.error ||
+            fullName.value.length === 0 ||
+            message.error ||
+            message.value.length === 0
+          }
           icon="send"
           mode="outlined"
           onPress={() => {}}
