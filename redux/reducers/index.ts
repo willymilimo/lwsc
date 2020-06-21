@@ -8,15 +8,15 @@ import accounts, { AccountReducerI } from "./accounts";
 import user from "./user";
 import serviceConstants, { ServiceConstantsI } from "./service-constants";
 import { NotificationI } from "../../models/notification";
-import { PayPointI } from "../../models/pay-point";
 import { PaymentHistoryI } from "../../models/payment-history";
+import { PayPointReducer } from "../../types/paypoint";
 
 export interface RootReducerI {
   theme: ThemeReducer;
   notifications: NotificationI[];
   accounts: AccountReducerI;
   serviceConstants: ServiceConstantsI;
-  payPoints: PayPointI[];
+  payPoints: PayPointReducer;
   paymentHistory: PaymentHistoryI[];
   user: string;
 }

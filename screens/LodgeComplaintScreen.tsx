@@ -131,7 +131,7 @@ const LodgeComplaintScreen = () => {
             borderColor: `${Colors.LwscBlack}01`,
           }}
           small
-          icon={(color: any) => (
+          icon={({ color }) => (
             <Feather name="zoom-out" size={25} color={color} />
           )}
         />
@@ -147,7 +147,7 @@ const LodgeComplaintScreen = () => {
             borderColor: `${Colors.LwscBlack}01`,
           }}
           small
-          icon={(color: any) => (
+          icon={({ color }) => (
             <Feather name="zoom-in" size={25} color={color} />
           )}
         />

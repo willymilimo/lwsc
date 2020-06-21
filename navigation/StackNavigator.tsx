@@ -32,7 +32,7 @@ import { setAccounts } from "../redux/actions/accounts";
 import { AccountReducerI } from "../redux/reducers/accounts";
 import { Account } from "../models/account";
 import { setPayPoints } from "../redux/actions/pay-points";
-import { PayPointI, PayPoint } from "../models/pay-point";
+import { PayPoint } from "../models/pay-point";
 import MeterReadingScreen from "../screens/MeterReadingScreen";
 import { setPaymentHistory } from "../redux/actions/payment-history";
 import { PaymentHistory } from "../models/payment-history";
@@ -43,6 +43,7 @@ import ReConnection from "../screens/service_forms/ReConnection";
 import ApplyForPaymentScheduleScreen from "../screens/ApplyForPaymentScheduleScreen";
 import ReadMeterScreen from "../screens/ReadMeterScreen";
 import LwscStaffAuthScreen from "../screens/LwscStaffAuthScreen";
+import { PayPointReducer } from "../types/paypoint";
 
 const Stack = createStackNavigator();
 
@@ -53,7 +54,7 @@ interface SNI {
   setNotifications(notifications: NotificationI[]): void;
   addNotification(notifications: NotificationI): void;
   setAccounts(accounts: AccountReducerI): void;
-  setPayPoints(paypoints: PayPointI[]): void;
+  setPayPoints(paypoints: PayPointReducer): void;
 }
 
 type SNT = SNI;
@@ -152,7 +153,16 @@ const StackNavigator = ({
       }
 
       if (paypoints) {
-        setPayPoints(JSON.parse(paypoints).map((pp: any) => new PayPoint(pp)));
+        const pp: any = {};
+        const regions = JSON.parse(paypoints);
+        for (const key in regions) {
+          if (regions.hasOwnProperty(key)) {
+            const region = regions[key];
+            pp[key] = region.map((p: any) => new PayPoint(p));            
+          }
+        }
+
+        setPayPoints(pp);
       }
 
       if (paymentHistory) {

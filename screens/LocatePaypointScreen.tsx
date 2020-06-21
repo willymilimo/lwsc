@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   View,
@@ -10,10 +10,16 @@ import {
 import Constants from "expo-constants";
 import * as Location from "expo-location";
 import MapViewDirections from "react-native-maps-directions";
-import MapView, { Marker, ProviderPropType } from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 import Colors from "../constants/Colors";
 const { width, height } = Dimensions.get("window");
 import Strings from "../constants/Strings";
+import { FAB, Menu, Button } from "react-native-paper";
+import { Feather } from "@expo/vector-icons";
+import { connect } from "react-redux";
+import { RootReducerI } from "../redux/reducers";
+import { PayPointReducer } from "../types/paypoint";
+import { PayPointI } from "../models/pay-point";
 
 function randomColor() {
   return `#${Math.floor(Math.random() * 16777215)
@@ -28,7 +34,13 @@ const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 let id = 0;
 
-const LocatePaypointScreen = ({ provider }: any) => {
+interface LPSI {
+  payPoints: PayPointReducer;
+  provider: any;
+}
+
+const LocatePaypointScreen = ({ provider, payPoints }: LPSI) => {
+  let map: MapView;
   const [markers, setMarkers] = React.useState<any[]>([]);
   const [region, setRegion] = React.useState({
     latitude: LATITUDE,
@@ -36,17 +48,8 @@ const LocatePaypointScreen = ({ provider }: any) => {
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   });
-
-  const onMapPress = (e: any) => {
-    setMarkers([
-      ...markers,
-      {
-        coordinate: e.nativeEvent.coordinate,
-        key: id++,
-        color: randomColor(),
-      },
-    ]);
-  };
+  const [showMenu, setShowMenu] = useState(false);
+  const [regionalPayPoints, setRegionalPayPoints] = useState<PayPointI[]>([]);
 
   const getLocationAsync = async () => {
     let { status } = await Location.requestPermissionsAsync();
@@ -72,6 +75,24 @@ const LocatePaypointScreen = ({ provider }: any) => {
     }
   };
 
+  const onPressZoomOut = () => {
+    setRegion({
+      ...region,
+      latitudeDelta: region.latitudeDelta / 10,
+      longitudeDelta: region.longitudeDelta / 10,
+    });
+    map.animateToRegion(region, 100);
+  };
+
+  const onPressZoomIn = () => {
+    setRegion({
+      ...region,
+      latitudeDelta: region.latitudeDelta * 10,
+      longitudeDelta: region.longitudeDelta * 10,
+    });
+    map.animateToRegion(region, 100);
+  };
+
   React.useEffect(() => {
     getLocationAsync();
   }, []);
@@ -79,12 +100,15 @@ const LocatePaypointScreen = ({ provider }: any) => {
   return (
     <View style={styles.container}>
       <MapView
+        ref={(ref) => (map = ref as MapView)}
+        zoomEnabled={true}
+        showsUserLocation={true}
         provider={provider}
         style={styles.map}
         region={region}
-        onPress={(e) => onMapPress(e)}
+        onRegionChangeComplete={() => setRegion(region)}
       >
-        {/* <Marker
+        <Marker
           draggable
           onDragEnd={(e) =>
             setRegion({
@@ -107,13 +131,70 @@ const LocatePaypointScreen = ({ provider }: any) => {
             coordinate={marker.coordinate}
             pinColor={marker.color}
           />
-        ))} */}
+        ))}
         <MapViewDirections
-          origin={{ latitude: -15.37496, longitude: 28.382121 }}
+          origin={region}
           destination={{ latitude: -15.412123, longitude: 28.303703 }}
           apikey={Strings.GOOGLE_MAP_API_KEY}
         />
       </MapView>
+
+      <FAB
+        onPress={onPressZoomOut}
+        style={{
+          position: "absolute",
+          margin: 16,
+          right: 0,
+          bottom: 50,
+          backgroundColor: "#ffffff",
+          borderWidth: 0.75,
+          borderColor: `${Colors.LwscBlack}01`,
+        }}
+        small
+        icon={({ color }) => (
+          <Feather name="zoom-out" size={25} color={color} />
+        )}
+      />
+      <FAB
+        onPress={onPressZoomIn}
+        style={{
+          position: "absolute",
+          margin: 16,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "#ffffff",
+          borderWidth: 0.75,
+          borderColor: `${Colors.LwscBlack}01`,
+        }}
+        small
+        icon={({ color }) => <Feather name="zoom-in" size={25} color={color} />}
+      />
+
+      <View style={{ position: "absolute", top: 10, right: 10 }}>
+        <Menu
+          visible={showMenu}
+          onDismiss={() => setShowMenu(false)}
+          anchor={
+            <Button mode={"contained"} onPress={() => setShowMenu(true)}>
+              Filter by Location
+            </Button>
+          }
+        >
+          {Object.keys(payPoints)
+            .sort()
+            .map((p, i) => (
+              <Menu.Item
+                key={p}
+                onPress={() => {
+                  setShowMenu(false);
+                  setRegionalPayPoints(payPoints[p]);
+                }}
+                title={p}
+              />
+            ))}
+        </Menu>
+      </View>
+
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           onPress={async () => {
@@ -122,18 +203,19 @@ const LocatePaypointScreen = ({ provider }: any) => {
           }}
           style={styles.bubble}
         >
-          <Text>Tap to center to your location</Text>
+          <Text style={styles.bubbleText}>Tap to center to your location</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 };
 
-LocatePaypointScreen.propTypes = {
-  provider: ProviderPropType,
-};
+// LocatePaypointScreen.propTypes = {
+//   provider: ProviderPropType,
+// };
+const mapStateToProps = ({ payPoints }: RootReducerI) => ({ payPoints });
 
-export default LocatePaypointScreen;
+export default connect(mapStateToProps)(LocatePaypointScreen);
 
 const aa = [
   { name: "CHELSTON OFFICE", latitude: -15.37496, longitude: 28.382121 },
@@ -151,10 +233,13 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   bubble: {
-    backgroundColor: "rgba(255,255,255,0.7)",
+    backgroundColor: `${Colors.linkBlue}66`,
     paddingHorizontal: 18,
     paddingVertical: 12,
     borderRadius: 20,
+  },
+  bubbleText: {
+    fontWeight: "bold",
   },
   latlng: {
     width: 200,
@@ -172,109 +257,3 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
 });
-
-/**
-import React from "react";
-import { StyleSheet, Text, View, Dimensions, Alert } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
-import * as Location from "expo-location";
-import MapView from "react-native-maps";
-import MapViewDirections from "react-native-maps-directions";
-import Strings from "../constants/Strings";
-const { width, height } = Dimensions.get("window");
-
-const origin = { latitude: -15.412123, longitude: 28.303703 };
-const destination = { latitude: -15.37496, longitude: 28.382121 };
-const ASPECT_RATIO = width / height;
-const LATITUDE = -15.37496;
-const LONGITUDE = 28.382121;
-const LATITUDE_DELTA = 0.0922;
-const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-
-const ReportLeakageScreen = () => {
-  const { container, map } = styles;
-  const [region, setRegion] = React.useState({
-    latitude: LATITUDE,
-    longitude: LONGITUDE,
-    latitudeDelta: LATITUDE_DELTA,
-    longitudeDelta: LONGITUDE_DELTA,
-  });
-
-  const getLocationAsync = async () => {
-    let { status } = await Location.requestPermissionsAsync();
-    if (status !== "granted") {
-      // setErrorMsg("Permission to access location was denied");
-      Alert.alert(
-        "Location Permission",
-        "We require permission access to show you the nearest paypoints.",
-        [{ text: "OK", onPress: async () => await getLocationAsync() }],
-        { cancelable: false }
-      );
-    } else {
-      let location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.BestForNavigation,
-      });
-      console.log(location.coords);
-      // console.log(this.state.region);
-      setRegion({
-        ...region,
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      });
-    }
-  };
-
-  React.useEffect(() => {
-    getLocationAsync();
-  }, []);
-
-  return (
-    <View style={container}>
-      <MapView initialRegion={region} style={styles.map}>
-        <MapViewDirections
-          origin={region}
-          destination={destination}
-          apikey={Strings.GOOGLE_MAP_API_KEY}
-        />
-      </MapView>
-    </View>
-  );
-};
-
-export default ReportLeakageScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    ...StyleSheet.absoluteFillObject,
-    // flex: 1,
-    // justifyContent: "flex-end",
-    // alignItems: "center",
-    backgroundColor: "red",
-  },
-  map: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  bubble: {
-    backgroundColor: "rgba(255,255,255,0.7)",
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    borderRadius: 20,
-  },
-  latlng: {
-    width: 200,
-    alignItems: "stretch",
-  },
-  button: {
-    width: 80,
-    paddingHorizontal: 12,
-    alignItems: "center",
-    marginHorizontal: 10,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    marginVertical: 20,
-    backgroundColor: "transparent",
-  },
-});
-
- */
