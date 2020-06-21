@@ -42,6 +42,7 @@ export default {
   ACCOUNTS_STORAGE: "ACCOUNT_STORAGE",
   PAYPOINTS_STORAGE: "PAYPOINT_STORAGE",
   PAYMENT_HISTORY_STORAGE: "PAYMENT_HISTORY_STORAGE",
+  USER_STORAGE: "USER_STORAGE",
   /*************** End Storage Constants *****************/
 
   // API

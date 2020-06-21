@@ -5,6 +5,7 @@ import notifications from "./notifications";
 import payPoints from "./pay-points";
 import paymentHistory from "./payment-history";
 import accounts, { AccountReducerI } from "./accounts";
+import user from "./user";
 import serviceConstants, { ServiceConstantsI } from "./service-constants";
 import { NotificationI } from "../../models/notification";
 import { PayPointI } from "../../models/pay-point";
@@ -17,6 +18,7 @@ export interface RootReducerI {
   serviceConstants: ServiceConstantsI;
   payPoints: PayPointI[];
   paymentHistory: PaymentHistoryI[];
+  user: string;
 }
 
 export default combineReducers({
@@ -26,4 +28,5 @@ export default combineReducers({
   serviceConstants,
   payPoints,
   paymentHistory,
+  user,
 });

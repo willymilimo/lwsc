@@ -20,6 +20,9 @@ const { width, height } = Dimensions.get("window");
 
 import Strings from "../constants/Strings";
 import { InputItemType } from "../types/input-item";
+import { parse } from "react-native-svg";
+import { connect } from "react-redux";
+import { RootReducerI } from "../redux/reducers";
 
 const ASPECT_RATIO = width / height;
 const LATITUDE = -15.37496;
@@ -27,7 +30,7 @@ const LONGITUDE = 28.382121;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = 0.0421; //LATITUDE_DELTA * ASPECT_RATIO;
 
-export default function ReadMeterScreen() {
+const ReadMeterScreen = ({ user }: { user: string }) => {
   const { container } = styles;
   const navigator = useNavigation();
   const [image, setImage] = useState<
@@ -39,10 +42,12 @@ export default function ReadMeterScreen() {
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   });
-  const [meterAccountNumber, setMeterAccountNumber] = React.useState<
-    InputItemType<string>
-  >({
+  const [meterNumber, setMeterNumber] = React.useState<InputItemType<string>>({
     value: "",
+    error: false,
+  });
+  const [meterReading, setMeterReading] = useState<InputItemType<number>>({
+    value: 0,
     error: false,
   });
   const [loading, setLoading] = useState(false);
@@ -196,16 +201,34 @@ export default function ReadMeterScreen() {
         style={{ marginTop: 10, backgroundColor: "white" }}
         disabled={loading}
         mode="outlined"
-        label={"Account/Meter Number (optional)"}
-        value={meterAccountNumber.value}
-        error={meterAccountNumber.error}
+        label={"Meter Number"}
+        value={meterNumber.value}
+        error={meterNumber.error}
         onChangeText={(value) =>
-          setMeterAccountNumber({
+          setMeterNumber({
             value,
             error: value.length > 0 && value.length < 5,
           })
         }
       />
+
+      {user && (
+        <TextInput
+          style={{ marginTop: 10, backgroundColor: "white" }}
+          disabled={loading}
+          mode="outlined"
+          label={"Meter Reading"}
+          value={meterReading.value.toString()}
+          error={meterReading.error}
+          onChangeText={(value) => {
+            const val = parseFloat(value);
+            setMeterReading({
+              value: isNaN(val) ? 0 : val,
+              error: isNaN(val),
+            });
+          }}
+        />
+      )}
 
       <Button
         style={{ marginTop: 15 }}
@@ -219,9 +242,7 @@ export default function ReadMeterScreen() {
         loading={loading}
         //   icon="send"
         disabled={
-          loading ||
-          meterAccountNumber.error ||
-          meterAccountNumber.value.length === 0
+          loading || meterNumber.error || meterNumber.value.length === 0
         }
         mode="outlined"
         onPress={() => {}}
@@ -230,7 +251,11 @@ export default function ReadMeterScreen() {
       </Button>
     </View>
   );
-}
+};
+
+const mapStateToProps = ({ user }: RootReducerI) => ({ user });
+
+export default connect(mapStateToProps)(ReadMeterScreen);
 
 const styles = StyleSheet.create({
   container: {
