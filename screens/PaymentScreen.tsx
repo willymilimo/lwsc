@@ -35,7 +35,7 @@ interface PaymentScreenI {
   route: {
     params: {
       params: AccountI | BowserI;
-      method: any;
+      method: PaymentT;
     };
   };
 }
@@ -72,7 +72,7 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
     if (!(phone.error || !/^\d+$/.test(amount) || email.error)) {
       //   setLoading(true);
       const methodDetails =
-        method === PaymentType.VISA
+        method === PaymentType["VISA/MasterCard"]
           ? `${method} reference contacts ${email.value} and ${phone.value}`
           : `${method} - ${phone.value}`;
       Alert.alert(
@@ -112,7 +112,7 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
         const { success, error, payload, message } = res.data;
 
         if (success) {
-          if (method === PaymentType.VISA) {
+          if (method === PaymentType["VISA/MasterCard"]) {
             navigation.navigate(Strings.WebviewScreen, payload);
           }
         } else {
@@ -204,7 +204,7 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
           }
         />
 
-        {method === PaymentType.VISA && (
+        {method === PaymentType["VISA/MasterCard"] && (
           <TextInput
             style={{ marginTop: 10 }}
             mode="outlined"
@@ -257,9 +257,9 @@ const Items = {
     placeholder: "0955549887",
     regex: Regex.ZAMTEL_NUMBER,
   },
-  [PaymentType.VISA]: {
+  [PaymentType["VISA/MasterCard"]]: {
     image: debit_card,
-    placeholder: "0968271892",
+    placeholder: "0955271892",
     regex: Regex.ZAMTEL_NUMBER,
   },
 };

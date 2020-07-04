@@ -8,6 +8,8 @@ export enum PaymentType {
   ZAMTEL_KWACHA = "Zampay",
   Zampay = "ZAMTEL_KWACHA",
 
-  VISA = "Debit/ATM Card",
-  "Debit/ATM Card" = "VISA"
+  "VISA/MasterCard" = "Debit/ATM Card",
+  "Debit/ATM Card" = "VISA/MasterCard"
 }
+
+export type PaymentT = PaymentType;

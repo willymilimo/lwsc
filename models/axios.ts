@@ -5,6 +5,7 @@ import { AccountI } from "./account";
 import { AddType } from "../types/add-type";
 import { PaymentType } from "../types/payment";
 import { PaymentI } from "./payment";
+import { MeterReading } from "./meter-reading";
 
 // axios.defaults.headers.common["username"] = Strings.API_USERNAME;
 // axios.defaults.headers.common["password"] = Strings.API_PASSWORD;
@@ -18,7 +19,7 @@ const getPayUrl = (paymentType: PaymentType): string | null => {
       return "";
     case PaymentType.ZAMTEL_KWACHA:
       return "";
-    case PaymentType.VISA:
+    case PaymentType["VISA/MasterCard"]:
       return "";
   }
 
@@ -48,4 +49,12 @@ export const makePayment = async (payment: PaymentI) => {
 
 export const applyForPaymentSchedule = async (account: AccountI) => {
   return await axios.post("apply-for-payment-schedule", account);
+};
+
+export const uploadFiles = async (account: AccountI) => {
+  return await axios.post("uploads/files/create", account);
+};
+
+export const submitMeterReading = async (reading: MeterReading) => {
+  return await axios.post("billing/meter-reading/create", reading);
 };
