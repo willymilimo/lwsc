@@ -136,8 +136,14 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
               navigation.navigate(Strings.WebviewScreen, payload);
             } else {
               Alert.alert(
-                "Pin Input",
-                `Please ensure you approve the payment by inputting your ${method} pin in the push request.`
+                "Input Pin",
+                `Please ensure you approve the payment by inputting your ${method} pin in the push request.`,
+                [
+                  {
+                    text: "OK",
+                    onPress: () => navigation.navigate(Strings.HomeTabNavigator),
+                  },
+                ]
               );
             }
           } else {
@@ -221,7 +227,7 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
           disabled={loading}
           onChangeText={(text) =>
             setPhone({
-              value: text,
+              value: `260${text.slice(-9)}`,
               error: !Regex.ZAMBIAN_MOBILE_NUMBER.test(text),
             })
           }

@@ -146,7 +146,7 @@ const paymentMethods = {
     image: zampay,
   },
   [PaymentChannel["MTN Money"]]: {
-    name: PaymentChannel["MTN Money"],
+    name: PaymentChannel.mtn,
     image: mtn_money,
   },
   [PaymentChannel["VISA/MasterCard"]]: {

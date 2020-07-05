@@ -60,6 +60,7 @@ const MakePaymentScreen = ({
         getCustomerByAccountNumber(meterAccountNo, type)
           .then((response) => {
             const { data } = response;
+            console.log(data)
 
             if (data.success) {
               addAccount(
@@ -78,7 +79,7 @@ const MakePaymentScreen = ({
               Alert.alert(
                 `${type} not Added`,
                 data.error
-                  ? data.error.message
+                  ? data.error.toString()
                   : `Specified ${type} number not found`
               );
             }

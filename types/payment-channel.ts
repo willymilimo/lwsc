@@ -5,7 +5,8 @@ export enum PaymentChannel {
   Zampay = "zamtel",
   zamtel = "Zampay",
 
-  "MTN Money" = "MTN Money",
+  "MTN Money" = "mtn",
+  mtn = "MTN Money",
 
   "VISA/MasterCard" = "VISA/MasterCard",
 }
