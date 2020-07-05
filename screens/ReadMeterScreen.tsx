@@ -23,6 +23,7 @@ import { InputItemType } from "../types/input-item";
 import { parse } from "react-native-svg";
 import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
+import { uploadFiles } from "../models/axios";
 
 const ASPECT_RATIO = width / height;
 const LATITUDE = -15.37496;
@@ -51,6 +52,10 @@ const ReadMeterScreen = ({ user }: { user: string }) => {
     error: false,
   });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    getLocationAsync();
+  }, []);
 
   const requestCameraPermissionAsync = async () => {
     var { status } = await ImagePicker.requestCameraPermissionsAsync(); // Permissions.askAsync(Permissions.CAMERA);
@@ -103,11 +108,25 @@ const ReadMeterScreen = ({ user }: { user: string }) => {
     });
 
     if (!result.cancelled && result.base64) {
+      console.log(result.uri);
       // console.log(result.base64);
       // setImage("data:image/jpeg;base64," + result.base64);
       // setImage(result.base64);
       setImage(result);
+      submitImage(result.uri);
     }
+  };
+
+  const submitImage = async (uri: string) => {
+    setLoading(true);
+    uploadFiles([uri])
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => setLoading(false));
   };
 
   const getLocationAsync = async () => {
@@ -140,10 +159,6 @@ const ReadMeterScreen = ({ user }: { user: string }) => {
       ]);
     }
   };
-
-  useEffect(() => {
-    getLocationAsync();
-  }, []);
 
   return (
     <View style={container}>
@@ -245,7 +260,7 @@ const ReadMeterScreen = ({ user }: { user: string }) => {
           loading || meterNumber.error || meterNumber.value.length === 0
         }
         mode="outlined"
-        onPress={() => {}}
+        // onPress={async () => await submitImage()}
       >
         Submit Reading
       </Button>

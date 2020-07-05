@@ -24,18 +24,22 @@ import { IconButton, Checkbox, TextInput, Button } from "react-native-paper";
 import LwscTextInput from "../components/LwscTextInput";
 import Regex from "../constants/Regex";
 import { toFixed } from "../helpers/functions";
-import { makePayment } from "../models/axios";
+import { makePayment, makeMoMoPayment } from "../models/axios";
 import { Payment } from "../models/payment";
 import Strings from "../constants/Strings";
 import { ControlIT } from "../models/control";
 import { BowserI, Bowser } from "../models/bowser";
+import { CustomerType } from "../types/customer-type";
+import { PaymentChannel } from "../types/payment-channel";
+
+type PayT = PaymentType;
 
 interface PaymentScreenI {
   navigation: NavType;
   route: {
     params: {
-      params: AccountI | BowserI;
-      method: PaymentT;
+      params: AccountI;
+      method: PaymentChannel;
     };
   };
 }
@@ -43,7 +47,7 @@ interface PaymentScreenI {
 const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
   const { container, methodStyle, formContainer, flexRow, prefix } = styles;
   const { params, method } = route.params;
-  const { image, placeholder, regex } = Items[method];
+  const { image, placeholder } = Items[method];
   const [phone, setPhone] = useState<ControlIT<string>>({
     value: "",
     error: false,
@@ -56,7 +60,6 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
     params instanceof Bowser ? params.totalPrice.toString() : ""
   );
   const [loading, setLoading] = useState(false);
-  console.log((params as BowserI).totalPrice);
 
   const confirmDetails =
     params instanceof Bowser
@@ -72,7 +75,7 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
     if (!(phone.error || !/^\d+$/.test(amount) || email.error)) {
       //   setLoading(true);
       const methodDetails =
-        method === PaymentType["VISA/MasterCard"]
+        method === PaymentChannel["VISA/MasterCard"]
           ? `${method} reference contacts ${email.value} and ${phone.value}`
           : `${method} - ${phone.value}`;
       Alert.alert(
@@ -96,41 +99,61 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
   };
 
   async function makePaymentRequest() {
-    const payment = new Payment({
-      account_number: params instanceof Account ? params.CUSTKEY : undefined,
-      payment_type: method,
-      amount,
-      customer_phone_number: phone.value,
-      email: email.value,
-    });
-    // makePayment
-    console.log(payment);
-    setLoading(true);
-    makePayment(payment)
-      .then((res) => {
-        // console.log(res.data);
-        const { success, error, payload, message } = res.data;
+    if (parseFloat(amount) < 15) {
+      Alert.alert(
+        "Invalid Amount",
+        "Please input a minimum amount of ZMW15.00"
+      );
+    } else {
+      const accnt = params as AccountI;
+      const payment = new Payment({
+        account_number: accnt.CUSTKEY,
+        meter_number: accnt.CUSTKEY,
+        first_name: accnt.INITIAL,
+        last_name: accnt.SURNAME,
+        customer_type: accnt.IS_METERED
+          ? CustomerType.prepaid
+          : CustomerType.postpaid,
+        amount,
+        payment_channel: PaymentChannel[method],
+        phone_number: phone.value,
+        email: accnt.STATEMENT_DELIVERY_BY_EMAIL,
+      });
+      // makePayment
+      const paymentMethod =
+        method === PaymentChannel["VISA/MasterCard"]
+          ? makePayment
+          : makeMoMoPayment;
+      console.log(payment);
+      setLoading(true);
+      paymentMethod(payment)
+        .then((res) => {
+          console.log(res.data);
+          const { success, error, payload, message } = res.data;
 
-        if (success) {
-          if (method === PaymentType["VISA/MasterCard"]) {
-            navigation.navigate(Strings.WebviewScreen, payload);
+          if (success) {
+            if (method === PaymentChannel["VISA/MasterCard"]) {
+              navigation.navigate(Strings.WebviewScreen, payload);
+            } else {
+              Alert.alert(
+                "Pin Input",
+                `Please ensure you approve the payment by inputting your ${method} pin in the push request.`
+              );
+            }
+          } else {
+            Alert.alert("Payment Not Approved", res.data.error);
           }
-        } else {
-          Alert.alert(
-            "Payment Not Approved",
-            `Please ensure you approve the payment by inputting your ${method} pin in the push request.`
-          );
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => setLoading(false));
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+        .finally(() => setLoading(false));
+    }
   }
 
   return (
     <ScrollView style={container}>
-      <Modal animationType="slide" visible={loading}>
+      <Modal animationType="slide" transparent visible={loading}>
         <View style={[styles.centeredView, { backgroundColor: "#00000077" }]}>
           <View style={styles.modalView}>
             <ActivityIndicator size="large" color={Colors.LwscOrange} />
@@ -199,12 +222,12 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
           onChangeText={(text) =>
             setPhone({
               value: text,
-              error: !regex.test(text),
+              error: !Regex.ZAMBIAN_MOBILE_NUMBER.test(text),
             })
           }
         />
 
-        {method === PaymentType["VISA/MasterCard"] && (
+        {method === PaymentChannel["VISA/MasterCard"] && (
           <TextInput
             style={{ marginTop: 10 }}
             mode="outlined"
@@ -241,7 +264,7 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
 
 export default PaymentScreen;
 
-const Items = {
+const Items: { [key: string]: any } = {
   [PaymentType.AIRTEL_MONEY]: {
     image: airtel_money,
     placeholder: "0978271892 or 0778271892",

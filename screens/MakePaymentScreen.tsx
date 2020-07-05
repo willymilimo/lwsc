@@ -51,6 +51,7 @@ const MakePaymentScreen = ({
   const [type, setType] = React.useState<AddType>(AddType.account);
   const [isBuyForAnother, setIsBuyForAnother] = React.useState(false);
   const [meterAccountNo, setMeterAccountNo] = React.useState("");
+  // const [isPrepaid, setIsPrepaid] = React.useState(false); // we start with 
 
   const handleAccountMeterSubmit = () => {
     if (meterAccountNo.length) {

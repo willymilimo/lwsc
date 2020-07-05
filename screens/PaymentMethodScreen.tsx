@@ -12,32 +12,25 @@ import { Button, IconButton, RadioButton } from "react-native-paper";
 import { ScrollView, TouchableHighlight } from "react-native-gesture-handler";
 import { PaymentType } from "../types/payment";
 import { NavType } from "../types/nav-type";
-import { AccountI, Account } from "../models/account";
+import { AccountI } from "../models/account";
 import Strings from "../constants/Strings";
-import { BowserI, Bowser } from "../models/bowser";
-import { BowserPaySummary } from "./service_forms/Boswer";
+import { PaymentChannel } from "../types/payment-channel";
 
 interface PaymentMethodScreenI {
   navigation: NavType;
   route: {
-    params: AccountI | BowserI;
+    params: AccountI;
   };
 }
 
 const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
   const { params } = route;
   const { container } = styles;
-  const [checked, setChecked] = React.useState(PaymentType.AIRTEL_MONEY);
+  const [checked, setChecked] = React.useState(PaymentChannel.airtel);
 
   return (
     <ScrollView style={container}>
-      {params instanceof Account ? (
-        <BillComponent account={params} />
-      ) : params instanceof Bowser ? (
-        <BowserPaySummary {...params} />
-      ) : (
-        <View />
-      )}
+      <BillComponent account={params} />
       <View style={{ padding: 10 }}>
         <Text
           style={{
@@ -52,7 +45,7 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
         </Text>
         <RadioButton.Group
           value={checked}
-          onValueChange={(value) => setChecked(value as PaymentType)}
+          onValueChange={(value) => setChecked(value as PaymentChannel)}
         >
           {Object.values(paymentMethods).map(({ image, name }, index) => (
             <TouchableHighlight
@@ -144,22 +137,38 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
 export default PaymentMethodScreen;
 
 const paymentMethods = {
-  [PaymentType.AIRTEL_MONEY]: {
-    name: PaymentType.AIRTEL_MONEY,
+  [PaymentChannel["Airtel Money"]]: {
+    name: PaymentChannel["airtel"],
     image: airtel_money,
   },
-  [PaymentType.MTN_MONEY]: {
-    name: PaymentType.MTN_MONEY,
-    image: mtn_money,
-  },
-  [PaymentType.ZAMTEL_KWACHA]: {
-    name: PaymentType.ZAMTEL_KWACHA,
+  [PaymentChannel.Zampay]: {
+    name: PaymentChannel.zamtel,
     image: zampay,
   },
-  [PaymentType.VISA]: {
-    name: PaymentType.VISA,
+  [PaymentChannel["MTN Money"]]: {
+    name: PaymentChannel["MTN Money"],
+    image: mtn_money,
+  },
+  [PaymentChannel["VISA/MasterCard"]]: {
+    name: PaymentChannel["VISA/MasterCard"],
     image: debit_card,
   },
+  // [PaymentType.AIRTEL_MONEY]: {
+  //   name: PaymentType.AIRTEL_MONEY,
+  //   image: airtel_money,
+  // },
+  // [PaymentType.MTN_MONEY]: {
+  //   name: PaymentType.MTN_MONEY,
+  //   image: mtn_money,
+  // },
+  // [PaymentType.ZAMTEL_KWACHA]: {
+  //   name: PaymentType.ZAMTEL_KWACHA,
+  //   image: zampay,
+  // },
+  // [PaymentType.VISA]: {
+  //   name: PaymentType.VISA,
+  //   image: debit_card,
+  // },
 };
 
 const styles = StyleSheet.create({

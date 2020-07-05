@@ -3,7 +3,7 @@ import Strings from "../constants/Strings";
 import { IResponse } from "./iresponse";
 import { AccountI } from "./account";
 import { AddType } from "../types/add-type";
-import { PaymentType } from "../types/payment";
+import { PaymentType, PaymentT } from "../types/payment";
 import { PaymentI } from "./payment";
 import { MeterReading } from "./meter-reading";
 
@@ -42,6 +42,10 @@ export const getCustomerByAccountNumber = async (
   return await axios.get(url);
 };
 
+export const makeMoMoPayment = async (payment: PaymentI) => {
+  return await axios.post(`http://41.72.107.14:3000/api/v1/billing/paybill`, payment);
+}
+
 export const makePayment = async (payment: PaymentI) => {
   // console.log(payment);
   return await axios.post(`transactions/make-payment`, payment);
@@ -51,8 +55,24 @@ export const applyForPaymentSchedule = async (account: AccountI) => {
   return await axios.post("apply-for-payment-schedule", account);
 };
 
-export const uploadFiles = async (account: AccountI) => {
-  return await axios.post("uploads/files/create", account);
+export const uploadFiles = async (uris: string[]) => {
+  const fd = new FormData();
+  uris.forEach((uri, i) => {
+    // fd.append(`reading${i}`, file);
+    let uriParts = uri.split(".");
+    let fileType = uriParts[uriParts.length - 1];
+    fd.append("photo", {
+      uri,
+      name: `photo.${fileType}`,
+      type: `image/${fileType}`,
+    } as any);
+  });
+
+  return await axios.post("uploads/files/create", fd, {
+    headers: {
+      "content-type": "multipart/form-data",
+    },
+  });
 };
 
 export const submitMeterReading = async (reading: MeterReading) => {
