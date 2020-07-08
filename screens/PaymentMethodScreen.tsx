@@ -150,7 +150,7 @@ const paymentMethods = {
     image: mtn_money,
   },
   [PaymentChannel["VISA/MasterCard"]]: {
-    name: PaymentChannel["VISA/MasterCard"],
+    name: PaymentChannel.visa_master_card,
     image: debit_card,
   },
   // [PaymentType.AIRTEL_MONEY]: {

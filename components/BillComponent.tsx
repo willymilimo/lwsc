@@ -30,7 +30,7 @@ export default function BillComponent({
   onEdit,
   onRemove,
 }: BillComponentI) {
-  console.log(onEdit, onRemove);
+  // console.log(onEdit, onRemove);
   const {
     hightlightStyle,
     itemStyle,
@@ -155,7 +155,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     marginBottom: 2,
   },
-  itemTitle: {},
+  itemTitle: {
+    fontWeight: "bold",
+    color: '#0009'
+  },
   textStyle: {
     marginLeft: 10,
     fontSize: 15,

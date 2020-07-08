@@ -8,5 +8,6 @@ export enum PaymentChannel {
   "MTN Money" = "mtn",
   mtn = "MTN Money",
 
-  "VISA/MasterCard" = "VISA/MasterCard",
+  "VISA/MasterCard" = "visa_master_card",
+  visa_master_card = "VISA/MasterCard"
 }

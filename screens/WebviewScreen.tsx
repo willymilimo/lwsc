@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, ActivityIndicator, View } from "react-native";
 import { WebView } from 'react-native-webview';
 import { NavType } from "../types/nav-type";
 
@@ -19,6 +19,13 @@ const WebviewScreen = ({ navigation, route }: WebviewI) => {
 
   return (
     <View style={[styles.container]}>
+      {!isLoadingComplete ? (
+          <ActivityIndicator
+            color="#009688"
+            size="large"
+            style={styles.activityIndicatorStyle}
+          />
+        ) : null}
       <WebView
         //Enable Javascript support
         javaScriptEnabled={true}
@@ -26,6 +33,7 @@ const WebviewScreen = ({ navigation, route }: WebviewI) => {
         domStorageEnabled={true}
         //View to show while loading the webpage
         onLoad={() => setLoadingComplete(true)}
+        onLoadStart={() => setLoadingComplete(false)}
         style={[styles.container]}
         source={{ uri: route.params.full_redirect_url }}
       />

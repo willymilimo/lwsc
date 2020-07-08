@@ -3,7 +3,7 @@ import { Dimensions, Platform } from "react-native";
 const width = Dimensions.get("window").width;
 const height = Dimensions.get("window").height;
 
-console.log(width);
+// console.log(width);
 
 export default {
   window: {

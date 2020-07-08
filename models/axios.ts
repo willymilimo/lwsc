@@ -43,12 +43,27 @@ export const getCustomerByAccountNumber = async (
 };
 
 export const makeMoMoPayment = async (payment: PaymentI) => {
-  return await axios.post(`http://41.72.107.14:3000/api/v1/billing/paybill`, payment);
-}
+  return await axios.post(
+    `http://41.72.107.14:3000/api/v1/billing/paybill`,
+    payment
+  );
+};
 
-export const makePayment = async (payment: PaymentI) => {
+export const makePayment = async (
+  payment: PaymentI
+): Promise<
+  AxiosResponse<
+    IResponse<{
+      transaction_id: string;
+      full_redirect_url: string;
+    }>
+  >
+> => {
   // console.log(payment);
-  return await axios.post(`transactions/make-payment`, payment);
+  return await axios.post(
+    `http://41.72.107.14:3000/api/v1/billing/paybill`,
+    payment
+  );
 };
 
 export const applyForPaymentSchedule = async (account: AccountI) => {

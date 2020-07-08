@@ -60,7 +60,7 @@ const MakePaymentScreen = ({
         getCustomerByAccountNumber(meterAccountNo, type)
           .then((response) => {
             const { data } = response;
-            console.log(data)
+            // console.log(data)
 
             if (data.success) {
               addAccount(
