@@ -6,10 +6,12 @@ import payPoints from "./pay-points";
 import paymentHistory from "./payment-history";
 import accounts, { AccountReducerI } from "./accounts";
 import user from "./user";
+import services from "./services";
 import serviceConstants, { ServiceConstantsI } from "./service-constants";
 import { NotificationI } from "../../models/notification";
 import { PaymentHistoryI } from "../../models/payment-history";
 import { PayPointReducer } from "../../types/paypoint";
+import { ServiceItemI } from "../../models/service-item";
 
 export interface RootReducerI {
   theme: ThemeReducer;
@@ -18,6 +20,7 @@ export interface RootReducerI {
   serviceConstants: ServiceConstantsI;
   payPoints: PayPointReducer;
   paymentHistory: PaymentHistoryI[];
+  services: ServiceItemI[];
   user: string;
 }
 
@@ -29,4 +32,5 @@ export default combineReducers({
   payPoints,
   paymentHistory,
   user,
+  services,
 });

@@ -6,6 +6,7 @@ import { AddType } from "../types/add-type";
 import { PaymentType, PaymentT } from "../types/payment";
 import { PaymentI } from "./payment";
 import { MeterReading } from "./meter-reading";
+import { ServiceItemI } from "./service-item";
 
 // axios.defaults.headers.common["username"] = Strings.API_USERNAME;
 // axios.defaults.headers.common["password"] = Strings.API_PASSWORD;
@@ -63,6 +64,14 @@ export const makePayment = async (
   return await axios.post(
     `http://41.72.107.14:3000/api/v1/billing/paybill`,
     payment
+  );
+};
+
+export const fetchServices = async (): Promise<
+  AxiosResponse<IResponse<ServiceItemI[]>>
+> => {
+  return await axios.get(
+    `http://41.72.107.14:3000/api/v1/services/types/fetch`
   );
 };
 
