@@ -22,7 +22,7 @@ import FeacalSludgeMgt from "../assets/feacal_sludge_mgt.svg";
 import OnsiteSanitation from "../assets/onsite_sanitation.svg";
 import ChangeConnection from "../assets/change_connection.svg";
 import { ServiceType } from "../types/service-type";
-import { ServiceItemI, ServiceItem } from "../models/service-item";
+import { ServiceItemI, ServiceItem, AppIcon } from "../models/service-item";
 import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
 import { bindActionCreators } from "redux";
@@ -75,6 +75,19 @@ const ServicesScreen = ({
       is_subscribed = false;
     };
   }, [serviceTypes]);
+
+  const createIcon = ({
+    type,
+    name,
+    size,
+    color,
+    bgColor,
+    width,
+    height,
+  }: AppIcon) => {
+    
+
+  };
 
   return (
     <ScrollView style={container}>
