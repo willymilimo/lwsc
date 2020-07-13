@@ -5,12 +5,13 @@ import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import Colors from "../../constants/Colors";
-import { Button, TextInput } from "react-native-paper";
+import { Button, TextInput, FAB } from "react-native-paper";
 import { ControlIT } from "../../models/control";
 import Regex from "../../constants/Regex";
 import { ServiceApplicationI } from "../../models/service-application";
 import { applyForService } from "../../models/axios";
 import Strings from "../../constants/Strings";
+import { Feather } from "@expo/vector-icons";
 const { width, height } = Dimensions.get("window");
 
 interface GeneralServiceFormI {
@@ -21,10 +22,11 @@ interface GeneralServiceFormI {
 const ASPECT_RATIO = width / height;
 const LATITUDE = -15.37496;
 const LONGITUDE = 28.382121;
-const LATITUDE_DELTA = 0.0922;
-const LONGITUDE_DELTA = 0.0421; //LATITUDE_DELTA * ASPECT_RATIO;
+const LATITUDE_DELTA = 0.00922;
+const LONGITUDE_DELTA = 0.00921; //LATITUDE_DELTA * ASPECT_RATIO;
 
 const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
+  let mapRef: MapView;
   const { title, type } = route.params;
   const { container, mapContainer, map } = styles;
   const [region, setRegion] = React.useState({
@@ -138,10 +140,39 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
       .finally(() => setLoading(false));
   };
 
+  const onPressZoomOut = () => {
+    console.log({
+      latitudeDelta: region.latitudeDelta / 10,
+      longitudeDelta: region.longitudeDelta / 10,
+    });
+    setRegion({
+      ...region,
+      latitudeDelta: region.latitudeDelta / 10,
+      longitudeDelta: region.longitudeDelta / 10,
+    });
+    mapRef.animateToRegion(region, 100);
+  };
+
+  const onPressZoomIn = () => {
+    console.log({
+      latitudeDelta: region.latitudeDelta / 10,
+      longitudeDelta: region.longitudeDelta / 10,
+    });
+    setRegion({
+      ...region,
+      latitudeDelta: region.latitudeDelta * 10,
+      longitudeDelta: region.longitudeDelta * 10,
+    });
+    mapRef.animateToRegion(region, 100);
+  };
+
   return (
     <ScrollView style={container}>
       <View style={mapContainer}>
         <MapView
+          ref={(ref) => (mapRef = ref as MapView)}
+          zoomEnabled={true}
+          showsUserLocation={true}
           region={region}
           onRegionChangeComplete={() => setRegion(region)}
           initialRegion={region}
@@ -163,6 +194,48 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
             pinColor={`${Colors.LwscRed}`}
           />
         </MapView>
+        <FAB
+          onPress={onPressZoomOut}
+          style={{
+            position: "absolute",
+            margin: 16,
+            right: 0,
+            bottom: 50,
+            backgroundColor: "#ffffff77",
+            borderWidth: 0.75,
+            borderColor: `${Colors.LwscBlack}01`,
+          }}
+          small
+          icon={({ color }) => (
+            <Feather
+              name="zoom-in"
+              size={25}
+              color={color}
+              style={{ backgroundColor: "transparent" }}
+            />
+          )}
+        />
+        <FAB
+          onPress={onPressZoomIn}
+          style={{
+            position: "absolute",
+            margin: 16,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "#ffffff77",
+            borderWidth: 0.75,
+            borderColor: `${Colors.LwscBlack}01`,
+          }}
+          small
+          icon={({ color }) => (
+            <Feather
+              name="zoom-out"
+              size={25}
+              color={color}
+              style={{ backgroundColor: "transparent" }}
+            />
+          )}
+        />
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[
@@ -180,7 +253,9 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
             onPress={async () => await getLocationAsync()}
             style={styles.bubble}
           >
-            <Text style={styles.bubbleText}>Tap to center to my location</Text>
+            <Text style={styles.bubbleText}>
+              Tap to center to your location
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

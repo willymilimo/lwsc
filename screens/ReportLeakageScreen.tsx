@@ -15,7 +15,7 @@ import MapView, { Marker } from "react-native-maps";
 import Colors from "../constants/Colors";
 import { TextInput, Button, FAB } from "react-native-paper";
 import { ControlIT } from "../models/control";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, Feather } from "@expo/vector-icons";
 import Strings from "../constants/Strings";
 const { width, height } = Dimensions.get("window");
 
@@ -27,8 +27,8 @@ import Regex from "../constants/Regex";
 const ASPECT_RATIO = width / height;
 const LATITUDE = -15.37496;
 const LONGITUDE = 28.382121;
-const LATITUDE_DELTA = 0.0922;
-const LONGITUDE_DELTA = 0.0421; //LATITUDE_DELTA * ASPECT_RATIO;
+const LATITUDE_DELTA = 0.00922;
+const LONGITUDE_DELTA = 0.00421; //LATITUDE_DELTA * ASPECT_RATIO;
 
 const ReportLeakageScreen = () => {
   let map: MapView;
@@ -153,14 +153,32 @@ const ReportLeakageScreen = () => {
     getLocationAsync();
   }, []);
 
+  const onPressZoomOut = () => {
+    setRegion({
+      ...region,
+      latitudeDelta: region.latitudeDelta / 10,
+      longitudeDelta: region.longitudeDelta / 10,
+    });
+    map.animateToRegion(region, 100);
+  };
+
+  const onPressZoomIn = () => {
+    setRegion({
+      ...region,
+      latitudeDelta: region.latitudeDelta * 10,
+      longitudeDelta: region.longitudeDelta * 10,
+    });
+    map.animateToRegion(region, 100);
+  };
+
   return (
     <ScrollView style={container}>
       <View style={mapContainer}>
         <MapView
           ref={(ref) => (map = ref as MapView)}
-          region={region}
           zoomEnabled={true}
           showsUserLocation={true}
+          region={region}
           onRegionChangeComplete={() => setRegion(region)}
           initialRegion={region}
           style={mapStyle}
@@ -181,6 +199,48 @@ const ReportLeakageScreen = () => {
             pinColor={`${Colors.LwscRed}`}
           />
         </MapView>
+        <FAB
+          onPress={onPressZoomOut}
+          style={{
+            position: "absolute",
+            margin: 16,
+            right: 0,
+            bottom: 50,
+            backgroundColor: "#ffffff77",
+            borderWidth: 0.75,
+            borderColor: `${Colors.LwscBlack}01`,
+          }}
+          small
+          icon={({ color }) => (
+            <Feather
+              name="zoom-in"
+              size={25}
+              color={color}
+              style={{ backgroundColor: "transparent" }}
+            />
+          )}
+        />
+        <FAB
+          onPress={onPressZoomIn}
+          style={{
+            position: "absolute",
+            margin: 16,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "#ffffff77",
+            borderWidth: 0.75,
+            borderColor: `${Colors.LwscBlack}01`,
+          }}
+          small
+          icon={({ color }) => (
+            <Feather
+              name="zoom-out"
+              size={25}
+              color={color}
+              style={{ backgroundColor: "transparent" }}
+            />
+          )}
+        />
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[
@@ -189,7 +249,7 @@ const ReportLeakageScreen = () => {
             ]}
           >
             <Text style={styles.bubbleText}>
-              Drag marker to location of the leak
+              Drag marker to location of the complaint (optional)
             </Text>
           </TouchableOpacity>
         </View>

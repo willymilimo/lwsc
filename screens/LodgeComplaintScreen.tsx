@@ -13,8 +13,8 @@ const { width, height } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
 const LATITUDE = -15.37496;
 const LONGITUDE = 28.382121;
-const LATITUDE_DELTA = 0.0922;
-const LONGITUDE_DELTA = 0.0421; //LATITUDE_DELTA * ASPECT_RATIO;
+const LATITUDE_DELTA = 0.00922;
+const LONGITUDE_DELTA = 0.00921; //LATITUDE_DELTA * ASPECT_RATIO;
 
 const LodgeComplaintScreen = () => {
   let map: MapView;
@@ -132,7 +132,7 @@ const LodgeComplaintScreen = () => {
           }}
           small
           icon={({ color }) => (
-            <Feather name="zoom-out" size={25} color={color} />
+            <Feather name="zoom-in" size={25} color={color} style={{backgroundColor: 'transparent'}} />
           )}
         />
         <FAB
@@ -148,29 +148,9 @@ const LodgeComplaintScreen = () => {
           }}
           small
           icon={({ color }) => (
-            <Feather name="zoom-in" size={25} color={color} />
+            <Feather name="zoom-out" size={25} color={color} style={{backgroundColor: 'transparent'}} />
           )}
         />
-        {/* <TouchableOpacity
-          style={styles.zoomIn}
-          onPress={(onPressZoomIn}
-        >
-          <Icon
-            name="add"
-            style={styles.icon}
-            size={20}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.zoomOut}
-          onPress={onPressZoomOut}
-        >
-          <Icon
-            name="remove"
-            style={styles.icon}
-            size={20}
-          />
-        </TouchableOpacity> */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[

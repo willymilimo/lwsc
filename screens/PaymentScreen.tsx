@@ -1,13 +1,6 @@
 import React, { useState } from "react";
-import {
-  StyleSheet,
-  View,
-  Image,
-  Text,
-  Alert,
-  Modal,
-  ActivityIndicator,
-} from "react-native";
+import { StyleSheet, View, Image, Text, Alert, Modal } from "react-native";
+
 import { ScrollView } from "react-native-gesture-handler";
 import { NavType } from "../types/nav-type";
 import { AccountI, Account } from "../models/account";
@@ -19,15 +12,21 @@ import {
   debit_card,
 } from "../constants/Images";
 import Colors from "../constants/Colors";
-import { IconButton, Checkbox, TextInput, Button } from "react-native-paper";
+import {
+  IconButton,
+  Checkbox,
+  TextInput,
+  Button,
+  ActivityIndicator,
+} from "react-native-paper";
 import LwscTextInput from "../components/LwscTextInput";
 import Regex from "../constants/Regex";
 import { toFixed } from "../helpers/functions";
-import { makePayment, makeMoMoPayment } from "../models/axios";
-import { Payment } from "../models/payment";
+import { makePayment } from "../models/axios";
+import { Payment, PaymentI } from "../models/payment";
 import Strings from "../constants/Strings";
 import { ControlIT } from "../models/control";
-import { BowserI, Bowser } from "../models/bowser";
+import { Bowser } from "../models/bowser";
 import { CustomerType } from "../types/customer-type";
 import { PaymentChannel } from "../types/payment-channel";
 
@@ -103,6 +102,66 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
     }
   };
 
+  async function processPayment(payment: PaymentI) {
+    setLoading(true);
+    makePayment(payment)
+      .then(({ data, status }) => {
+        const { success, error, payload, message } = data;
+
+        if (status === 200) {
+          if (success) {
+            if (method === PaymentChannel.visa_master_card) {
+              navigation.navigate(Strings.WebviewScreen, payload);
+            } else if (method === PaymentChannel.zamtel) {
+              Alert.alert(
+                Strings.PAYMENT_SUCCESS.title,
+                Strings.PAYMENT_SUCCESS.message,
+                [
+                  {
+                    text: "OK",
+                    onPress: () =>
+                      navigation.navigate(Strings.HomeTabNavigator),
+                  },
+                ]
+              );
+            } else {
+              Alert.alert(
+                Strings.PIN_INPUT.title,
+                Strings.PIN_INPUT.message.replace("{pin}", method),
+                [
+                  {
+                    text: "OK",
+                    onPress: () =>
+                      navigation.navigate(Strings.HomeTabNavigator),
+                  },
+                ]
+              );
+            }
+          } else {
+            let msg =
+              message ||
+              error ||
+              Strings.PIN_INPUT.message.replace("{pin}", method);
+
+            // if (msg.toLowerCase() === "transaction initiation failed") 
+
+            Alert.alert("Payment Not Approved", msg);
+          }
+        } else {
+          console.error(data);
+          throw new Error("We did not get a 200 instead got a " + status);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        Alert.alert(
+          Strings.SELF_REPORTING_PROBLEM.title,
+          Strings.SELF_REPORTING_PROBLEM.message
+        );
+      })
+      .finally(() => setLoading(false));
+  }
+
   async function makePaymentRequest() {
     const accnt = params as AccountI;
     const payment = new Payment({
@@ -118,41 +177,24 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
       phone_number: phone.value,
       email: email.value || accnt.STATEMENT_DELIVERY_BY_EMAIL,
     });
-    // makePayment
-    // const paymentMethod =
-    //   method === PaymentChannel["VISA/MasterCard"]
-    //     ? makePayment
-    //     : makeMoMoPayment;
-    console.log(payment);
-    setLoading(true);
-    makePayment(payment)
-      .then((res) => {
-        console.log(res.data);
-        const { success, error, payload, message } = res.data;
 
-        if (success) {
-          if (method === PaymentChannel.visa_master_card) {
-            navigation.navigate(Strings.WebviewScreen, payload);
-          } else {
-            Alert.alert(
-              "Input Pin",
-              `Please ensure you approve the payment by inputting your ${method} pin in the push request.`,
-              [
-                {
-                  text: "OK",
-                  onPress: () => navigation.navigate(Strings.HomeTabNavigator),
-                },
-              ]
-            );
-          }
-        } else {
-          Alert.alert("Payment Not Approved", res.data.error);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => setLoading(false));
+    if (method === PaymentChannel.zamtel) {
+      Alert.alert(
+        Strings.PIN_INPUT.title,
+        `${Strings.PIN_INPUT.message.replace(
+          "{pin}",
+          method
+        )} Tap PROCEED to continue.`,
+        [
+          {
+            text: "PROCEED",
+            onPress: async () => processPayment(payment),
+          },
+        ]
+      );
+    } else {
+      processPayment(payment);
+    }
   }
 
   return (
@@ -226,8 +268,8 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
           onBlur={() => {
             setPhone({
               value: `260${phone.value.slice(-9)}`,
-              error: phone.error
-            })
+              error: phone.error,
+            });
           }}
           onChangeText={(text) =>
             setPhone({

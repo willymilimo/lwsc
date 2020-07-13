@@ -138,4 +138,13 @@ export default {
     message:
       "Sorry, we need location permission to quickly address the address!",
   },
+
+  PIN_INPUT: {
+    title: "Input Pin",
+    message: `Please ensure you approve the payment by inputting your {pin} pin in the push request.`,
+  },
+  PAYMENT_SUCCESS: {
+    title: "Payment Successful",
+    message: "Your payment has been processed successfully. You will recieve an SMS with the payment confirmation details."
+  }
 };
