@@ -7,6 +7,7 @@ import { PaymentType, PaymentT } from "../types/payment";
 import { PaymentI } from "./payment";
 import { MeterReading } from "./meter-reading";
 import { ServiceItemI } from "./service-item";
+import { ServiceApplicationI } from "./service-application";
 
 // axios.defaults.headers.common["username"] = Strings.API_USERNAME;
 // axios.defaults.headers.common["password"] = Strings.API_PASSWORD;
@@ -44,10 +45,7 @@ export const getCustomerByAccountNumber = async (
 };
 
 export const makeMoMoPayment = async (payment: PaymentI) => {
-  return await axios.post(
-    `http://41.72.107.14:3000/api/v1/billing/paybill`,
-    payment
-  );
+  return await axios.post(`billing/paybill`, payment);
 };
 
 export const makePayment = async (
@@ -61,18 +59,20 @@ export const makePayment = async (
   >
 > => {
   // console.log(payment);
-  return await axios.post(
-    `http://41.72.107.14:3000/api/v1/billing/paybill`,
-    payment
-  );
+  return await axios.post(`billing/paybill`, payment, { timeout: 60000 });
 };
 
 export const fetchServices = async (): Promise<
   AxiosResponse<IResponse<ServiceItemI[]>>
 > => {
-  return await axios.get(
-    `http://41.72.107.14:3000/api/v1/services/types/fetch`
-  );
+  return await axios.get(`services/types/fetch`);
+};
+
+export const applyForService = async (
+  service: ServiceApplicationI
+): Promise<AxiosResponse<IResponse>> => {
+  console.log(service);
+  return await axios.post(`applications/create`, service);
 };
 
 export const applyForPaymentSchedule = async (account: AccountI) => {

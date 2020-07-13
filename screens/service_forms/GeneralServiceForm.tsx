@@ -7,11 +7,15 @@ import * as Location from "expo-location";
 import Colors from "../../constants/Colors";
 import { Button, TextInput } from "react-native-paper";
 import { ControlIT } from "../../models/control";
+import Regex from "../../constants/Regex";
+import { ServiceApplicationI } from "../../models/service-application";
+import { applyForService } from "../../models/axios";
+import Strings from "../../constants/Strings";
 const { width, height } = Dimensions.get("window");
 
 interface GeneralServiceFormI {
   navigation: any;
-  route: { params: { title: string; type: ServiceType } };
+  route: { params: { title: string; type: string } };
 }
 
 const ASPECT_RATIO = width / height;
@@ -89,6 +93,51 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
     getLocationAsync();
   }, []);
 
+  const handleSubmit = () => {
+    setLoading(false);
+    const name = fullName.value.split(" ");
+    const first_name = name[0];
+    let last_name = first_name;
+    if (name.length > 2) {
+      name.reverse().pop();
+      last_name = name.reverse().toString();
+    }
+    const application: ServiceApplicationI = {
+      service_type: type,
+      first_name,
+      last_name,
+      phone: phone.value,
+      email: email.value,
+      location: region,
+      address: address.value,
+      description: description.value,
+      accountMeterNumber: account_meter.value,
+    };
+
+    applyForService(application)
+      .then(({ status, data }) => {
+        const { success, payload } = data;
+        if (status === 200 && success) {
+          Alert.alert(
+            "Application Submitted",
+            "Application submitted successfully. Your code is as follows"
+          );
+        } else {
+          Alert.alert(
+            Strings.SELF_REPORTING_PROBLEM.title,
+            Strings.SELF_REPORTING_PROBLEM.message
+          );
+        }
+      })
+      .catch((err) => {
+        Alert.alert(
+          Strings.SELF_REPORTING_PROBLEM.title,
+          Strings.SELF_REPORTING_PROBLEM.message
+        );
+      })
+      .finally(() => setLoading(false));
+  };
+
   return (
     <ScrollView style={container}>
       <View style={mapContainer}>
@@ -122,7 +171,7 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
             ]}
           >
             <Text style={styles.bubbleText}>
-              Drag marker to location of the leak
+              Drag marker to location requiring the service
             </Text>
           </TouchableOpacity>
         </View>
@@ -144,7 +193,12 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
           value={fullName.value}
           error={fullName.error}
           disabled={loading}
-          onChangeText={(text) => {}}
+          onChangeText={(text) =>
+            setFullName({
+              value: text,
+              error: !Regex.NAME.test(text),
+            })
+          }
         />
 
         <TextInput
@@ -155,18 +209,28 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
           value={phone.value}
           error={phone.error}
           disabled={loading}
-          onChangeText={(text) => {}}
+          onChangeText={(text) =>
+            setPhone({
+              value: text,
+              error: !Regex.ZAMBIAN_PHONE_NUMBER.test(text),
+            })
+          }
         />
 
         <TextInput
           style={{ marginTop: 10 }}
           mode="outlined"
-          label="Email Address"
+          label="Email Address (optional)"
           placeholder="e.g. mchola@lwsc.co.zm"
           value={email.value}
           error={email.error}
           disabled={loading}
-          onChangeText={(text) => {}}
+          onChangeText={(text) =>
+            setEmail({
+              value: text,
+              error: text.length > 0 && !Regex.EMAIL.test(text),
+            })
+          }
         />
 
         <TextInput
@@ -174,12 +238,17 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
           multiline={true}
           numberOfLines={3}
           mode="outlined"
-          label="Residential Address"
-          placeholder="e.g. Plot 5, off Alick Nkhata Road"
+          label="Address"
+          placeholder="e.g. Plot 5, off Alick Nkhata Road, Mass Media"
           value={address.value}
           error={address.error}
           disabled={loading}
-          onChangeText={(text) => {}}
+          onChangeText={(text) =>
+            setAddress({
+              value: text,
+              error: text.length < 10,
+            })
+          }
         />
 
         <TextInput
@@ -190,7 +259,12 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
           value={account_meter.value}
           error={account_meter.error}
           disabled={loading}
-          onChangeText={(text) => {}}
+          onChangeText={(text) =>
+            setAccountMeter({
+              value: text,
+              error: text.length > 0 && !/^\d{5,}$/g.test(text),
+            })
+          }
         />
 
         <TextInput
@@ -203,7 +277,12 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
           value={description.value}
           error={description.error}
           disabled={loading}
-          onChangeText={(text) => {}}
+          onChangeText={(text) =>
+            setDescription({
+              value: text,
+              error: text.length > 0 && text.length < 5,
+            })
+          }
         />
 
         <Button
@@ -215,10 +294,11 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
             backgroundColor: `${Colors.linkBlue}22`,
           }}
           color={`${Colors.LwscBlue}bb`}
+          disabled={fullName.error || address.error || phone.error}
           loading={loading}
           //   icon="send"
           mode="outlined"
-          onPress={() => {}}
+          onPress={handleSubmit}
         >
           Request Service
         </Button>

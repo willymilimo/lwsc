@@ -9,6 +9,7 @@ import {
   Entypo,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
+import { ActivityIndicator } from "react-native-paper";
 import Strings from "../constants/Strings";
 import Colors from "../constants/Colors";
 import LwscButton from "../components/LwscButton";
@@ -63,7 +64,7 @@ const ServicesScreen = ({
             }
           })
           .catch((err) => {
-            console.log(err);
+            // console.log(err);
             const { title, message } = Strings.SELF_REPORTING_PROBLEM;
             Alert.alert(title, message);
           })
@@ -76,94 +77,145 @@ const ServicesScreen = ({
     };
   }, [serviceTypes]);
 
-  const createIcon = ({
-    type,
-    name,
-    size,
-    color,
-    bgColor,
-    width,
-    height,
-  }: AppIcon) => {
-    
+  const createIcon = (
+    icon: string,
+    { type, name, color, width, height, size }: AppIcon
+  ) => {
+    if (type !== "svg") {
+      let Icon = null;
 
+      switch (type) {
+        case "MaterialCommunityIcons":
+          Icon = MaterialCommunityIcons;
+          break;
+        case "FontAwesome":
+          Icon = FontAwesome;
+          break;
+        case "FontAwesome5":
+          Icon = FontAwesome5;
+          break;
+        case "Octicons":
+          Icon = Octicons;
+          break;
+        case "MaterialIcons":
+          Icon = MaterialIcons;
+          break;
+        case "Entypo":
+          Icon = Entypo;
+          break;
+        default:
+          Icon = MaterialIcons;
+          break;
+      }
+      return <Icon name={name} color={color} size={size} />;
+    }
+
+    let Icon = SewerConnection;
+    switch (icon) {
+      case "sewer_connection.svg":
+        Icon = SewerConnection;
+        break;
+      case "feacal_sludge_mgt.svg":
+        Icon = FeacalSludgeMgt;
+        break;
+      case "onsite_sanitation.svg":
+        Icon = OnsiteSanitation;
+        break;
+      case "change_connection.svg":
+        Icon = ChangeConnection;
+        break;
+      case "water_tap.svg":
+        Icon = WaterTap;
+        break;
+      case "sewer_home.svg":
+        Icon = SewerHome;
+        break;
+    }
+
+    return <Icon width={width} height={height} fill={color} />;
   };
 
   return (
     <ScrollView style={container}>
       <View style={btnsBox}>
-        {serviceTypes.map((btn) => (
-          <View
-            key={btn._id}
-            style={{
-              width: Layouts.window.width / 3,
-              height: Layouts.window.width / 3,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+        {loading ? (
+          <View style={{display: 'flex', flex: 1, alignItems: 'center'}}><ActivityIndicator size={50} animating={true} color={Colors.colorGreen} /></View>
+        ) : !serviceTypes.length ? (
+          <Text style={{paddingHorizontal: 10}}>No services available</Text>
+        ) : (
+          serviceTypes.map(({ _id, thumbnail_img, title, app_icon }) => (
             <View
+              key={_id}
               style={{
-                width: "82%",
-                height: "82%",
-                borderRadius: 10,
-                backgroundColor: "#fff",
-                shadowColor: `${Colors.linkBlue}22`,
-
-                elevation: 5,
-
-                shadowOffset: {
-                  width: 1,
-                  height: 1,
-                },
-                shadowOpacity: 0.25,
-                shadowRadius: 1,
+                width: Layouts.window.width / 3,
+                height: Layouts.window.width / 3,
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              <TouchableHighlight
-                underlayColor="#55555533"
-                onPress={() =>
-                  navigation.navigate(Strings.GeneralServiceForm, {
-                    title: btn.title,
-                    type: ServiceType,
-                  })
-                }
+              <View
                 style={{
-                  padding: 5,
-                  height: "100%",
+                  width: "82%",
+                  height: "82%",
                   borderRadius: 10,
-                  alignItems: "center",
-                  justifyContent: "center",
+                  backgroundColor: "#fff",
+                  shadowColor: `${Colors.linkBlue}22`,
+
+                  elevation: 5,
+
+                  shadowOffset: {
+                    width: 1,
+                    height: 1,
+                  },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 1,
                 }}
               >
-                <React.Fragment>
-                  <View
-                    style={[
-                      iconContainer,
-                      {
-                        height: "55%",
-                        width: "55%",
-                        backgroundColor: btn.app_icon.bgColor,
-                      },
-                    ]}
-                  >
-                    {/* {btn.icon} */}
-                  </View>
-                  <Text
-                    style={{
-                      marginHorizontal: 5,
-                      fontWeight: "600",
-                      textAlign: "center",
-                    }}
-                  >
-                    {btn.title}
-                  </Text>
-                </React.Fragment>
-              </TouchableHighlight>
+                <TouchableHighlight
+                  underlayColor="#55555533"
+                  onPress={() =>
+                    navigation.navigate(Strings.GeneralServiceForm, {
+                      title: title,
+                      type: _id,
+                    })
+                  }
+                  style={{
+                    padding: 5,
+                    height: "100%",
+                    borderRadius: 10,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <React.Fragment>
+                    <View
+                      style={[
+                        iconContainer,
+                        {
+                          height: "55%",
+                          width: "55%",
+                          backgroundColor: app_icon.bgColor,
+                        },
+                      ]}
+                    >
+                      {createIcon(thumbnail_img, app_icon)}
+                    </View>
+                    <Text
+                      style={{
+                        marginHorizontal: 5,
+                        fontWeight: "600",
+                        textAlign: "center",
+                      }}
+                    >
+                      {title}
+                    </Text>
+                  </React.Fragment>
+                </TouchableHighlight>
+              </View>
             </View>
-          </View>
-        ))}
-        {btns.map((btn) => (
+          ))
+        )}
+        {/* {btns.map((btn) => (
           <View
             key={btn.label}
             style={{
@@ -233,7 +285,7 @@ const ServicesScreen = ({
               </TouchableHighlight>
             </View>
           </View>
-        ))}
+        ))} */}
       </View>
     </ScrollView>
   );

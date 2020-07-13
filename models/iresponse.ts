@@ -1,4 +1,4 @@
-export interface IResponse<Type> {
+export interface IResponse<Type = any> {
   success: boolean;
   error: string;
   message: string;

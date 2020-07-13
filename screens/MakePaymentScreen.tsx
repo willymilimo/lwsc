@@ -58,11 +58,9 @@ const MakePaymentScreen = ({
       if (!Object.keys(accounts).includes(meterAccountNo)) {
         setLoading(true);
         getCustomerByAccountNumber(meterAccountNo, type)
-          .then((response) => {
-            const { data } = response;
-            // console.log(data)
+          .then(({data, status}) => {
 
-            if (data.success) {
+            if (status === 200 && data.success) {
               addAccount(
                 new Account({
                   ...data.payload,
