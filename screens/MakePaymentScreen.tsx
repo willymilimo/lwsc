@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, View, Platform, Alert } from "react-native";
 import {
   Portal,
@@ -51,20 +51,63 @@ const MakePaymentScreen = ({
   const [type, setType] = React.useState<AddType>(AddType.account);
   const [isBuyForAnother, setIsBuyForAnother] = React.useState(false);
   const [meterAccountNo, setMeterAccountNo] = React.useState("");
-  // const [isPrepaid, setIsPrepaid] = React.useState(false); // we start with 
+  // const [isPrepaid, setIsPrepaid] = React.useState(false); // we start with
 
-  const handleAccountMeterSubmit = () => {
-    if (meterAccountNo.length) {
-      if (!Object.keys(accounts).includes(meterAccountNo)) {
+  useEffect(() => {
+    let is_subscribed = true;
+    const keys = Object.keys(accounts);
+    if (is_subscribed && keys.length) {
+      const updateAccounts = async () => {
         setLoading(true);
-        getCustomerByAccountNumber(meterAccountNo, type)
-          .then(({data, status}) => {
-
+        for (let i = 0; i < keys.length; i++) {
+          const accnt = keys[i];
+          try {
+            const { data, status } = await getCustomerByAccountNumber(
+              accnt,
+              AddType.account
+            );
             if (status === 200 && data.success) {
               addAccount(
                 new Account({
                   ...data.payload,
                   IS_METERED: type == AddType.meter,
+                })
+              );
+            } else {
+              deleteAccount(accnt);
+            }
+          } catch (exc) {
+            Alert.alert(
+              Strings.SELF_REPORTING_PROBLEM.title,
+              Strings.SELF_REPORTING_PROBLEM.message
+            );
+            break;
+          }
+        }
+        setLoading(false);
+      };
+
+      updateAccounts();
+    }
+
+    return () => {
+      is_subscribed = false;
+    };
+  }, [accounts]);
+
+  const handleAccountMeterSubmit = () => {
+    if (type === AddType.meter) {
+      navigation.navigate(Strings.PaymentMethodScreen, { meterNumber: meterAccountNo });
+    } else if (meterAccountNo.length) {
+      if (!Object.keys(accounts).includes(meterAccountNo)) {
+        setLoading(true);
+        getCustomerByAccountNumber(meterAccountNo, type)
+          .then(({ data, status }) => {
+            if (status === 200 && data.success) {
+              addAccount(
+                new Account({
+                  ...data.payload,
+                  IS_METERED: false,
                 })
               );
               setShowDialog(false);

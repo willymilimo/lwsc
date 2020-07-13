@@ -12,14 +12,14 @@ import { Button, IconButton, RadioButton } from "react-native-paper";
 import { ScrollView, TouchableHighlight } from "react-native-gesture-handler";
 import { PaymentType } from "../types/payment";
 import { NavType } from "../types/nav-type";
-import { AccountI } from "../models/account";
+import { AccountI, Account } from "../models/account";
 import Strings from "../constants/Strings";
 import { PaymentChannel } from "../types/payment-channel";
 
 interface PaymentMethodScreenI {
   navigation: NavType;
   route: {
-    params: AccountI;
+    params: AccountI | { meterNumber: string };
   };
 }
 
@@ -28,9 +28,11 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
   const { container } = styles;
   const [checked, setChecked] = React.useState(PaymentChannel.airtel);
 
+  console.log(params);
+
   return (
     <ScrollView style={container}>
-      <BillComponent account={params} />
+      {params instanceof Account && <BillComponent account={params} />}
       <View style={{ padding: 10 }}>
         <Text
           style={{
