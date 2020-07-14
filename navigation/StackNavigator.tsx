@@ -1,10 +1,17 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { connect } from "react-redux";
-import { AsyncStorage, Vibration, Platform } from "react-native";
+import {
+  AsyncStorage,
+  Vibration,
+  Platform,
+  Alert,
+  BackHandler,
+} from "react-native";
 import { bindActionCreators } from "redux";
 import { Notifications } from "expo";
 import * as Permissions from "expo-permissions";
+import NetInfo from "@react-native-community/netinfo";
 import Constants from "expo-constants";
 
 import HomeTabNavigator from "./HomeTabNavigator";
@@ -68,6 +75,14 @@ const StackNavigator = ({
   setAccounts,
   setPayPoints,
 }: SNT) => {
+  NetInfo.configure({
+    reachabilityUrl: "https://41.72.107.14:300/api/v1/services/types/fetch",
+    reachabilityTest: async (response) => response.status === 200,
+    reachabilityLongTimeout: 60 * 1000, // 60s
+    reachabilityShortTimeout: 5 * 1000, // 5s
+    reachabilityRequestTimeout: 15 * 1000, // 15s
+  });
+
   const [pushToken, setPushToken] = React.useState("");
   const [pushNotification, setPushNotification] = React.useState(null);
   const [activeTheme, setActiveTheme] = React.useState(themeReducer.theme);
@@ -158,7 +173,7 @@ const StackNavigator = ({
         for (const key in regions) {
           if (regions.hasOwnProperty(key)) {
             const region = regions[key];
-            pp[key] = region.map((p: any) => new PayPoint(p));            
+            pp[key] = region.map((p: any) => new PayPoint(p));
           }
         }
 
@@ -221,7 +236,22 @@ const StackNavigator = ({
     };
   }, [handleNotification]);
 
-  // console.log(`json: ${JSON.stringify(pushNotification)}`);
+  React.useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      console.log(state);
+      if (!state.isConnected) {
+        Alert.alert(
+          Strings.INTERNET_FAILURE.title,
+          Strings.INTERNET_FAILURE.message,
+          [{ text: "Exit", onPress: () => BackHandler.exitApp() }]
+        );
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   return (
     <Stack.Navigator

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Image, Text, Alert, Modal } from "react-native";
+import { StyleSheet, View, Image, Text, Alert, Modal, BackHandler } from "react-native";
+import NetInfo from "@react-native-community/netinfo";
 
 import { ScrollView } from "react-native-gesture-handler";
 import { NavType } from "../types/nav-type";
@@ -229,6 +230,18 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
       processPayment(payment);
     }
   }
+
+  // React.useEffect(() => {
+  //   NetInfo.addEventListener((state) => {
+  //     if (!state.isConnected) {
+  //       Alert.alert(
+  //         Strings.INTERNET_FAILURE.title,
+  //         Strings.INTERNET_FAILURE.message,
+  //         [{ text: "Exit", onPress: () => BackHandler.exitApp() }]
+  //       );
+  //     }
+  //   });
+  // }, []);
 
   return (
     <ScrollView style={container}>

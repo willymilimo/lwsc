@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { StyleSheet, View, Platform, Alert } from "react-native";
+import { StyleSheet, View, Platform, Alert, BackHandler } from "react-native";
 import {
   Portal,
   TextInput,
@@ -12,6 +12,7 @@ import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { ScrollView } from "react-native-gesture-handler";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import NetInfo from "@react-native-community/netinfo";
 
 import Colors from "../constants/Colors";
 import LwscFAB from "../components/LwscFAB";
@@ -95,6 +96,18 @@ const MakePaymentScreen = ({
       is_subscribed = false;
     };
   }, []);
+  
+  // React.useEffect(() => {
+  //   NetInfo.addEventListener((state) => {
+  //     if (!state.isConnected) {
+  //       Alert.alert(
+  //         Strings.INTERNET_FAILURE.title,
+  //         Strings.INTERNET_FAILURE.message,
+  //         [{ text: "Exit", onPress: () => BackHandler.exitApp() }]
+  //       );
+  //     }
+  //   });
+  // }, []);
 
   const handleAccountMeterSubmit = () => {
     if (type === AddType.meter) {

@@ -81,7 +81,7 @@ export default {
   MESSENGER: "http://m.me/lusakawater",
 
   INTERNET_FAILURE: {
-    title: "INTERNET FAILURE",
+    title: "NO INTERNET",
     message:
       "Please check your internet connection. Turn on your mobile data or WIFI.",
   },
