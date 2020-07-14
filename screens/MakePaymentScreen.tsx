@@ -2,11 +2,11 @@ import React, { useEffect } from "react";
 import { StyleSheet, View, Platform, Alert } from "react-native";
 import {
   Portal,
-  Text,
-  Button,
-  Dialog,
   TextInput,
   RadioButton,
+  Button,
+  Dialog,
+  Text,
 } from "react-native-paper";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
@@ -24,6 +24,7 @@ import Strings from "../constants/Strings";
 import { AccountReducerI } from "../redux/reducers/accounts";
 import BillComponent from "../components/BillComponent";
 import { NavType } from "../types/nav-type";
+import { Prepaid } from "../models/prepaid";
 
 interface MakePaymentScreenI {
   navigation: NavType;
@@ -93,11 +94,18 @@ const MakePaymentScreen = ({
     return () => {
       is_subscribed = false;
     };
-  }, [accounts]);
+  }, []);
 
   const handleAccountMeterSubmit = () => {
     if (type === AddType.meter) {
-      navigation.navigate(Strings.PaymentMethodScreen, { meterNumber: meterAccountNo });
+      setShowDialog(false);
+      setMeterAccountNo("");
+      navigation.navigate(
+        Strings.PaymentMethodScreen,
+        new Prepaid({
+          meterNumber: meterAccountNo,
+        })
+      );
     } else if (meterAccountNo.length) {
       if (!Object.keys(accounts).includes(meterAccountNo)) {
         setLoading(true);

@@ -29,34 +29,49 @@ import { ControlIT } from "../models/control";
 import { Bowser } from "../models/bowser";
 import { CustomerType } from "../types/customer-type";
 import { PaymentChannel } from "../types/payment-channel";
+import PrepaidComponent from "./reusable/PrepaidComponent";
+import { PrepaidI, Prepaid } from "../models/prepaid";
 
 interface PaymentScreenI {
   navigation: NavType;
   route: {
     params: {
-      params: AccountI;
+      params: AccountI | PrepaidI;
       method: PaymentChannel;
     };
   };
 }
 
 const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
-  const { container, methodStyle, formContainer, flexRow, prefix } = styles;
+  const { container, methodStyle, formContainer, contentBox } = styles;
   const { params, method } = route.params;
   // console.log(route.params);
   const { image, placeholder } = Items[method];
   // console.log(params, method, image, placeholder);
+  const isPrepaid = params instanceof Prepaid;
+  const [meterNumber, setMeterNumber] = useState<ControlIT<string>>({
+    value: isPrepaid ? (params as Prepaid).meterNumber : "",
+    error: false,
+  });
   const [phone, setPhone] = useState<ControlIT<string>>({
     value: "",
     error: false,
   });
   const [email, setEmail] = useState<ControlIT<string>>({
-    value: "",
+    value: params instanceof Account ? params.STATEMENT_DELIVERY_BY_EMAIL : "",
     error: false,
   });
   const [amount, setAmount] = useState(
     params instanceof Bowser ? params.totalPrice.toString() : ""
   );
+  const [firstName, setFirstName] = useState<ControlIT<string>>({
+    value: "",
+    error: false,
+  });
+  const [lastName, setLastName] = useState<ControlIT<string>>({
+    value: "",
+    error: false,
+  });
   const [loading, setLoading] = useState(false);
 
   const confirmDetails =
@@ -103,6 +118,7 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
   };
 
   async function processPayment(payment: PaymentI) {
+    console.log(payment);
     setLoading(true);
     makePayment(payment)
       .then(({ data, status }) => {
@@ -143,7 +159,10 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
               error ||
               Strings.PIN_INPUT.message.replace("{pin}", method);
 
-            // if (msg.toLowerCase() === "transaction initiation failed") 
+            // if (msg.toLowerCase() === "transaction initiation failed")
+            if (isPrepaid) {
+              msg += ". Please ensure to input a valid Meter Number.";
+            }
 
             Alert.alert("Payment Not Approved", msg);
           }
@@ -163,20 +182,34 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
   }
 
   async function makePaymentRequest() {
-    const accnt = params as AccountI;
-    const payment = new Payment({
-      account_number: accnt.CUSTKEY,
-      meter_number: accnt.CUSTKEY,
-      first_name: accnt.INITIAL,
-      last_name: accnt.SURNAME,
-      customer_type: accnt.IS_METERED
-        ? CustomerType.prepaid
-        : CustomerType.postpaid,
-      amount,
-      payment_channel: PaymentChannel[method],
-      phone_number: phone.value,
-      email: email.value || accnt.STATEMENT_DELIVERY_BY_EMAIL,
-    });
+    let payment: PaymentI;
+
+    if (isPrepaid) {
+      payment = new Payment({
+        account_number: "",
+        meter_number: meterNumber.value,
+        first_name: firstName.value,
+        last_name: lastName.value,
+        customer_type: CustomerType.prepaid,
+        amount,
+        payment_channel: PaymentChannel[method],
+        phone_number: phone.value,
+        email: email.value,
+      });
+    } else {
+      const accnt = params as AccountI;
+      payment = new Payment({
+        account_number: accnt.CUSTKEY,
+        meter_number: accnt.CUSTKEY,
+        first_name: accnt.INITIAL,
+        last_name: accnt.SURNAME,
+        customer_type: CustomerType.postpaid,
+        amount,
+        payment_channel: PaymentChannel[method],
+        phone_number: phone.value,
+        email: email.value || accnt.STATEMENT_DELIVERY_BY_EMAIL,
+      });
+    }
 
     if (method === PaymentChannel.zamtel) {
       Alert.alert(
@@ -210,105 +243,167 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
       {params instanceof Account ? (
         <BillComponent account={params} />
       ) : (
-        <View />
+        // <PrepaidComponent>{(params as PrepaidI).meterNumber}</PrepaidComponent>
+        <></>
       )}
-      <View style={methodStyle}>
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          <IconButton
-            style={{ borderRadius: 25 }}
-            size={40}
-            icon={({ size, color }) => (
-              <Image
-                style={{ height: size, width: size }}
-                height={size}
-                width={size}
-                source={image}
-              />
-            )}
-          />
-          <Text
+      <View style={contentBox}>
+        <View style={methodStyle}>
+          <View
             style={{
-              fontWeight: "900",
-              fontSize: 18,
-              color: Colors.whiteColor,
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
             }}
           >
-            {method}
-          </Text>
+            <IconButton
+              style={{ borderRadius: 25 }}
+              size={40}
+              icon={({ size, color }) => (
+                <Image
+                  style={{ height: size, width: size }}
+                  height={size}
+                  width={size}
+                  source={image}
+                />
+              )}
+            />
+            <Text
+              style={{
+                fontWeight: "900",
+                fontSize: 18,
+                color: Colors.whiteColor,
+              }}
+            >
+              {method}
+            </Text>
+          </View>
+          <Checkbox status="checked" color="white" />
         </View>
-        <Checkbox status="checked" color="white" />
-      </View>
-      <View style={formContainer}>
-        <LwscTextInput
-          onChangeText={setAmount}
-          defaultValue={amount}
-          prefix="ZMW"
-          label="Amount"
-          money={true}
-          validator={/^\d+$/}
-          loading={loading}
-          disabled={params instanceof Bowser}
-        />
+        <View style={formContainer}>
+          {isPrepaid && (
+            <>
+              <TextInput
+                style={{ marginBottom: 15 }}
+                mode="outlined"
+                label="Meter Number"
+                placeholder={`e.g. 41130324183`}
+                value={meterNumber.value}
+                error={meterNumber.error}
+                disabled={loading}
+                onChangeText={(text) =>
+                  setMeterNumber({
+                    value: text,
+                    error: !/^\d{5,}$/.test(text),
+                  })
+                }
+              />
+            </>
+          )}
+          <LwscTextInput
+            onChangeText={setAmount}
+            defaultValue={amount}
+            prefix="ZMW"
+            label="Amount"
+            money={true}
+            validator={/^\d+$/}
+            loading={loading}
+            disabled={params instanceof Bowser}
+          />
 
-        <TextInput
-          style={{ marginTop: 10 }}
-          mode="outlined"
-          label="Phone Number"
-          keyboardType="phone-pad"
-          placeholder={`e.g. ${placeholder}`}
-          value={phone.value}
-          error={phone.error}
-          disabled={loading}
-          onBlur={() => {
-            setPhone({
-              value: `260${phone.value.slice(-9)}`,
-              error: phone.error,
-            });
-          }}
-          onChangeText={(text) =>
-            setPhone({
-              value: text,
-              error: !Regex.ZAMBIAN_MOBILE_NUMBER.test(text),
-            })
-          }
-        />
+          {isPrepaid && (
+            <>
+              <TextInput
+                style={{ marginTop: 10 }}
+                mode="outlined"
+                label="First Name"
+                placeholder={`e.g. Isaac`}
+                value={firstName.value}
+                error={firstName.error}
+                disabled={loading}
+                onChangeText={(text) =>
+                  setFirstName({
+                    value: text,
+                    error: !Regex.NAME.test(text),
+                  })
+                }
+              />
+              <TextInput
+                style={{ marginTop: 10 }}
+                mode="outlined"
+                label="Last Name"
+                placeholder={`e.g. Isaac`}
+                value={lastName.value}
+                error={lastName.error}
+                disabled={loading}
+                onChangeText={(text) =>
+                  setLastName({
+                    value: text,
+                    error: !Regex.NAME.test(text),
+                  })
+                }
+              />
+            </>
+          )}
 
-        {method === PaymentChannel.visa_master_card && (
           <TextInput
             style={{ marginTop: 10 }}
             mode="outlined"
-            label="Email Address"
-            keyboardType="email-address"
-            placeholder={`e.g. example@lwsc.co.zm`}
-            value={email.value}
-            error={email.error}
+            label="Phone Number"
+            keyboardType="phone-pad"
+            placeholder={`e.g. ${placeholder}`}
+            value={phone.value}
+            error={phone.error}
             disabled={loading}
+            onBlur={() => {
+              setPhone({
+                value: `260${phone.value.slice(-9)}`,
+                error: phone.error,
+              });
+            }}
             onChangeText={(text) =>
-              setEmail({
+              setPhone({
                 value: text,
-                error: !Regex.EMAIL.test(text),
+                error: !Regex.ZAMBIAN_MOBILE_NUMBER.test(text),
               })
             }
           />
-        )}
 
-        <Button
-          disabled={
-            loading || phone.error || !/^\d+$/.test(amount) || email.error
-          }
-          style={{ marginVertical: 20, paddingVertical: 5 }}
-          labelStyle={{ fontSize: 17 }}
-          mode="contained"
-          onPress={confirmPayment}
-        >
-          Make Payment
-        </Button>
+          {method === PaymentChannel.visa_master_card ||
+            (isPrepaid && (
+              <TextInput
+                style={{ marginTop: 10 }}
+                mode="outlined"
+                label="Email Address"
+                keyboardType="email-address"
+                placeholder={`e.g. example@lwsc.co.zm`}
+                value={email.value}
+                error={email.error}
+                disabled={loading}
+                onChangeText={(text) =>
+                  setEmail({
+                    value: text,
+                    error: !Regex.EMAIL.test(text),
+                  })
+                }
+              />
+            ))}
+
+          <Button
+            disabled={
+              loading ||
+              !Regex.ZAMBIAN_MOBILE_NUMBER.test(phone.value) ||
+              !/^\d+$/.test(amount) ||
+              (method === PaymentChannel.visa_master_card &&
+                !Regex.EMAIL.test(email.value))
+            }
+            style={{ marginVertical: 20, paddingVertical: 5 }}
+            labelStyle={{ fontSize: 17 }}
+            mode="contained"
+            onPress={confirmPayment}
+          >
+            Make Payment
+          </Button>
+        </View>
       </View>
     </ScrollView>
   );
@@ -344,7 +439,6 @@ const styles = StyleSheet.create({
     display: "flex",
     flex: 1,
     backgroundColor: "white",
-    padding: 10,
   },
   methodStyle: {
     borderWidth: 0.5,
@@ -358,6 +452,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: Colors.LwscSelectedBlue,
+  },
+  contentBox: {
+    padding: 10,
   },
   formContainer: {
     display: "flex",

@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View, Image } from "react-native";
+import { StyleSheet, Text, View, Image, Platform } from "react-native";
 import BillComponent from "../components/BillComponent";
 import Colors from "../constants/Colors";
 import {
@@ -15,11 +15,14 @@ import { NavType } from "../types/nav-type";
 import { AccountI, Account } from "../models/account";
 import Strings from "../constants/Strings";
 import { PaymentChannel } from "../types/payment-channel";
+import { Ionicons } from "@expo/vector-icons";
+import PrepaidComponent from "./reusable/PrepaidComponent";
+import { PrepaidI } from "../models/prepaid";
 
 interface PaymentMethodScreenI {
   navigation: NavType;
   route: {
-    params: AccountI | { meterNumber: string };
+    params: AccountI | PrepaidI;
   };
 }
 
@@ -28,11 +31,13 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
   const { container } = styles;
   const [checked, setChecked] = React.useState(PaymentChannel.airtel);
 
-  console.log(params);
-
   return (
     <ScrollView style={container}>
-      {params instanceof Account && <BillComponent account={params} />}
+      {params instanceof Account ? (
+        <BillComponent account={params} />
+      ) : (
+        <PrepaidComponent>{(params as PrepaidI).meterNumber}</PrepaidComponent>
+      )}
       <View style={{ padding: 10 }}>
         <Text
           style={{
