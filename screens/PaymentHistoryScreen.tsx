@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList, TouchableHighlight } from "react-native-gesture-handler";
@@ -6,11 +6,21 @@ import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
 import { PaymentHistoryI } from "../models/payment-history";
 import { SimpleLineIcons } from "@expo/vector-icons";
-import { Divider } from "react-native-paper";
+import { Divider, ActivityIndicator } from "react-native-paper";
 import Colors from "../constants/Colors";
+import { bindActionCreators } from "redux";
+import { setPaymentHistory } from "../redux/actions/payment-history";
+import { fetchPaymentHistory } from "../models/axios";
+import { AccountReducerI } from "../redux/reducers/accounts";
+import { AddType } from "../types/add-type";
+import Strings from "../constants/Strings";
+import { useNavigation } from "@react-navigation/native";
 
 interface PaymentHistoryScreenI {
   paymentHistory: PaymentHistoryI[];
+  accounts: AccountReducerI;
+  navigation: any;
+  setPaymentHistory(history: PaymentHistoryI[]): void;
 }
 
 function Item({
@@ -67,30 +77,149 @@ function Item({
   );
 }
 
-const PaymentHistoryScreen = ({ paymentHistory }: PaymentHistoryScreenI) => {
-  const { container } = styles;
-  return (
-    <SafeAreaView style={container}>
-      {paymentHistory.length ? (
-        <FlatList
-          data={paymentHistory}
-          renderItem={({ item }) => Item(item)}
-          keyExtractor={(item) => item._id}
-        />
-      ) : (
-        <Text style={{ margin: 10, color: `${Colors.LwscBlack}bb` }}>
-          You have not made any payments for far.
-        </Text>
-      )}
-    </SafeAreaView>
-  );
-};
+// const PaymentHistoryScreen = ({
+//   paymentHistory,
+//   accounts,
+//   setPaymentHistory,
+// }: PaymentHistoryScreenI) => {
 
-const mapStateToProps = ({ paymentHistory }: RootReducerI) => ({
+//   useEffect(() => {
+//     let is_subscribed = true;
+
+//     if (is_subscribed) {
+//       setLoading(true);
+//       fetchPaymentHistory("", AddType.account)
+//         .then(({ status, data }) => {
+// if (status === 200 && data.success) {
+//   setPaymentHistory(data.payload);
+// } else {
+//   Alert.alert(
+//     Strings.SELF_REPORTING_PROBLEM.title,
+//     Strings.SELF_REPORTING_PROBLEM.message,
+//     [
+//       {
+//         text: "OK",
+//         onPress: () => navigator.navigate(Strings.HomeScreen),
+//       },
+//     ]
+//   );
+// }
+//         })
+//         .catch((err) => {
+//           Alert.alert(
+//             Strings.SELF_REPORTING_PROBLEM.title,
+//             Strings.SELF_REPORTING_PROBLEM.message,
+//             [
+//               {
+//                 text: "OK",
+//                 onPress: () => navigator.navigate(Strings.HomeScreen),
+//               },
+//             ]
+//           );
+//         })
+//         .finally(() => setLoading(false));
+//     }
+
+//     return () => {
+//       is_subscribed = false;
+//     };
+//   }, []);
+
+// };
+
+export class PaymentHistoryScreen extends React.Component<
+  PaymentHistoryScreenI,
+  any
+> {
+  constructor(prop: PaymentHistoryScreenI) {
+    super(prop);
+    this.state = {
+      loading: false,
+    };
+  }
+
+  componentDidMount() {
+    this.fetchPaymentHistory();
+  }
+
+  async fetchPaymentHistory() {
+    this.setState({ loading: true });
+    try {
+      const { status, data } = await fetchPaymentHistory("", AddType.account);
+      if (status === 200 && data.success) {
+        setPaymentHistory(data.payload);
+      } else {
+        Alert.alert(
+          Strings.SELF_REPORTING_PROBLEM.title,
+          Strings.SELF_REPORTING_PROBLEM.message,
+          [
+            {
+              text: "OK",
+              onPress: () => this.props.navigation.navigate(Strings.HomeScreen),
+            },
+          ]
+        );
+      }
+    } catch (err) {
+      Alert.alert(
+        Strings.SELF_REPORTING_PROBLEM.title,
+        Strings.SELF_REPORTING_PROBLEM.message,
+        [
+          {
+            text: "OK",
+            onPress: () => this.props.navigation.navigate(Strings.HomeScreen),
+          },
+        ]
+      );
+    }
+    this.setState({ loading: false });
+  }
+
+  render() {
+    const { container } = styles;
+    const { loading } = this.state;
+    const { paymentHistory, accounts } = this.props;
+    return (
+      <SafeAreaView style={container}>
+        {loading ? (
+          <ActivityIndicator
+            size={50}
+            color={Colors.colorGreen}
+            style={{ alignSelf: "center", marginTop: 20 }}
+          />
+        ) : paymentHistory.length ? (
+          <FlatList
+            data={paymentHistory}
+            renderItem={({ item }) => Item(item)}
+            keyExtractor={(item) => item._id}
+          />
+        ) : (
+          <Text style={{ margin: 10, color: `${Colors.LwscBlack}bb` }}>
+            You have not made any payments thus far.
+          </Text>
+        )}
+      </SafeAreaView>
+    );
+  }
+}
+
+const mapStateToProps = ({ paymentHistory, accounts }: RootReducerI) => ({
   paymentHistory,
+  accounts,
 });
 
-export default connect(mapStateToProps)(PaymentHistoryScreen);
+const mapDispatchToProps = (dispatch: any) =>
+  bindActionCreators(
+    {
+      setPaymentHistory,
+    },
+    dispatch
+  );
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(PaymentHistoryScreen);
 
 const styles = StyleSheet.create({
   container: {

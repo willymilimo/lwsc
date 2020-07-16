@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Image, Text, Alert, Modal, BackHandler } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Image,
+  Text,
+  Alert,
+  Modal,
+  BackHandler,
+} from "react-native";
 import NetInfo from "@react-native-community/netinfo";
 
 import { ScrollView } from "react-native-gesture-handler";
@@ -381,25 +389,24 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
             }
           />
 
-          {method === PaymentChannel.visa_master_card ||
-            (isPrepaid && (
-              <TextInput
-                style={{ marginTop: 10 }}
-                mode="outlined"
-                label="Email Address"
-                keyboardType="email-address"
-                placeholder={`e.g. example@lwsc.co.zm`}
-                value={email.value}
-                error={email.error}
-                disabled={loading}
-                onChangeText={(text) =>
-                  setEmail({
-                    value: text,
-                    error: !Regex.EMAIL.test(text),
-                  })
-                }
-              />
-            ))}
+          {(method === PaymentChannel.visa_master_card || isPrepaid) && (
+            <TextInput
+              style={{ marginTop: 10 }}
+              mode="outlined"
+              label="Email Address"
+              keyboardType="email-address"
+              placeholder={`e.g. example@lwsc.co.zm`}
+              value={email.value}
+              error={email.error}
+              disabled={loading}
+              onChangeText={(text) =>
+                setEmail({
+                  value: text,
+                  error: !Regex.EMAIL.test(text),
+                })
+              }
+            />
+          )}
 
           <Button
             disabled={

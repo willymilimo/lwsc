@@ -8,6 +8,7 @@ import { PaymentI } from "./payment";
 import { MeterReading } from "./meter-reading";
 import { ServiceItemI } from "./service-item";
 import { ServiceApplicationI } from "./service-application";
+import { PaymentHistoryI } from "./payment-history";
 
 // axios.defaults.headers.common["username"] = Strings.API_USERNAME;
 // axios.defaults.headers.common["password"] = Strings.API_PASSWORD;
@@ -101,4 +102,11 @@ export const uploadFiles = async (uris: string[]) => {
 
 export const submitMeterReading = async (reading: MeterReading) => {
   return await axios.post("billing/meter-reading/create", reading);
+};
+
+export const fetchPaymentHistory = async (
+  identity: string,
+  type: AddType
+): Promise<AxiosResponse<IResponse<PaymentHistoryI[]>>> => {
+  return await axios.get("payment-history");
 };
