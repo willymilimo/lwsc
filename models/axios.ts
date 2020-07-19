@@ -1,6 +1,4 @@
 import axios, { AxiosResponse } from "axios";
-// import btoa from 'btoa';
-import Strings from "../constants/Strings";
 import { IResponse } from "./iresponse";
 import { AccountI } from "./account";
 import { AddType } from "../types/add-type";
@@ -10,9 +8,8 @@ import { PaymentI } from "./payment";
 import { MeterReading } from "./meter-reading";
 import { ServiceItemI } from "./service-item";
 import { ServiceApplicationI } from "./service-application";
-import { PaymentHistoryI } from "./payment-history";
 import { UploadFileI } from "./upload-file";
-import { TransactionResponseI } from "./statement";
+import { StatementI } from "./statement";
 
 // axios.defaults.auth = Strings.API_CREDS;
 axios.defaults.headers.Authorization =
@@ -116,7 +113,7 @@ export const submitMeterReading = async (reading: MeterReading) => {
 export const fetchPaymentHistory = async (
   identity: string,
   type: IdentityType
-): Promise<AxiosResponse<IResponse<TransactionResponseI[]>>> => {
+): Promise<AxiosResponse<IResponse<StatementI[]>>> => {
   return await axios.get(
     `payments/statement/transactions/fetch?identifier=${identity}&type=${type}`
   );
