@@ -51,10 +51,11 @@ const ServicesScreen = ({
       if (!serviceTypes.length) {
         setLoading(true);
         fetchServices()
-          .then((res) => {
-            const { success, payload, error, message } = res.data;
+          .then(({status, data}) => {
+            const { success, payload, error, message } = data;
+            console.log(status, data)
 
-            if (success) {
+            if (status === 200 && success) {
               setServiceTypes(payload.map((item) => new ServiceItem(item)));
             } else {
               Alert.alert(
@@ -64,7 +65,7 @@ const ServicesScreen = ({
             }
           })
           .catch((err) => {
-            // console.log(err);
+            console.log(err);
             const { title, message } = Strings.SELF_REPORTING_PROBLEM;
             Alert.alert(title, message);
           })

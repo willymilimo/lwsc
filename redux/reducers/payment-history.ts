@@ -1,29 +1,29 @@
-import { PaymentHistoryI, PaymentHistory } from "../../models/payment-history";
 import Actions, { ActionI } from "../Actions";
 import { AsyncStorage } from "react-native";
 import Strings from "../../constants/Strings";
+import { StatementI } from "../../models/statement";
 
-const initState: PaymentHistoryI[] = [
-  new PaymentHistory({
-    _id: 'asfasdfasdbasdfasdfad',
-    payment_date: new Date(),
-    payment_type: "Bill Payment",
-    payment_description: "some descriptio of the payment",
-    amount: 100,
-  }),
-  new PaymentHistory({
-    _id: 'asfasdfasdbasdfabbbbcdfad',
-    payment_date: new Date(),
-    payment_type: "Bowser Payment",
-    payment_description: "some descriptio of the payment",
-    amount: 1500,
-  }),
+const initState: StatementI[] = [
+  // new PaymentHistory({
+  //   _id: 'asfasdfasdbasdfasdfad',
+  //   payment_date: new Date(),
+  //   payment_type: "Bill Payment",
+  //   payment_description: "some descriptio of the payment",
+  //   amount: 100,
+  // }),
+  // new PaymentHistory({
+  //   _id: 'asfasdfasdbasdfabbbbcdfad',
+  //   payment_date: new Date(),
+  //   payment_type: "Bowser Payment",
+  //   payment_description: "some descriptio of the payment",
+  //   amount: 1500,
+  // }),
 ];
 
 export default function (
   state = initState,
   action: ActionI<any>
-): PaymentHistoryI[] {
+): StatementI[] {
   const { type, payload } = action;
 
   switch (type) {

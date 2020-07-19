@@ -23,6 +23,7 @@ import * as ImagePicker from "expo-image-picker";
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 import { useNavigation } from "@react-navigation/native";
 import Regex from "../constants/Regex";
+import ImageUploadComponent from "./reusable/ImageUploadComponent";
 
 const ASPECT_RATIO = width / height;
 const LATITUDE = -15.37496;
@@ -54,69 +55,8 @@ const ReportLeakageScreen = () => {
     value: "",
     error: false,
   });
-  const [image, setImage] = useState<
-    (ImagePicker.ImagePickerResult & ImageInfo) | null
-  >(null);
+  const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [hasPermission, setHasPermission] = useState(false);
-
-  const requestCameraPermissionAsync = async () => {
-    var { status } = await ImagePicker.requestCameraPermissionsAsync(); // Permissions.askAsync(Permissions.CAMERA);
-    if (status !== "granted") {
-      const { title, message } = Strings.CAMERA_PERMISSION;
-      Alert.alert(title, message, [
-        {
-          text: "Grant Permission",
-          onPress: async () =>
-            await ImagePicker.requestCameraPermissionsAsync(), // Permissions.askAsync(Permissions.CAMERA)
-        },
-        { text: "Deny", onPress: () => BackHandler.exitApp() },
-      ]);
-    }
-  };
-
-  const requestCameraRollPermissionAsync = async () => {
-    var { status } = await ImagePicker.requestCameraRollPermissionsAsync(); //Permissions.askAsync(Permissions.CAMERA_ROLL);
-    if (status !== "granted") {
-      const { title, message } = Strings.CAMERA_ROLL_PERMISSION;
-      Alert.alert(title, message, [
-        {
-          text: "Grant Permission",
-          onPress: async () =>
-            await ImagePicker.requestCameraRollPermissionsAsync(), // Permissions.askAsync(Permissions.CAMERA_ROLL)
-        },
-        { text: "Deny", onPress: () => BackHandler.exitApp() },
-      ]);
-    }
-  };
-
-  const requestCameraPermission = async () => {
-    if (Platform.OS === "ios") {
-      try {
-        await requestCameraPermissionAsync();
-        await requestCameraRollPermissionAsync();
-      } catch (err) {
-        const { title, message } = Strings.SELF_REPORTING_PROBLEM;
-        Alert.alert(title, message, [
-          { text: "Ok", onPress: () => navigator.goBack() },
-        ]);
-      }
-    }
-  };
-
-  const captureImage = async () => {
-    let result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      base64: true,
-    });
-
-    if (!result.cancelled && result.base64) {
-      // console.log(result.base64);
-      // setImage("data:image/jpeg;base64," + result.base64);
-      // setImage(result.base64);
-      setImage(result);
-    }
-  };
 
   const getLocationAsync = async () => {
     try {
@@ -139,7 +79,6 @@ const ReportLeakageScreen = () => {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
         });
-        await requestCameraPermission();
       }
     } catch (error) {
       const { title, message } = Strings.SELF_REPORTING_PROBLEM;
@@ -266,56 +205,7 @@ const ReportLeakageScreen = () => {
       </View>
 
       <View style={{ paddingVertical: 15, paddingHorizontal: 15 }}>
-        <View>
-          {image ? (
-            <View
-              style={{
-                position: "relative",
-                borderRadius: 3,
-                alignSelf: "center",
-                borderWidth: 3,
-                borderColor: "#00000022",
-              }}
-            >
-              <FAB
-                style={styles.fab}
-                small
-                icon="delete-forever"
-                onPress={() => setImage(null)}
-              />
-              <Image
-                style={{
-                  width: (300 * image.width) / image.height,
-                  height: 300,
-                  resizeMode: "stretch",
-                }}
-                source={{ uri: image.uri }}
-              />
-            </View>
-          ) : (
-            <Button
-              contentStyle={{
-                borderColor: Colors.linkBlue,
-                borderWidth: 0.75,
-                borderRadius: 5,
-                backgroundColor: `${Colors.linkBlue}22`,
-              }}
-              color={`${Colors.LwscBlue}bb`}
-              //   loading={loading}
-              icon={({ color }) => (
-                <Ionicons
-                  color={color}
-                  size={22}
-                  name={`${Platform.OS === "ios" ? "ios" : "md"}-camera`}
-                />
-              )}
-              mode="outlined"
-              onPress={async () => await captureImage()}
-            >
-              CAPTURE LEAK
-            </Button>
-          )}
-        </View>
+        <ImageUploadComponent uploadCallback={setImage} />
         <TextInput
           style={{ marginTop: 10 }}
           mode="outlined"

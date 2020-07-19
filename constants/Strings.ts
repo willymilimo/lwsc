@@ -77,8 +77,14 @@ export default {
   CUSTOMER_SERVICE: ["+260211251571", "+260211250002"],
   WEBSITE: "http://www.lwsc.com.zm",
   CONTACT_US_PAGE: "http://www.lwsc.com.zm/?page_id=46",
-  FACEBOOK: "lusakawater",
-  MESSENGER: "http://m.me/lusakawater",
+  FACEBOOK: "488903867833451",
+  MESSENGER: "http://m.me/488903867833451",
+  WHATSAPP: "+260966621305",
+
+  API_CREDS: {
+    username: "lwsc_mobile_app_dev",
+    password: "#www@1234_lwsc_app",
+  },
 
   INTERNET_FAILURE: {
     title: "NO INTERNET",
@@ -143,8 +149,16 @@ export default {
     title: "Input Pin",
     message: `Please ensure you approve the payment by inputting your {pin} pin in the push request.`,
   },
+
   PAYMENT_SUCCESS: {
     title: "Payment Successful",
-    message: "Your payment has been processed successfully. You will recieve an SMS with the payment confirmation details."
-  }
+    message:
+      "Your payment has been processed successfully. You will recieve an SMS with the payment confirmation details.",
+  },
+
+  IMG_UPLOAD_FAILURE: {
+    title: "Upload Failed",
+    message:
+      "Failed to upload the image. Please ensure you are connected to the internet.",
+  },
 };

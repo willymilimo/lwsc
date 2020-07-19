@@ -12,15 +12,16 @@ import { bindActionCreators } from "redux";
 import { setPaymentHistory } from "../redux/actions/payment-history";
 import { fetchPaymentHistory } from "../models/axios";
 import { AccountReducerI } from "../redux/reducers/accounts";
-import { AddType } from "../types/add-type";
 import Strings from "../constants/Strings";
 import { useNavigation } from "@react-navigation/native";
+import { IdentityType } from "../types/identity-type";
+import { StatementI } from "../models/statement";
 
 interface PaymentHistoryScreenI {
-  paymentHistory: PaymentHistoryI[];
+  paymentHistory: StatementI[];
   accounts: AccountReducerI;
   navigation: any;
-  setPaymentHistory(history: PaymentHistoryI[]): void;
+  setPaymentHistory(history: StatementI[]): void;
 }
 
 function Item({
@@ -145,9 +146,10 @@ export class PaymentHistoryScreen extends React.Component<
   async fetchPaymentHistory() {
     this.setState({ loading: true });
     try {
-      const { status, data } = await fetchPaymentHistory("", AddType.account);
+      const { status, data } = await fetchPaymentHistory("", IdentityType.Account);
       if (status === 200 && data.success) {
-        setPaymentHistory(data.payload);
+        // setPaymentHistory(data.payload);
+
       } else {
         Alert.alert(
           Strings.SELF_REPORTING_PROBLEM.title,

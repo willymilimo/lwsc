@@ -1,15 +1,15 @@
 import Actions, { ActionI } from "../Actions";
-import { PaymentHistoryI } from "../../models/payment-history";
+import { StatementI } from "../../models/statement";
 
 export const setPaymentHistory = (
-  paymentHistory: PaymentHistoryI[]
+  paymentHistory: StatementI[]
 ): ActionI<any> => ({
   type: Actions.SET_PAYMENT_HISTORY,
   payload: paymentHistory,
 });
 
 export const addPaymentHistory = (
-  paymentHistory: PaymentHistoryI
+  paymentHistory: StatementI
 ): ActionI<any> => ({
   type: Actions.ADD_PAYMENT_HISTORY,
   payload: paymentHistory,

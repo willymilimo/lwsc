@@ -87,7 +87,12 @@ const FeedbackScreen = () => {
   };
 
   const toggleOpen = () => {
-    const toValue = _open ? 0 : 1;
+    if (_open) setFABClosed();
+    else setFABOpen();
+  };
+
+  const setFABClosed = () => {
+    const toValue = 0;
 
     Animated.timing(animation, {
       toValue,
@@ -95,7 +100,19 @@ const FeedbackScreen = () => {
       duration: 200,
     }).start();
 
-    _open = !_open;
+    _open = false;
+  };
+
+  const setFABOpen = () => {
+    const toValue = 1;
+
+    Animated.timing(animation, {
+      toValue,
+      easing: Easing.ease,
+      duration: 200,
+    }).start();
+
+    _open = true;
   };
 
   const handleSubmit = () => {
@@ -107,11 +124,12 @@ const FeedbackScreen = () => {
     <View style={container}>
       <TextInput
         disabled={loading}
-        autoFocus={true}
+        // autoFocus={true}
         mode="outlined"
         label={"Full Name"}
         value={fullName.value}
         error={fullName.error}
+        onFocus={setFABClosed}
         onChangeText={(value) => setFullName({ value, error: false })}
       />
       <TextInput
@@ -123,6 +141,7 @@ const FeedbackScreen = () => {
         label={"Your feedback"}
         value={message.value}
         error={message.error}
+        onFocus={setFABClosed}
         onChangeText={(value) => setMessage({ value, error: false })}
       />
       <Button
@@ -231,6 +250,20 @@ const buttons: Array<ButtonI> = [
   },
   {
     icon: {
+      name: "whatsapp",
+      type: MaterialCommunityIcons,
+    },
+    color: Colors.whiteColor,
+    bg: Colors.whatsapp,
+    url: {
+      store: "app/whatsapp-messenger/id310633997",
+      play: "com.whatsapp",
+      app: `whatsapp://send?text=Hello, &phone=${Strings.WHATSAPP}`,
+      web: `https://wa.me/${Strings.WHATSAPP}`,
+    },
+  },
+  {
+    icon: {
       name: Platform.OS === "ios" ? "ios-text" : "md-text",
       type: Ionicons,
     },
@@ -239,7 +272,7 @@ const buttons: Array<ButtonI> = [
     url: {
       store: "",
       play: "",
-      app: `sms:${Strings.SMS}?body=Hello, `, //495954420452034
+      app: `sms:${Strings.WHATSAPP}?body=Hello, `, //495954420452034
       web: ``,
     },
   },

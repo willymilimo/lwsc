@@ -1,18 +1,25 @@
 import axios, { AxiosResponse } from "axios";
+// import btoa from 'btoa';
 import Strings from "../constants/Strings";
 import { IResponse } from "./iresponse";
 import { AccountI } from "./account";
 import { AddType } from "../types/add-type";
-import { PaymentType, PaymentT } from "../types/payment";
+import { IdentityType } from "../types/identity-type";
+import { PaymentType } from "../types/payment";
 import { PaymentI } from "./payment";
 import { MeterReading } from "./meter-reading";
 import { ServiceItemI } from "./service-item";
 import { ServiceApplicationI } from "./service-application";
 import { PaymentHistoryI } from "./payment-history";
+import { UploadFileI } from "./upload-file";
+import { TransactionResponseI } from "./statement";
 
-// axios.defaults.headers.common["username"] = Strings.API_USERNAME;
-// axios.defaults.headers.common["password"] = Strings.API_PASSWORD;
+// axios.defaults.auth = Strings.API_CREDS;
+axios.defaults.headers.Authorization =
+  "Basic bHdzY19tb2JpbGVfYXBwX2Rldjojd3d3QDEyMzRfbHdzY19hcHA=";
 axios.defaults.baseURL = "http://41.72.107.14:3000/api/v1/";
+
+console.log(axios.defaults.headers);
 
 const getPayUrl = (paymentType: PaymentType): string | null => {
   switch (paymentType) {
@@ -80,7 +87,9 @@ export const applyForPaymentSchedule = async (account: AccountI) => {
   return await axios.post("apply-for-payment-schedule", account);
 };
 
-export const uploadFiles = async (uris: string[]) => {
+export const uploadFiles = async (
+  uris: string[]
+): Promise<AxiosResponse<IResponse<UploadFileI>>> => {
   const fd = new FormData();
   uris.forEach((uri, i) => {
     // fd.append(`reading${i}`, file);
@@ -106,7 +115,9 @@ export const submitMeterReading = async (reading: MeterReading) => {
 
 export const fetchPaymentHistory = async (
   identity: string,
-  type: AddType
-): Promise<AxiosResponse<IResponse<PaymentHistoryI[]>>> => {
-  return await axios.get("payment-history");
+  type: IdentityType
+): Promise<AxiosResponse<IResponse<TransactionResponseI[]>>> => {
+  return await axios.get(
+    `payments/statement/transactions/fetch?identifier=${identity}&type=${type}`
+  );
 };

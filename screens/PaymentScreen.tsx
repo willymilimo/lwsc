@@ -137,18 +137,18 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
           if (success) {
             if (method === PaymentChannel.visa_master_card) {
               navigation.navigate(Strings.WebviewScreen, payload);
-            } else if (method === PaymentChannel.zamtel) {
-              Alert.alert(
-                Strings.PAYMENT_SUCCESS.title,
-                Strings.PAYMENT_SUCCESS.message,
-                [
-                  {
-                    text: "OK",
-                    onPress: () =>
-                      navigation.navigate(Strings.HomeTabNavigator),
-                  },
-                ]
-              );
+            // } else if (method === PaymentChannel.zamtel) {
+            //   Alert.alert(
+            //     Strings.PAYMENT_SUCCESS.title,
+            //     Strings.PAYMENT_SUCCESS.message,
+            //     [
+            //       {
+            //         text: "OK",
+            //         onPress: () =>
+            //           navigation.navigate(Strings.HomeTabNavigator),
+            //       },
+            //     ]
+            //   );
             } else {
               Alert.alert(
                 Strings.PIN_INPUT.title,
@@ -220,36 +220,8 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
       });
     }
 
-    if (method === PaymentChannel.zamtel) {
-      Alert.alert(
-        Strings.PIN_INPUT.title,
-        `${Strings.PIN_INPUT.message.replace(
-          "{pin}",
-          method
-        )} Tap PROCEED to continue.`,
-        [
-          {
-            text: "PROCEED",
-            onPress: async () => processPayment(payment),
-          },
-        ]
-      );
-    } else {
-      processPayment(payment);
-    }
+    processPayment(payment);
   }
-
-  // React.useEffect(() => {
-  //   NetInfo.addEventListener((state) => {
-  //     if (!state.isConnected) {
-  //       Alert.alert(
-  //         Strings.INTERNET_FAILURE.title,
-  //         Strings.INTERNET_FAILURE.message,
-  //         [{ text: "Exit", onPress: () => BackHandler.exitApp() }]
-  //       );
-  //     }
-  //   });
-  // }, []);
 
   return (
     <ScrollView style={container}>

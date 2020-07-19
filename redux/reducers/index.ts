@@ -9,9 +9,9 @@ import user from "./user";
 import services from "./services";
 import serviceConstants, { ServiceConstantsI } from "./service-constants";
 import { NotificationI } from "../../models/notification";
-import { PaymentHistoryI } from "../../models/payment-history";
 import { PayPointReducer } from "../../types/paypoint";
 import { ServiceItemI } from "../../models/service-item";
+import { StatementI } from "../../models/statement";
 
 export interface RootReducerI {
   theme: ThemeReducer;
@@ -19,7 +19,7 @@ export interface RootReducerI {
   accounts: AccountReducerI;
   serviceConstants: ServiceConstantsI;
   payPoints: PayPointReducer;
-  paymentHistory: PaymentHistoryI[];
+  paymentHistory: StatementI[];
   services: ServiceItemI[];
   user: string;
 }
