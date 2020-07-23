@@ -43,6 +43,9 @@ export default {
   PAYPOINTS_STORAGE: "PAYPOINT_STORAGE",
   PAYMENT_HISTORY_STORAGE: "PAYMENT_HISTORY_STORAGE",
   USER_STORAGE: "USER_STORAGE",
+  BILL_GROUP_STORAGE: "BILL_GROUP_STORAGE",
+  BOOK_NUMBER_STORAGE: "BOOK_NUMBER_STORAGE",
+  MR_PROPERTY_STORAGE: "MR_PROPERTY_STORAGE",
   /*************** End Storage Constants *****************/
 
   // API
@@ -154,6 +157,11 @@ export default {
     title: "Payment Successful",
     message:
       "Your payment has been processed successfully. You will recieve an SMS with the payment confirmation details.",
+  },
+
+  REPORT_SUCCESS: {
+    title: "Reported Successfully",
+    message: "Your report has been submitted successfully.",
   },
 
   IMG_UPLOAD_FAILURE: {

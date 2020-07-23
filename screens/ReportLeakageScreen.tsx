@@ -15,15 +15,16 @@ import MapView, { Marker } from "react-native-maps";
 import Colors from "../constants/Colors";
 import { TextInput, Button, FAB } from "react-native-paper";
 import { ControlIT } from "../models/control";
-import { Ionicons, Feather } from "@expo/vector-icons";
 import Strings from "../constants/Strings";
 const { width, height } = Dimensions.get("window");
 
-import * as ImagePicker from "expo-image-picker";
-import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 import { useNavigation } from "@react-navigation/native";
 import Regex from "../constants/Regex";
 import ImageUploadComponent from "./reusable/ImageUploadComponent";
+import { UploadFileI } from "../models/upload-file";
+import { ServiceReportI } from "../models/service-report";
+import { reportLeakage } from "../models/axios";
+import { Feather } from "@expo/vector-icons";
 
 const ASPECT_RATIO = width / height;
 const LATITUDE = -15.37496;
@@ -55,7 +56,12 @@ const ReportLeakageScreen = () => {
     value: "",
     error: false,
   });
-  const [image, setImage] = useState<string | null>(null);
+  const [description, setDescription] = useState({ value: "", error: false });
+  const [email, setEmail] = useState({ value: "", error: false });
+  const [area, setArea] = useState({ value: "", error: false });
+  const [address, setAddress] = useState({ value: "", error: false });
+  // const [image, setImage] = useState<string | null>(null);
+  const [uploadFiles, setUploadFiles] = useState<UploadFileI[]>();
   const [loading, setLoading] = useState(false);
 
   const getLocationAsync = async () => {
@@ -108,6 +114,55 @@ const ReportLeakageScreen = () => {
       longitudeDelta: region.longitudeDelta * 10,
     });
     map.animateToRegion(region, 100);
+  };
+
+  const handleReportLeakageSubmit = () => {
+    const space = fullName.value.indexOf(" ");
+    const report: ServiceReportI = {
+      first_name:
+        space != -1 ? fullName.value.substring(0, space) : fullName.value,
+      last_name:
+        space != -1 ? fullName.value.substring(space).trim() : fullName.value,
+      phone: phone.value,
+      coordinates: region,
+      area: area.value,
+      email: email.value,
+      address: address.value,
+      account_number: meterAccountNumber.value,
+      meter_number: meterAccountNumber.value,
+      description: description.value,
+      files: uploadFiles as UploadFileI[],
+    };
+    setLoading(true);
+
+    reportLeakage(report)
+      .then(({ status, data }) => {
+        console.log(data)
+        const { success, payload } = data;
+        if (status === 200 && success) {
+          Alert.alert(
+            Strings.REPORT_SUCCESS.title,
+            Strings.REPORT_SUCCESS.message,
+            [
+              {
+                onPress: () => navigator.navigate(Strings.HomeTabNavigator),
+              },
+            ]
+          );
+        }
+      })
+      .catch((err) =>
+        Alert.alert(
+          Strings.SELF_REPORTING_PROBLEM.title,
+          Strings.SELF_REPORTING_PROBLEM.message,
+          [
+            {
+              onPress: () => navigator.navigate(Strings.HomeTabNavigator),
+            },
+          ]
+        )
+      )
+      .finally(() => setLoading(false));
   };
 
   return (
@@ -205,7 +260,7 @@ const ReportLeakageScreen = () => {
       </View>
 
       <View style={{ paddingVertical: 15, paddingHorizontal: 15 }}>
-        <ImageUploadComponent uploadCallback={setImage} />
+        <ImageUploadComponent uploadCallback={setUploadFiles} />
         <TextInput
           style={{ marginTop: 10 }}
           mode="outlined"
@@ -217,7 +272,7 @@ const ReportLeakageScreen = () => {
           onChangeText={(value) => {
             setFullName({
               value,
-              error: Regex.NAME.test(value),
+              error: !Regex.NAME.test(value),
             });
           }}
         />
@@ -233,9 +288,37 @@ const ReportLeakageScreen = () => {
           onChangeText={(value) => {
             setPhone({
               value,
-              error: Regex.PHONE_NUMBER.test(value),
+              error: !Regex.PHONE_NUMBER.test(value),
             });
           }}
+        />
+        <TextInput
+          style={{ marginTop: 10 }}
+          disabled={loading}
+          mode="outlined"
+          label={"Area"}
+          value={area.value}
+          error={area.error}
+          onChangeText={(value) =>
+            setArea({
+              value,
+              error: value.length < 5,
+            })
+          }
+        />
+        <TextInput
+          style={{ marginTop: 10 }}
+          disabled={loading}
+          mode="outlined"
+          label={"Email Address (optional)"}
+          value={email.value}
+          error={email.error}
+          onChangeText={(value) =>
+            setEmail({
+              value,
+              error: value.length > 0 && !Regex.EMAIL.test(value),
+            })
+          }
         />
         <TextInput
           style={{ marginTop: 10 }}
@@ -246,6 +329,36 @@ const ReportLeakageScreen = () => {
           error={meterAccountNumber.error}
           onChangeText={(value) =>
             setMeterAccountNumber({
+              value,
+              error: value.length > 0 && value.length < 5,
+            })
+          }
+        />
+        <TextInput
+          style={{ marginTop: 10 }}
+          disabled={loading}
+          mode="outlined"
+          label={"Address (optional)"}
+          value={address.value}
+          error={address.error}
+          onChangeText={(value) =>
+            setAddress({
+              value,
+              error: value.length > 0 && value.length < 5,
+            })
+          }
+        />
+        <TextInput
+          style={{ marginTop: 10 }}
+          disabled={loading}
+          mode="outlined"
+          label={"Description"}
+          value={description.value}
+          error={description.error}
+          multiline={true}
+          numberOfLines={5}
+          onChangeText={(value) =>
+            setDescription({
               value,
               error: value.length > 0 && value.length < 5,
             })
@@ -266,15 +379,21 @@ const ReportLeakageScreen = () => {
           disabled={
             loading ||
             meterAccountNumber.error ||
+            email.error ||
+            address.error ||
             phone.error ||
             phone.value.length === 0 ||
             fullName.error ||
-            fullName.value.length === 0
+            fullName.value.length === 0 ||
+            area.error ||
+            area.value.length === 0 ||
+            description.error ||
+            description.value.length === 0
           }
           mode="outlined"
-          onPress={() => {}}
+          onPress={handleReportLeakageSubmit}
         >
-          Submit Report
+          Submit Leakage
         </Button>
       </View>
     </ScrollView>

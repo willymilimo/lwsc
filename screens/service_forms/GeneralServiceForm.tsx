@@ -110,10 +110,13 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
       last_name,
       phone: phone.value,
       email: email.value,
-      location: region,
+      loc_coordinates: region,
+      coordinates: region,
       address: address.value,
       description: description.value,
-      accountMeterNumber: account_meter.value,
+      meter_number: account_meter.value,
+      customer_account_id: account_meter.value,
+      customer_id: account_meter.value
     };
 
     applyForService(application)
@@ -132,6 +135,7 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
         }
       })
       .catch((err) => {
+        console.log(err);
         Alert.alert(
           Strings.SELF_REPORTING_PROBLEM.title,
           Strings.SELF_REPORTING_PROBLEM.message

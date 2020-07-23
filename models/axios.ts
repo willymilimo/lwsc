@@ -10,6 +10,7 @@ import { ServiceItemI } from "./service-item";
 import { ServiceApplicationI } from "./service-application";
 import { UploadFileI } from "./upload-file";
 import { StatementI } from "./statement";
+import { ServiceReportI } from "./service-report";
 
 // axios.defaults.auth = Strings.API_CREDS;
 axios.defaults.headers.Authorization =
@@ -77,7 +78,7 @@ export const applyForService = async (
   service: ServiceApplicationI
 ): Promise<AxiosResponse<IResponse>> => {
   console.log(service);
-  return await axios.post(`applications/create`, service);
+  return await axios.post('services/apply', service);
 };
 
 export const applyForPaymentSchedule = async (account: AccountI) => {
@@ -86,7 +87,7 @@ export const applyForPaymentSchedule = async (account: AccountI) => {
 
 export const uploadFiles = async (
   uris: string[]
-): Promise<AxiosResponse<IResponse<UploadFileI>>> => {
+): Promise<AxiosResponse<IResponse<UploadFileI[]>>> => {
   const fd = new FormData();
   uris.forEach((uri, i) => {
     // fd.append(`reading${i}`, file);
@@ -99,7 +100,7 @@ export const uploadFiles = async (
     } as any);
   });
 
-  return await axios.post("uploads/files/create", fd, {
+  return await axios.post("uploads/files/disk/create", fd, {
     headers: {
       "content-type": "multipart/form-data",
     },
@@ -117,4 +118,12 @@ export const fetchPaymentHistory = async (
   return await axios.get(
     `payments/statement/transactions/fetch?identifier=${identity}&type=${type}`
   );
+};
+
+export const reportLeakage = async (report: ServiceReportI) : Promise<AxiosResponse<IResponse<string>>> => {
+  return await axios.post("service-desk/leakages/create", report);
+};
+
+export const submitComplaint = async (report: ServiceReportI) : Promise<AxiosResponse<IResponse<string>>> => {
+  return await axios.post("service-desk/leakages/create", report);
 };

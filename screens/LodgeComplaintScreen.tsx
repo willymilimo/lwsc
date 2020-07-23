@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, Text, View, Dimensions, Alert } from "react-native";
 import { InputItemType } from "../types/input-item";
 import { TextInput, Button, FAB } from "react-native-paper";
@@ -8,7 +8,11 @@ import MapView, { Marker } from "react-native-maps";
 import { TouchableOpacity, ScrollView } from "react-native-gesture-handler";
 import { Feather } from "@expo/vector-icons";
 import Regex from "../constants/Regex";
+import { ServiceReportI } from "../models/service-report";
 const { width, height } = Dimensions.get("window");
+import { submitComplaint } from "../models/axios";
+import Strings from "../constants/Strings";
+import { useNavigation } from "@react-navigation/native";
 
 const ASPECT_RATIO = width / height;
 const LATITUDE = -15.37496;
@@ -17,6 +21,7 @@ const LATITUDE_DELTA = 0.00922;
 const LONGITUDE_DELTA = 0.00921; //LATITUDE_DELTA * ASPECT_RATIO;
 
 const LodgeComplaintScreen = () => {
+  const navigator = useNavigation();
   let map: MapView;
   const { container, formContainer, mapContainer } = styles;
   const [region, setRegion] = React.useState({
@@ -40,6 +45,9 @@ const LodgeComplaintScreen = () => {
     value: "",
     error: false,
   });
+  const [email, setEmail] = useState({ value: "", error: false });
+  const [area, setArea] = useState({ value: "", error: false });
+  const [address, setAddress] = useState({ value: "", error: false });
   const [message, setMessage] = React.useState<InputItemType<string>>({
     value: "",
     error: false,
@@ -91,6 +99,56 @@ const LodgeComplaintScreen = () => {
     map.animateToRegion(region, 100);
   };
 
+  const handleSubmitComplaint = () => {
+    const space = fullName.value.indexOf(" ");
+    const report: ServiceReportI = {
+      first_name:
+        space != -1 ? fullName.value.substring(0, space) : fullName.value,
+      last_name:
+        space != -1 ? fullName.value.substring(space).trim() : fullName.value,
+      phone: phone.value,
+      coordinates: region,
+      area: area.value,
+      email: email.value,
+      address: address.value,
+      account_number: meterAccountNumber.value,
+      meter_number: meterAccountNumber.value,
+      description: message.value,
+      files: [],
+    };
+    setLoading(true);
+
+    submitComplaint(report)
+      .then(({ status, data }) => {
+        console.log(data);
+        const { success, payload } = data;
+        if (status === 200 && success) {
+          Alert.alert(
+            Strings.REPORT_SUCCESS.title,
+            Strings.REPORT_SUCCESS.message,
+            [
+              {
+                onPress: () => navigator.navigate(Strings.HomeTabNavigator),
+              },
+            ]
+          );
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+        Alert.alert(
+          Strings.SELF_REPORTING_PROBLEM.title,
+          Strings.SELF_REPORTING_PROBLEM.message,
+          // [
+          //   {
+          //     onPress: () => navigator.navigate(Strings.HomeTabNavigator),
+          //   },
+          // ]
+        );
+      })
+      .finally(() => setLoading(false));
+  };
+
   return (
     <ScrollView style={container}>
       <View style={mapContainer}>
@@ -132,7 +190,12 @@ const LodgeComplaintScreen = () => {
           }}
           small
           icon={({ color }) => (
-            <Feather name="zoom-in" size={25} color={color} style={{backgroundColor: 'transparent'}} />
+            <Feather
+              name="zoom-in"
+              size={25}
+              color={color}
+              style={{ backgroundColor: "transparent" }}
+            />
           )}
         />
         <FAB
@@ -148,7 +211,12 @@ const LodgeComplaintScreen = () => {
           }}
           small
           icon={({ color }) => (
-            <Feather name="zoom-out" size={25} color={color} style={{backgroundColor: 'transparent'}} />
+            <Feather
+              name="zoom-out"
+              size={25}
+              color={color}
+              style={{ backgroundColor: "transparent" }}
+            />
           )}
         />
         <View style={styles.buttonContainer}>
@@ -187,7 +255,7 @@ const LodgeComplaintScreen = () => {
           onChangeText={(value) => {
             setFullName({
               value,
-              error: Regex.NAME.test(value),
+              error: !Regex.NAME.test(value),
             });
           }}
         />
@@ -201,7 +269,7 @@ const LodgeComplaintScreen = () => {
           onChangeText={(value) =>
             setMeterAccountNumber({
               value,
-              error: /\d{5,}/.test(value.length.toString()),
+              error: !/\d{5,}/.test(value),
             })
           }
         />
@@ -216,9 +284,52 @@ const LodgeComplaintScreen = () => {
           onChangeText={(value) => {
             setPhone({
               value,
-              error: Regex.PHONE_NUMBER.test(value),
+              error: !Regex.PHONE_NUMBER.test(value),
             });
           }}
+        />
+        <TextInput
+          style={{ marginTop: 15, backgroundColor: "white" }}
+          disabled={loading}
+          mode="outlined"
+          label={"Email Address (Optional)"}
+          placeholder="email@gmail.com"
+          value={email.value}
+          error={email.error}
+          onChangeText={(value) => {
+            setEmail({
+              value,
+              error: !Regex.EMAIL.test(value),
+            });
+          }}
+        />
+        <TextInput
+          style={{ marginTop: 10 }}
+          disabled={loading}
+          mode="outlined"
+          label={"Area"}
+          value={area.value}
+          error={area.error}
+          onChangeText={(value) =>
+            setArea({
+              value,
+              error: value.length < 5,
+            })
+          }
+        />
+        <TextInput
+          style={{ marginTop: 10 }}
+          disabled={loading}
+          mode="outlined"
+          label={"Address (optional)"}
+          value={address.value}
+          error={address.error}
+          onChangeText={(value) =>
+            setAddress({
+              value,
+              error: value.length > 0 && value.length < 5,
+            })
+          }
         />
         <TextInput
           disabled={loading}
@@ -251,11 +362,12 @@ const LodgeComplaintScreen = () => {
             fullName.error ||
             fullName.value.length === 0 ||
             message.error ||
-            message.value.length === 0
+            message.value.length === 0 ||
+            email.error
           }
           icon="send"
           mode="outlined"
-          onPress={() => {}}
+          onPress={handleSubmitComplaint}
         >
           Submit
         </Button>

@@ -4,10 +4,14 @@ export interface ServiceApplicationI {
   last_name: string;
   phone: string;
   email?: string;
-  location: { latitude: number; longitude: number };
-  address: string;
+  loc_coordinates?: { latitude: number; longitude: number };
+  coordinates?: { latitude: number; longitude: number };
+  address?: string;
+  area?: string;
   description?: string;
-  accountMeterNumber?: string;
+  meter_number?: string;
+  customer_id: String;
+  customer_account_id: String;
 }
 
 // export class ServiceApplication implements ServiceApplicationI {
@@ -20,6 +24,5 @@ export interface ServiceApplicationI {
 //   address: string;
 //   description?: string | undefined;
 //   accountMeterNumber?: string | undefined;
-
 
 // }

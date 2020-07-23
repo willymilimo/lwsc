@@ -15,9 +15,10 @@ import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 import Strings from "../../constants/Strings";
 import { useNavigation } from "@react-navigation/native";
 import { uploadFiles } from "../../models/axios";
+import { UploadFileI } from "../../models/upload-file";
 
 interface IUC {
-  uploadCallback(url: string): void;
+  uploadCallback(uploadFile: UploadFileI[]): void;
 }
 
 export default function ImageUploadComponent({ uploadCallback }: IUC) {
@@ -87,7 +88,8 @@ export default function ImageUploadComponent({ uploadCallback }: IUC) {
       uploadFiles([result.uri])
         .then(({ status, data }) => {
           const { success, payload } = data;
-          if (status === 200 && success) {
+          if (status === 200 && success && payload.length) {
+            uploadCallback(payload);
           } else {
             Alert.alert(
               Strings.IMG_UPLOAD_FAILURE.title,
