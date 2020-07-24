@@ -5,7 +5,7 @@ import { AddType } from "../types/add-type";
 import { IdentityType } from "../types/identity-type";
 import { PaymentType } from "../types/payment";
 import { PaymentI } from "./payment";
-import { MeterReading } from "./meter-reading";
+import { MeterReading, BillGroupI, BookNumberI } from "./meter-reading";
 import { ServiceItemI } from "./service-item";
 import { ServiceApplicationI } from "./service-application";
 import { UploadFileI } from "./upload-file";
@@ -78,7 +78,7 @@ export const applyForService = async (
   service: ServiceApplicationI
 ): Promise<AxiosResponse<IResponse>> => {
   console.log(service);
-  return await axios.post('services/apply', service);
+  return await axios.post("services/apply", service);
 };
 
 export const applyForPaymentSchedule = async (account: AccountI) => {
@@ -120,10 +120,38 @@ export const fetchPaymentHistory = async (
   );
 };
 
-export const reportLeakage = async (report: ServiceReportI) : Promise<AxiosResponse<IResponse<string>>> => {
+export const reportLeakage = async (
+  report: ServiceReportI
+): Promise<AxiosResponse<IResponse<string>>> => {
   return await axios.post("service-desk/leakages/create", report);
 };
 
-export const submitComplaint = async (report: ServiceReportI) : Promise<AxiosResponse<IResponse<string>>> => {
+export const submitComplaint = async (
+  report: ServiceReportI
+): Promise<AxiosResponse<IResponse<string>>> => {
   return await axios.post("service-desk/leakages/create", report);
+};
+
+export const fetchAllBillGroups = async (): Promise<
+  AxiosResponse<
+    IResponse<{ recordset: BillGroupI[]; recordsets: [BillGroupI[]] }>
+  >
+> => {
+  return await axios.get("billing/bill-groups/fetch");
+};
+
+export const fetchAllBookNumbers = async (): Promise<
+  AxiosResponse<
+    IResponse<{ recordset: BookNumberI[]; recordsets: [BookNumberI[]] }>
+  >
+> => {
+  return await axios.get("billing/book-numbers/fetch?query_type=all");
+};
+
+export const fetchAllCustomerDetailsByBillGroup = async (billGroup: string): Promise<
+  AxiosResponse<
+    IResponse<{ recordset: BookNumberI[]; recordsets: [BookNumberI[]] }>
+  >
+> => {
+  return await axios.get(`billing/walk-routes/fetch?query_type=bill_group&bill_group=${billGroup}`);
 };

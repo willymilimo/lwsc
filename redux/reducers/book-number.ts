@@ -21,8 +21,8 @@ export default function (
       break;
     case Actions.ADD_BOOK_NUMBER:
       payload = payload as BookNumberI;
-      const item = state[payload.BILLGROUP];
-      state = { ...state, [payload.BILLGROUP]: [...item, payload] };
+      const item = state[payload.key];
+      state = { ...state, [payload.key]: [...item, payload] };
       break;
     case Actions.DELETE_BOOK_NUMBER:
       payload = payload as string;
