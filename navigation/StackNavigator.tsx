@@ -58,6 +58,9 @@ import { BillGroupReducerI } from "../redux/reducers/bill-groups";
 import { BookNumberReducerI } from "../redux/reducers/book-number";
 import { MeterReadingPropertiesReducerI } from "../redux/reducers/meter-reading-proerties";
 import { BookNumberI, BookNumber, Property } from "../models/meter-reading";
+import BillGroupScreen from "../screens/BillGroupScreen";
+import BookNumbersScreen from "../screens/BookNumbersScreen";
+import PropertiesScreen from "../screens/PropertiesScreen";
 
 const Stack = createStackNavigator();
 
@@ -219,7 +222,7 @@ const StackNavigator = ({
         Object.keys(data).forEach((key) => {
           let bns = data[key];
 
-          Object.keys(bns).forEach((k) => (bns[k] = new BookNumber(bns[k])));
+          Object.keys(bns).forEach((k) => (bns.CODE = new BookNumber(bns[k])));
         });
       }
 
@@ -377,6 +380,18 @@ const StackNavigator = ({
       <Stack.Screen
         name={Strings.LwscStaffAuthScreen}
         component={LwscStaffAuthScreen}
+      />
+      <Stack.Screen
+        name={Strings.BillGroupScreen}
+        component={BillGroupScreen}
+      />
+      <Stack.Screen
+        name={Strings.BookNumbersScreen}
+        component={BookNumbersScreen}
+      />
+      <Stack.Screen
+        name={Strings.PropertiesScreen}
+        component={PropertiesScreen}
       />
     </Stack.Navigator>
   );

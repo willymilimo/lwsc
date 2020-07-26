@@ -22,7 +22,7 @@ export default function (
     case Actions.ADD_BOOK_NUMBER:
       payload = payload as BookNumberI;
       const item = state[payload.key];
-      state = { ...state, [payload.key]: { ...item, payload } };
+      state = { ...state, [payload.key]: { ...item, [payload.CODE]: payload } };
       break;
     case Actions.DELETE_BOOK_NUMBER:
       payload = payload as string;

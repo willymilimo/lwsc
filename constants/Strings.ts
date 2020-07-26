@@ -24,6 +24,9 @@ export default {
   ApplyForPaymentScheduleScreen: "Apply for Payment Schedule",
   ReadMeterScreen: "Read Meter",
   LwscStaffAuthScreen: "Login",
+  BillGroupScreen: "Select Bill Group",
+  BookNumbersScreen: "Select Book Number",
+  PropertiesScreen: "Select Property",
 
   /*************** Begin REDUCER TYPES *****************/
   WHITE_THEME: "WHITE_THEME",
