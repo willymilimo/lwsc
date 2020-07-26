@@ -5,7 +5,12 @@ import { AddType } from "../types/add-type";
 import { IdentityType } from "../types/identity-type";
 import { PaymentType } from "../types/payment";
 import { PaymentI } from "./payment";
-import { MeterReading, BillGroupI, BookNumberI } from "./meter-reading";
+import {
+  MeterReading,
+  BillGroupI,
+  BookNumberI,
+  PropertyI,
+} from "./meter-reading";
 import { ServiceItemI } from "./service-item";
 import { ServiceApplicationI } from "./service-application";
 import { UploadFileI } from "./upload-file";
@@ -16,8 +21,9 @@ import { ServiceReportI } from "./service-report";
 axios.defaults.headers.Authorization =
   "Basic bHdzY19tb2JpbGVfYXBwX2Rldjojd3d3QDEyMzRfbHdzY19hcHA=";
 axios.defaults.baseURL = "http://41.72.107.14:3000/api/v1/";
+// axios.defaults.timeout = 60000;
 
-console.log(axios.defaults.headers);
+// console.log(axios.defaults.headers);
 
 const getPayUrl = (paymentType: PaymentType): string | null => {
   switch (paymentType) {
@@ -148,10 +154,18 @@ export const fetchAllBookNumbers = async (): Promise<
   return await axios.get("billing/book-numbers/fetch?query_type=all");
 };
 
-export const fetchAllCustomerDetailsByBillGroup = async (billGroup: string): Promise<
+export const fetchAllCustomerDetailsByBillGroup = async (
+  bn: BookNumberI
+): Promise<
   AxiosResponse<
-    IResponse<{ recordset: BookNumberI[]; recordsets: [BookNumberI[]] }>
+    IResponse<{ recordset: PropertyI[]; recordsets: [PropertyI[]] }>
   >
 > => {
-  return await axios.get(`billing/walk-routes/fetch?query_type=bill_group&bill_group=${billGroup}`);
+  console.log(
+    `billing/walk-routes/fetch?query_type=book_number&bill_group=${bn.BILLGROUP}&book_number=${bn.CODE}`
+  );
+  return await axios.get(
+    `billing/walk-routes/fetch?query_type=book_number&bill_group=${bn.BILLGROUP}&book_number=${bn.CODE}`,
+    { timeout: 600000 }
+  );
 };

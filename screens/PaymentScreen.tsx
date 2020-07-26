@@ -5,10 +5,8 @@ import {
   Image,
   Text,
   Alert,
-  Modal,
-  BackHandler,
+  Modal
 } from "react-native";
-import NetInfo from "@react-native-community/netinfo";
 
 import { ScrollView } from "react-native-gesture-handler";
 import { NavType } from "../types/nav-type";
@@ -38,7 +36,6 @@ import { ControlIT } from "../models/control";
 import { Bowser } from "../models/bowser";
 import { CustomerType } from "../types/customer-type";
 import { PaymentChannel } from "../types/payment-channel";
-import PrepaidComponent from "./reusable/PrepaidComponent";
 import { PrepaidI, Prepaid } from "../models/prepaid";
 
 interface PaymentScreenI {

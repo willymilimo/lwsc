@@ -5,7 +5,7 @@ import { BookNumberI } from "../../models/meter-reading";
 export const setBookNumbers = (
   bookNumbers: BookNumberReducerI
 ): ActionI<BookNumberReducerI> => ({
-  type: Actions.SET_BILL_GROUP,
+  type: Actions.SET_BOOK_NUMBER,
   payload: bookNumbers,
 });
 

@@ -55,7 +55,7 @@ export class BookNumber implements BookNumberI {
   }
 
   get key(): string {
-    return `${this.BILLGROUP}:${this.CODE}`
+    return `${this.BILLGROUP}`
   }
 }
 
@@ -134,6 +134,6 @@ export class Property implements PropertyI {
   }
 
   get key(): string {
-    return `${this.BOOK_NO}_${this.BOOK_NO}_${this.WALK_NO}`;
+    return `${this.BILLGROUP}_${this.BOOK_NO}_${this.WALK_NO}`;
   }
 }

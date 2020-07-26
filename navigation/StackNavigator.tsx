@@ -51,6 +51,13 @@ import ApplyForPaymentScheduleScreen from "../screens/ApplyForPaymentScheduleScr
 import ReadMeterScreen from "../screens/ReadMeterScreen";
 import LwscStaffAuthScreen from "../screens/LwscStaffAuthScreen";
 import { PayPointReducer } from "../types/paypoint";
+import { setBillGroups } from "../redux/actions/bill-groups";
+import { setBookNumbers } from "../redux/actions/book-numbers";
+import { setMRProperties } from "../redux/actions/meter-reading-properties";
+import { BillGroupReducerI } from "../redux/reducers/bill-groups";
+import { BookNumberReducerI } from "../redux/reducers/book-number";
+import { MeterReadingPropertiesReducerI } from "../redux/reducers/meter-reading-proerties";
+import { BookNumberI, BookNumber, Property } from "../models/meter-reading";
 
 const Stack = createStackNavigator();
 
@@ -62,6 +69,9 @@ interface SNI {
   addNotification(notifications: NotificationI): void;
   setAccounts(accounts: AccountReducerI): void;
   setPayPoints(paypoints: PayPointReducer): void;
+  setBillGroups(billGroups: BillGroupReducerI): void;
+  setBookNumbers(bookNumbers: BookNumberReducerI): void;
+  setMRProperties(properties: MeterReadingPropertiesReducerI): void;
 }
 
 type SNT = SNI;
@@ -74,6 +84,9 @@ const StackNavigator = ({
   addNotification,
   setAccounts,
   setPayPoints,
+  setBillGroups,
+  setBookNumbers,
+  setMRProperties,
 }: SNT) => {
   NetInfo.configure({
     reachabilityUrl: "https://41.72.107.14:300/api/v1/services/types/fetch",
@@ -133,6 +146,9 @@ const StackNavigator = ({
       let accounts;
       let paypoints;
       let paymentHistory;
+      let billGroups;
+      let bookNumbers;
+      let properties;
 
       try {
         theme = await AsyncStorage.getItem(Strings.THEME_STORAGE);
@@ -141,6 +157,13 @@ const StackNavigator = ({
         paymentHistory = await AsyncStorage.getItem(
           Strings.PAYMENT_HISTORY_STORAGE
         );
+
+        // await AsyncStorage.removeItem(Strings.BILL_GROUP_STORAGE)
+        // await AsyncStorage.removeItem(Strings.BOOK_NUMBER_STORAGE)
+        // await AsyncStorage.removeItem(Strings.MR_PROPERTY_STORAGE)
+        billGroups = await AsyncStorage.getItem(Strings.BILL_GROUP_STORAGE);
+        bookNumbers = await AsyncStorage.getItem(Strings.BOOK_NUMBER_STORAGE);
+        properties = await AsyncStorage.getItem(Strings.MR_PROPERTY_STORAGE);
       } catch (e) {
         // Restoring token failed
       }
@@ -184,6 +207,28 @@ const StackNavigator = ({
         setPaymentHistory(
           JSON.parse(paymentHistory).map((ph: any) => new PaymentHistory(ph))
         );
+      }
+
+      if (billGroups) {
+        console.log(JSON.parse(billGroups));
+        setBillGroups(JSON.parse(billGroups));
+      }
+
+      if (bookNumbers) {
+        const data: BookNumberReducerI = JSON.parse(bookNumbers);
+        Object.keys(data).forEach((key) => {
+          let bns = data[key];
+
+          Object.keys(bns).forEach((k) => (bns[k] = new BookNumber(bns[k])));
+        });
+      }
+
+      if (properties) {
+        const data: MeterReadingPropertiesReducerI = JSON.parse(properties);
+        Object.keys(data).forEach((key) => {
+          let bns = data[key];
+          data[key] = bns.map((item) => new Property(item));
+        });
       }
     };
 
@@ -238,7 +283,7 @@ const StackNavigator = ({
 
   React.useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
-      console.log(state);
+      // console.log(state);
       if (!state.isConnected) {
         Alert.alert(
           Strings.INTERNET_FAILURE.title,
@@ -350,6 +395,9 @@ const mapDispatchToProps = (dispatch: any) =>
       addNotification,
       setAccounts,
       setPayPoints,
+      setBillGroups,
+      setBookNumbers,
+      setMRProperties,
     },
     dispatch
   );
