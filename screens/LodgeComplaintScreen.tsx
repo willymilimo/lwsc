@@ -120,7 +120,7 @@ const LodgeComplaintScreen = () => {
 
     submitComplaint(report)
       .then(({ status, data }) => {
-        console.log(data);
+        // console.log(data);
         const { success, payload } = data;
         if (status === 200 && success) {
           Alert.alert(
@@ -135,7 +135,7 @@ const LodgeComplaintScreen = () => {
         }
       })
       .catch((err) => {
-        console.log(err)
+        // console.log(err)
         Alert.alert(
           Strings.SELF_REPORTING_PROBLEM.title,
           Strings.SELF_REPORTING_PROBLEM.message,

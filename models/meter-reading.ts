@@ -55,7 +55,7 @@ export class BookNumber implements BookNumberI {
   }
 
   get key(): string {
-    return `${this.BILLGROUP}`
+    return `${this.BILLGROUP}`;
   }
 }
 
@@ -77,6 +77,7 @@ export interface PropertyI {
   MessagesAccess: string;
   Meter_Status: string;
   key: string;
+  previousReadingDate: Date;
 }
 
 export class Property implements PropertyI {
@@ -86,8 +87,8 @@ export class Property implements PropertyI {
   WALK_NO: number;
   AccountNumber: string;
   lineNumber: string;
-  Customer_Address: string;
-  PLOT_NO: string;
+  _Customer_Address: string;
+  _PLOT_NO: string;
   MeterNumber: string;
   PreviousReading: number;
   PreviousReadingDate: string;
@@ -121,8 +122,8 @@ export class Property implements PropertyI {
     this.WALK_NO = WALK_NO;
     this.AccountNumber = AccountNumber;
     this.lineNumber = lineNumber;
-    this.Customer_Address = Customer_Address;
-    this.PLOT_NO = PLOT_NO;
+    this._Customer_Address = Customer_Address;
+    this._PLOT_NO = PLOT_NO;
     this.MeterNumber = MeterNumber;
     this.PreviousReading = PreviousReading;
     this.PreviousReadingDate = PreviousReadingDate;
@@ -135,5 +136,17 @@ export class Property implements PropertyI {
 
   get key(): string {
     return `${this.BILLGROUP}_${this.BOOK_NO}_${this.WALK_NO}`;
+  }
+
+  get Customer_Address(): string {
+    return this._Customer_Address || "";
+  }
+
+  get PLOT_NO(): string {
+    return this._PLOT_NO || "";
+  }
+
+  get previousReadingDate(): Date {
+    return new Date(this.PreviousReadingDate);
   }
 }

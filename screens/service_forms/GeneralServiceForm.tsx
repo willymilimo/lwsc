@@ -135,7 +135,7 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
         }
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
         Alert.alert(
           Strings.SELF_REPORTING_PROBLEM.title,
           Strings.SELF_REPORTING_PROBLEM.message
@@ -145,10 +145,10 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
   };
 
   const onPressZoomOut = () => {
-    console.log({
-      latitudeDelta: region.latitudeDelta / 10,
-      longitudeDelta: region.longitudeDelta / 10,
-    });
+    // console.log({
+    //   latitudeDelta: region.latitudeDelta / 10,
+    //   longitudeDelta: region.longitudeDelta / 10,
+    // });
     setRegion({
       ...region,
       latitudeDelta: region.latitudeDelta / 10,
@@ -158,10 +158,10 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
   };
 
   const onPressZoomIn = () => {
-    console.log({
-      latitudeDelta: region.latitudeDelta / 10,
-      longitudeDelta: region.longitudeDelta / 10,
-    });
+    // console.log({
+    //   latitudeDelta: region.latitudeDelta / 10,
+    //   longitudeDelta: region.longitudeDelta / 10,
+    // });
     setRegion({
       ...region,
       latitudeDelta: region.latitudeDelta * 10,

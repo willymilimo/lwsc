@@ -65,7 +65,7 @@ const LocatePaypointScreen = ({ provider, payPoints }: LPSI) => {
       let location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.BestForNavigation,
       });
-      console.log(location.coords);
+      // console.log(location.coords);
       // console.log(this.state.region);
       setRegion({
         ...region,

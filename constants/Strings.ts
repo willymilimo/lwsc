@@ -49,6 +49,7 @@ export default {
   BILL_GROUP_STORAGE: "BILL_GROUP_STORAGE",
   BOOK_NUMBER_STORAGE: "BOOK_NUMBER_STORAGE",
   MR_PROPERTY_STORAGE: "MR_PROPERTY_STORAGE",
+  ACCESS_NOTES_STORAGE: "ACCESS_NOTES_STORAGE",
   /*************** End Storage Constants *****************/
 
   // API

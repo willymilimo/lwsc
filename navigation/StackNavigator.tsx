@@ -61,6 +61,8 @@ import { BookNumberI, BookNumber, Property } from "../models/meter-reading";
 import BillGroupScreen from "../screens/BillGroupScreen";
 import BookNumbersScreen from "../screens/BookNumbersScreen";
 import PropertiesScreen from "../screens/PropertiesScreen";
+import { AccessNotesReducerI } from "../redux/reducers/access-notes";
+import { setAccessNotes } from "../redux/actions/access-notes";
 
 const Stack = createStackNavigator();
 
@@ -75,6 +77,7 @@ interface SNI {
   setBillGroups(billGroups: BillGroupReducerI): void;
   setBookNumbers(bookNumbers: BookNumberReducerI): void;
   setMRProperties(properties: MeterReadingPropertiesReducerI): void;
+  setAccessNotes(accessNotes: AccessNotesReducerI): void;
 }
 
 type SNT = SNI;
@@ -90,6 +93,7 @@ const StackNavigator = ({
   setBillGroups,
   setBookNumbers,
   setMRProperties,
+  setAccessNotes,
 }: SNT) => {
   NetInfo.configure({
     reachabilityUrl: "https://41.72.107.14:300/api/v1/services/types/fetch",
@@ -152,6 +156,7 @@ const StackNavigator = ({
       let billGroups;
       let bookNumbers;
       let properties;
+      let accessNotes;
 
       try {
         theme = await AsyncStorage.getItem(Strings.THEME_STORAGE);
@@ -167,6 +172,10 @@ const StackNavigator = ({
         billGroups = await AsyncStorage.getItem(Strings.BILL_GROUP_STORAGE);
         bookNumbers = await AsyncStorage.getItem(Strings.BOOK_NUMBER_STORAGE);
         properties = await AsyncStorage.getItem(Strings.MR_PROPERTY_STORAGE);
+
+
+        // await AsyncStorage.removeItem(Strings.ACCESS_NOTES_STORAGE)
+        accessNotes = await AsyncStorage.getItem(Strings.ACCESS_NOTES_STORAGE);
       } catch (e) {
         // Restoring token failed
       }
@@ -213,7 +222,7 @@ const StackNavigator = ({
       }
 
       if (billGroups) {
-        console.log(JSON.parse(billGroups));
+        // console.log(JSON.parse(billGroups));
         setBillGroups(JSON.parse(billGroups));
       }
 
@@ -222,8 +231,9 @@ const StackNavigator = ({
         Object.keys(data).forEach((key) => {
           let bns = data[key];
 
-          Object.keys(bns).forEach((k) => (bns.CODE = new BookNumber(bns[k])));
+          bns.map((k) => new BookNumber(k)); // forEach((k) => (bns.CODE = new BookNumber(bns[k])));
         });
+        setBookNumbers(data);
       }
 
       if (properties) {
@@ -232,6 +242,11 @@ const StackNavigator = ({
           let bns = data[key];
           data[key] = bns.map((item) => new Property(item));
         });
+        setMRProperties(data);
+      }
+
+      if (accessNotes) {
+        setAccessNotes(JSON.parse(accessNotes));
       }
     };
 
@@ -413,6 +428,7 @@ const mapDispatchToProps = (dispatch: any) =>
       setBillGroups,
       setBookNumbers,
       setMRProperties,
+      setAccessNotes,
     },
     dispatch
   );

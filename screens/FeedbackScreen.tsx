@@ -116,7 +116,7 @@ const FeedbackScreen = () => {
   };
 
   const handleSubmit = () => {
-    console.log(fullName, message);
+    // console.log(fullName, message);
     setLoading(true);
   };
 

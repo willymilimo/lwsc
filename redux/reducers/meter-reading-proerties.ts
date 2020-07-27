@@ -16,15 +16,15 @@ export default function (
     let { type, payload } = action;
   
     switch (type) {
-      case Actions.SET_BOOK_NUMBER:
+      case Actions.SET_MR_PROPERTY:
         state = payload as MeterReadingPropertiesReducerI;
         break;
-      case Actions.ADD_BOOK_NUMBER:
+      case Actions.ADD_MR_PROPERTY:
         payload = payload as PropertyI;
-        const item = state[payload.key];
-        state = { ...state, [payload.key]: [...item, payload] };
+        const item = state[payload.BOOK_NO];
+        state = { ...state, [payload.BOOK_NO]: [...item, payload] };
         break;
-      case Actions.DELETE_BOOK_NUMBER:
+      case Actions.DELETE_MR_PROPERTY:
         payload = payload as string;
         delete state[payload];
         break;

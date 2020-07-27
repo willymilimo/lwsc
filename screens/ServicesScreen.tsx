@@ -53,7 +53,7 @@ const ServicesScreen = ({
         fetchServices()
           .then(({status, data}) => {
             const { success, payload, error, message } = data;
-            console.log(status, data)
+            // console.log(status, data)
 
             if (status === 200 && success) {
               setServiceTypes(payload.map((item) => new ServiceItem(item)));
@@ -65,7 +65,7 @@ const ServicesScreen = ({
             }
           })
           .catch((err) => {
-            console.log(err);
+            // console.log(err);
             const { title, message } = Strings.SELF_REPORTING_PROBLEM;
             Alert.alert(title, message);
           })

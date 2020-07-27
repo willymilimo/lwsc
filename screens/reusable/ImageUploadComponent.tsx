@@ -18,10 +18,14 @@ import { uploadFiles } from "../../models/axios";
 import { UploadFileI } from "../../models/upload-file";
 
 interface IUC {
+  buttonName?: string;
   uploadCallback(uploadFile: UploadFileI[]): void;
 }
 
-export default function ImageUploadComponent({ uploadCallback }: IUC) {
+export default function ImageUploadComponent({
+  buttonName,
+  uploadCallback,
+}: IUC) {
   const navigator = useNavigation();
   const [loading, setLoading] = useState(false);
   const [image, setImage] = useState<
@@ -181,7 +185,7 @@ export default function ImageUploadComponent({ uploadCallback }: IUC) {
           mode="outlined"
           onPress={async () => await captureImage()}
         >
-          CAPTURE LEAK
+          {buttonName || "CAPTURE LEAK"}
         </Button>
       )}
     </View>

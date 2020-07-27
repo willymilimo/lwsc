@@ -5,8 +5,6 @@ import {
   View,
   Dimensions,
   Alert,
-  Platform,
-  Image,
   BackHandler,
 } from "react-native";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
@@ -137,7 +135,7 @@ const ReportLeakageScreen = () => {
 
     reportLeakage(report)
       .then(({ status, data }) => {
-        console.log(data)
+        // console.log(data)
         const { success, payload } = data;
         if (status === 200 && success) {
           Alert.alert(

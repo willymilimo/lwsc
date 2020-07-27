@@ -90,8 +90,9 @@ const BillGroupScreen = ({ billGroups, setBillGroups, route }: PropsI) => {
                 marginTop: 20,
                 textAlign: "center",
               }}
-            >{`Loading bill groups
-            ...`}</Text>
+            >
+              Loading bill groups
+            </Text>
             <Text
               style={{
                 marginTop: 20,

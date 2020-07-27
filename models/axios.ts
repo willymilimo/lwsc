@@ -16,6 +16,7 @@ import { ServiceApplicationI } from "./service-application";
 import { UploadFileI } from "./upload-file";
 import { StatementI } from "./statement";
 import { ServiceReportI } from "./service-report";
+import { NotesI, NoAccessI } from "./access-description";
 
 // axios.defaults.auth = Strings.API_CREDS;
 axios.defaults.headers.Authorization =
@@ -161,11 +162,34 @@ export const fetchAllCustomerDetailsByBillGroup = async (
     IResponse<{ recordset: PropertyI[]; recordsets: [PropertyI[]] }>
   >
 > => {
-  console.log(
-    `billing/walk-routes/fetch?query_type=book_number&bill_group=${bn.BILLGROUP}&book_number=${bn.CODE}`
-  );
   return await axios.get(
     `billing/walk-routes/fetch?query_type=book_number&bill_group=${bn.BILLGROUP}&book_number=${bn.CODE}`,
     { timeout: 600000 }
+  );
+};
+
+export const fetchAccessNotes = async (): Promise<
+  AxiosResponse<
+    IResponse<{
+      recordset: NotesI[];
+      recordsets: [NotesI[]];
+    }>
+  >
+> => {
+  return await axios.get(
+    "billing/notes-access-descriptions/fetch?query_type=notes"
+  );
+};
+
+export const fetchNoAccessOptions = async (): Promise<
+  AxiosResponse<
+    IResponse<{
+      recordset: NoAccessI[];
+      recordsets: [NoAccessI[]];
+    }>
+  >
+> => {
+  return await axios.get(
+    "billing/notes-access-descriptions/fetch?query_type=no_access"
   );
 };

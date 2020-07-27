@@ -124,7 +124,7 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
   };
 
   async function processPayment(payment: PaymentI) {
-    console.log(payment);
+    // console.log(payment);
     setLoading(true);
     makePayment(payment)
       .then(({ data, status }) => {
@@ -178,7 +178,7 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
         }
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
         Alert.alert(
           Strings.SELF_REPORTING_PROBLEM.title,
           Strings.SELF_REPORTING_PROBLEM.message

@@ -25,9 +25,10 @@ interface PropI {
 const BookNumbersScreen = ({ bookNumbers, setBookNumbers, route }: PropI) => {
   const navigator = useNavigation();
   const { manNumber, billGroup } = route.params;
+  const props = bookNumbers[billGroup.GROUP_ID];
   const [loading, setLoading] = useState(false);
   const [displayList, setDisplayList] = useState<BookNumberI[]>(
-    Object.values(bookNumbers[billGroup.GROUP_ID])
+    props && Object.values(props).length ? Object.values(props) : []
   );
   const [filteredDisplayList, setFilteredDisplayList] = useState<BookNumberI[]>(
     []
@@ -63,7 +64,13 @@ const BookNumbersScreen = ({ bookNumbers, setBookNumbers, route }: PropI) => {
 
   const renderListItem = ({ item }: { item: BookNumberI }) => (
     <List.Item
-      onPress={() => navigator.navigate(Strings.PropertiesScreen, { bg: item })}
+      onPress={() =>
+        navigator.navigate(Strings.PropertiesScreen, {
+          manNumber,
+          bookNumber: item,
+          billGroup: billGroup
+        })
+      }
       title={item.DESCRIBE}
       description={`${item.CODE} - ${item.NO_WALKS} walks`}
       left={(props) => (
@@ -83,24 +90,23 @@ const BookNumbersScreen = ({ bookNumbers, setBookNumbers, route }: PropI) => {
 
   const fetchBookNumbers = async () => {
     setLoading(true);
-    const bns: { [key: string]: BookNumberI } = {};
+    // const bns: { [key: string]: BookNumberI } = {};
     const { data } = await fetchAllBookNumbers();
     const { success, payload } = data;
     if (success) {
       const pay: BookNumberReducerI = {};
       payload.recordset.forEach((bg) => {
         bg = new BookNumber(bg);
-        let items = pay[bg.key];
+        let items = pay[bg.BILLGROUP];
 
-        if (!items) items = {};
-        if (bg.key) {
-          pay[bg.key] = { ...items, [bg.CODE]: bg };
-          bns[bg.key] = bg;
+        if (!items) items = [];
+        if (bg.CODE) {
+          pay[bg.BILLGROUP] = [...items, bg];
         }
       });
 
       setBookNumbers(pay);
-      setDisplayList(Object.values(pay[route.params.GROUP_ID]));
+      setDisplayList(Object.values(pay[billGroup.GROUP_ID]));
     }
 
     setLoading(false);
@@ -117,8 +123,9 @@ const BookNumbersScreen = ({ bookNumbers, setBookNumbers, route }: PropI) => {
                 marginTop: 20,
                 textAlign: "center",
               }}
-            >{`Loading bill groups
-            ...`}</Text>
+            >
+              Loading book numbers
+            </Text>
             <Text
               style={{
                 marginTop: 20,
