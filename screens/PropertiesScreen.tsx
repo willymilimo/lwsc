@@ -128,16 +128,18 @@ const PropertiesScreen = ({ properties, setMRProperties, route }: PropI) => {
   };
 
   const renderListItem = ({ item }: { item: PropertyI }) => {
-    //   const desc =
+    //   const desc =c
+    // console.log(item);
     return (
       <List.Item
-        onPress={() =>
+        onPress={() => {
+          console.log(item);
           navigator.navigate(Strings.ReadMeterScreen, {
             manNumber,
             billGroup,
             property: item,
-          })
-        }
+          });
+        }}
         title={item.MeterNumber}
         description={`${item.PLOT_NO} ${item.Customer_Address} ${item.Township}`.trim()}
         left={(props) => (
@@ -180,7 +182,7 @@ const PropertiesScreen = ({ properties, setMRProperties, route }: PropI) => {
         </View>
       </Modal>
       <Searchbar
-        placeholder={`Search Book Number`}
+        placeholder={`Search Property`}
         onChangeText={onChangeSearch}
         value={searchQuery}
       />

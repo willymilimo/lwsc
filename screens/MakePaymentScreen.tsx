@@ -96,18 +96,6 @@ const MakePaymentScreen = ({
       is_subscribed = false;
     };
   }, []);
-  
-  // React.useEffect(() => {
-  //   NetInfo.addEventListener((state) => {
-  //     if (!state.isConnected) {
-  //       Alert.alert(
-  //         Strings.INTERNET_FAILURE.title,
-  //         Strings.INTERNET_FAILURE.message,
-  //         [{ text: "Exit", onPress: () => BackHandler.exitApp() }]
-  //       );
-  //     }
-  //   });
-  // }, []);
 
   const handleAccountMeterSubmit = () => {
     if (type === AddType.meter) {

@@ -21,7 +21,7 @@ export default function (
     case Actions.SET_ACCESS_NOTES:
       state = payload as AccessNotesReducerI;
       break;
-    case Actions.SET_ACCESS_NOTES:
+    case Actions.SET_AN_ACCESS:
       payload = payload as NoAccessI[];
       state = { ...state, no_access: payload };
       break;
@@ -33,9 +33,9 @@ export default function (
 
   if (
     [
-      Actions.SET_ACCOUNTS,
-      Actions.ADD_ACCOUNT,
-      Actions.DELETE_ACCOUNT,
+      Actions.SET_ACCESS_NOTES,
+      Actions.SET_AN_NOTES,
+      Actions.SET_AN_ACCESS,
     ].includes(type)
   ) {
     AsyncStorage.setItem(Strings.ACCESS_NOTES_STORAGE, JSON.stringify(state));

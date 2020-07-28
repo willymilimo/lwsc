@@ -24,6 +24,7 @@ import Strings from "../constants/Strings";
 import { useNavigation } from "@react-navigation/native";
 import { IdentityType } from "../types/identity-type";
 import { StatementI } from "../models/statement";
+import LwscFAB from "../components/LwscFAB";
 
 interface PaymentHistoryScreenI {
   paymentHistory: StatementI[];
@@ -113,8 +114,6 @@ const PaymentHistoryScreen = ({
   );
   const [showDialog, setShowDialog] = useState(false);
   const [type, setType] = useState(IdentityType.Account);
-  const [identity, setIdentity] = useState("");
-  const [showMenu, setShowMenu] = useState(false);
   // console.log(accounts)
 
   useEffect(() => {
@@ -159,8 +158,6 @@ const PaymentHistoryScreen = ({
     };
   }, []);
 
-  const handleSubmitIdentity = () => {};
-
   return (
     <SafeAreaView style={container}>
       {selectedAccount && (
@@ -185,7 +182,11 @@ const PaymentHistoryScreen = ({
               right: 40,
               top: 5,
             }}
-            onPress={() => setShowDialog(true)}
+            onPress={() =>
+              navigator.navigate(Strings.HomeTabNavigator, {
+                screen: "Accounts",
+              })
+            }
           />
           <Appbar.Action
             icon={`dots-${Platform.OS === "ios" ? "horizontal" : "vertical"}`}
@@ -199,46 +200,6 @@ const PaymentHistoryScreen = ({
           />
         </Appbar>
       )}
-
-      
-      <Portal>
-        <Dialog visible={showDialog} onDismiss={() => setShowDialog(false)}>
-          <Dialog.Title
-            style={{ textTransform: "capitalize" }}
-          >{`Add ${IdentityType[type]}`}</Dialog.Title>
-          <Dialog.Content>
-            <RadioButton.Group
-              onValueChange={(value) => setType(value as IdentityType)}
-              value={type}
-            >
-              <View style={flexRow}>
-                <View style={flexRow}>
-                  <Text style={radioLabelStyle}>Account</Text>
-                  <RadioButton color="#3366cc" value={IdentityType.Account} />
-                </View>
-                <View style={flexRow}>
-                  <Text style={radioLabelStyle}>Meter</Text>
-                  <RadioButton color="#3366cc" value={IdentityType.Meter} />
-                </View>
-              </View>
-            </RadioButton.Group>
-            <TextInput
-              mode="outlined"
-              label={`${IdentityType[type]} Number`}
-              keyboardType="number-pad"
-              value={identity}
-              disabled={loading}
-              autoFocus={true}
-              onChangeText={(text) => setIdentity(text.trim())}
-            />
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button loading={loading} onPress={() => handleSubmitIdentity()}>
-              Submit
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
 
       {loading ? (
         <ActivityIndicator
@@ -257,6 +218,21 @@ const PaymentHistoryScreen = ({
           You have not made any payments thus far.
         </Text>
       )}
+      <LwscFAB
+        visible={true}
+        onPress={() =>
+          navigator.navigate(Strings.HomeTabNavigator, { screen: "Accounts" })
+        }
+        label="Add Account/Meter"
+        labelStyle={{ width: 145 }}
+        icon={{
+          name: `${Platform.OS === "ios" ? "ios" : "md"}-add`,
+          type: Ionicons,
+        }}
+        style={{ bottom: 20 }}
+        backgroundColor={Colors.LwscBlue}
+        color="white"
+      />
     </SafeAreaView>
   );
 };

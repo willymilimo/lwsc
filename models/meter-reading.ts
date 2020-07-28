@@ -93,6 +93,7 @@ export interface PropertyI {
   Meter_Status: string;
   key: string;
   previousReadingDate: Date;
+  connection_id: string;
 }
 
 export class Property implements PropertyI {
@@ -112,6 +113,7 @@ export class Property implements PropertyI {
   MessagesNote: string;
   MessagesAccess: string;
   Meter_Status: string;
+  connection_id: string;
 
   constructor({
     BILLGROUP,
@@ -130,6 +132,7 @@ export class Property implements PropertyI {
     MessagesNote,
     MessagesAccess,
     Meter_Status,
+    connection_id,
   }: PropertyI) {
     this.BILLGROUP = BILLGROUP;
     this.Township = Township;
@@ -147,6 +150,7 @@ export class Property implements PropertyI {
     this.MessagesNote = MessagesNote;
     this.MessagesAccess = MessagesAccess;
     this.Meter_Status = Meter_Status;
+    this.connection_id = connection_id;
   }
 
   get key(): string {

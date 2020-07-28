@@ -45,6 +45,7 @@ import {
   fetchAccessNotes,
   createMeterReading,
 } from "../models/axios";
+import { formatDate, formatDateTime } from "../helpers/functions";
 
 const ASPECT_RATIO = width / height;
 const LATITUDE = -15.37496;
@@ -138,7 +139,7 @@ const ReadMeterScreen = ({
           const { status, data } = await fetchAccessNotes();
           if (status === 200 && data.success) {
             setANNotes(data.payload.recordset);
-            console.log(data.payload.recordset);
+            // console.log(data.payload.recordset);
             displayItems.notes = data.payload.recordset;
             setDisplayItems(displayItems);
           } else {
@@ -215,18 +216,17 @@ const ReadMeterScreen = ({
 
   const submitMeterReading = () => {
     const date = new Date();
-    const lds = date.toLocaleDateString().split("/");
 
     const reading: MeterReadingI = {
       bill_group: billGroup.GROUP_ID,
       current_reading: meterReading.value,
-      current_reading_date: `${lds[2]}-${lds[0]}-${lds[1]}`,
-      current_reading_datetime: date.toISOString(),
+      current_reading_date: formatDate(date),
+      current_reading_datetime: formatDateTime(date),
       x_gps: region.longitude,
       y_gps: region.latitude,
       access_code: access.value,
       description_code: note.value,
-      connection_id: 97681,
+      connection_id: property.connection_id,
       attachements: uploadFiles as UploadFileI[],
     };
 
@@ -470,19 +470,11 @@ const ReadMeterScreen = ({
           <Picker
             selectedValue={access.value}
             onValueChange={(itemValue, index) => {
-              // console.log(itemValue, index);
-              console.log(
-                !displayItems.notes.some(
-                  (value) => value.CODE === itemValue.CODE
-                ),
-                itemValue !== "-- Select Access Description --"
-              );
               setAccess({
                 value: itemValue,
-                error:
-                  !displayItems.no_access.some(
-                    (value) => value.code === itemValue.code
-                  ) && itemValue !== "-- Select Access Description --",
+                error: !displayItems.no_access.some(
+                  (value) => value.code === itemValue
+                ),
               });
             }}
           >
@@ -515,18 +507,11 @@ const ReadMeterScreen = ({
           <Picker
             selectedValue={note.value}
             onValueChange={(itemValue, index) => {
-              console.log(
-                !displayItems.notes.some(
-                  (value) => value.CODE === itemValue.CODE
-                ),
-                itemValue !== "-- Select Note --"
-              );
               setNote({
                 value: itemValue,
-                error:
-                  !displayItems.notes.some(
-                    (value) => value.CODE === itemValue.CODE
-                  ) && itemValue !== "-- Select Note --",
+                error: !displayItems.notes.some(
+                  (value) => value.CODE === itemValue
+                ),
               });
             }}
           >

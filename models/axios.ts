@@ -163,8 +163,9 @@ export const fetchAllCustomerDetailsByBillGroup = async (
     IResponse<{ recordset: PropertyI[]; recordsets: [PropertyI[]] }>
   >
 > => {
+  //  `billing/walk-routes/fetch?query_type=book_number&bill_group=${bn.BILLGROUP}&book_number=${bn.CODE}`,
   return await axios.get(
-    `billing/walk-routes/fetch?query_type=book_number&bill_group=${bn.BILLGROUP}&book_number=${bn.CODE}`,
+    `billing/walk-routes/fetch?query_type=bill_group&bill_group=${bn.BILLGROUP}&book_number=${bn.CODE}&walk_number=${bn.NO_WALKS}`,
     { timeout: 600000 }
   );
 };
