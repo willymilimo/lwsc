@@ -168,6 +168,16 @@ export default {
     message: "Your report has been submitted successfully.",
   },
 
+  METER_READING_SUBMIT_SUCCESS: {
+    title: "Meter Reading Submitted",
+    message: "Meter reading has been submitted successfully.",
+  },
+
+  METER_READING_SUBMIT_FAILURE: {
+    title: "Failed to Submit",
+    message: "Failed to submit meter reading. Please ensure all input is valid.",
+  },
+
   IMG_UPLOAD_FAILURE: {
     title: "Upload Failed",
     message:

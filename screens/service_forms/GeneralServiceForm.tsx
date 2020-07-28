@@ -1,17 +1,18 @@
 import React from "react";
-import { StyleSheet, Text, View, Dimensions, Alert } from "react-native";
+import { StyleSheet, Text, View, Dimensions, Alert, Modal } from "react-native";
 import { ServiceType } from "../../types/service-type";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import Colors from "../../constants/Colors";
-import { Button, TextInput, FAB } from "react-native-paper";
+import { Button, TextInput, FAB, ActivityIndicator } from "react-native-paper";
 import { ControlIT } from "../../models/control";
 import Regex from "../../constants/Regex";
 import { ServiceApplicationI } from "../../models/service-application";
 import { applyForService } from "../../models/axios";
 import Strings from "../../constants/Strings";
 import { Feather } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 const { width, height } = Dimensions.get("window");
 
 interface GeneralServiceFormI {
@@ -27,6 +28,7 @@ const LONGITUDE_DELTA = 0.00921; //LATITUDE_DELTA * ASPECT_RATIO;
 
 const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
   let mapRef: MapView;
+  const navigator = useNavigation();
   const { title, type } = route.params;
   const { container, mapContainer, map } = styles;
   const [region, setRegion] = React.useState({
@@ -116,21 +118,24 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
       description: description.value,
       meter_number: account_meter.value,
       customer_account_id: account_meter.value,
-      customer_id: account_meter.value
+      customer_id: account_meter.value,
     };
 
     applyForService(application)
       .then(({ status, data }) => {
         const { success, payload } = data;
         if (status === 200 && success) {
+          console.log(payload);
           Alert.alert(
             "Application Submitted",
-            "Application submitted successfully. Your code is as follows"
+            "Application submitted successfully. We will respond to you on your provided contact details.",
+            [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
           );
         } else {
           Alert.alert(
             Strings.SELF_REPORTING_PROBLEM.title,
-            Strings.SELF_REPORTING_PROBLEM.message
+            Strings.SELF_REPORTING_PROBLEM.message,
+            [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
           );
         }
       })
@@ -138,17 +143,14 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
         // console.log(err);
         Alert.alert(
           Strings.SELF_REPORTING_PROBLEM.title,
-          Strings.SELF_REPORTING_PROBLEM.message
+          Strings.SELF_REPORTING_PROBLEM.message,
+          [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
         );
       })
       .finally(() => setLoading(false));
   };
 
   const onPressZoomOut = () => {
-    // console.log({
-    //   latitudeDelta: region.latitudeDelta / 10,
-    //   longitudeDelta: region.longitudeDelta / 10,
-    // });
     setRegion({
       ...region,
       latitudeDelta: region.latitudeDelta / 10,
@@ -158,10 +160,6 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
   };
 
   const onPressZoomIn = () => {
-    // console.log({
-    //   latitudeDelta: region.latitudeDelta / 10,
-    //   longitudeDelta: region.longitudeDelta / 10,
-    // });
     setRegion({
       ...region,
       latitudeDelta: region.latitudeDelta * 10,
@@ -172,6 +170,14 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
 
   return (
     <ScrollView style={container}>
+      <Modal animationType="slide" transparent visible={loading}>
+        <View style={[styles.centeredView, { backgroundColor: "#00000077" }]}>
+          <View style={styles.modalView}>
+            <ActivityIndicator size="large" color={Colors.LwscOrange} />
+          </View>
+        </View>
+      </Modal>
+
       <View style={mapContainer}>
         <MapView
           ref={(ref) => (mapRef = ref as MapView)}
@@ -425,5 +431,26 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginVertical: 20,
     backgroundColor: "transparent",
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });

@@ -10,6 +10,7 @@ import {
   BillGroupI,
   BookNumberI,
   PropertyI,
+  MeterReadingI,
 } from "./meter-reading";
 import { ServiceItemI } from "./service-item";
 import { ServiceApplicationI } from "./service-application";
@@ -85,7 +86,7 @@ export const applyForService = async (
   service: ServiceApplicationI
 ): Promise<AxiosResponse<IResponse>> => {
   console.log(service);
-  return await axios.post("services/apply", service);
+  return await axios.post("services/applications/create", service);
 };
 
 export const applyForPaymentSchedule = async (account: AccountI) => {
@@ -192,4 +193,10 @@ export const fetchNoAccessOptions = async (): Promise<
   return await axios.get(
     "billing/notes-access-descriptions/fetch?query_type=no_access"
   );
+};
+
+export const createMeterReading = async (
+  reading: MeterReadingI
+): Promise<AxiosResponse<IResponse<boolean>>> => {
+  return await axios.post("billing/meter-reading/create", reading);
 };

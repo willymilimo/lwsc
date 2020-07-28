@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Modal } from "react-native";
+import { StyleSheet, Text, View, Modal, Alert } from "react-native";
 import { setBillGroups } from "../redux/actions/bill-groups";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -68,15 +68,39 @@ const BillGroupScreen = ({ billGroups, setBillGroups, route }: PropsI) => {
 
   const fetchBillGroups = async () => {
     setLoading(true);
-    const pay: BillGroupReducerI = {};
-    const { data } = await fetchAllBillGroups();
-    const { success, payload } = data;
-    if (success) {
-      payload.recordset.forEach((bg) => (pay[bg.GROUP_ID] = bg));
-      setBillGroups(pay);
-      setDisplayList(Object.values(pay));
-    }
-    setLoading(false);
+    fetchAllBillGroups()
+      .then(({ status, data }) => {
+        const { success, payload } = data;
+
+        // console.log(status, data);
+
+        if (status === 200 && success) {
+          const pay: BillGroupReducerI = {};
+          payload.recordset.forEach((bg) => (pay[bg.GROUP_ID] = bg));
+          setBillGroups(pay);
+          setDisplayList(Object.values(pay));
+        } else {
+          Alert.alert(
+            "Load Failure",
+            "Failed to load bill groups. Please try again later.",
+            [
+              {
+                text: "Cancel",
+                onPress: () => navigator.navigate(Strings.HomeTabNavigator),
+              },
+              { text: "RETRY", onPress: fetchBillGroups },
+            ]
+          );
+        }
+      })
+      .catch((e) =>
+        Alert.alert(
+          Strings.SELF_REPORTING_PROBLEM.title,
+          Strings.SELF_REPORTING_PROBLEM.message,
+          [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
+        )
+      )
+      .finally(() => setLoading(false));
   };
 
   return (

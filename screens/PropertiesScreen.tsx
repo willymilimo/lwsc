@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Modal } from "react-native";
+import { StyleSheet, Text, View, Modal, Alert } from "react-native";
 import { RootReducerI } from "../redux/reducers";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { setMRProperties } from "../redux/actions/meter-reading-properties";
 import { MeterReadingPropertiesReducerI } from "../redux/reducers/meter-reading-proerties";
-import { BookNumberI, Property, PropertyI, BillGroupI } from "../models/meter-reading";
+import {
+  BookNumberI,
+  Property,
+  PropertyI,
+  BillGroupI,
+} from "../models/meter-reading";
 import { asyncForEach } from "../helpers/functions";
 import { fetchAllCustomerDetailsByBillGroup } from "../models/axios";
 import { ActivityIndicator, Searchbar, List } from "react-native-paper";
@@ -19,7 +24,11 @@ interface PropI {
   properties: MeterReadingPropertiesReducerI;
   setMRProperties(properties: MeterReadingPropertiesReducerI): void;
   route: {
-    params: { manNumber: string; bookNumber: BookNumberI, billGroup: BillGroupI };
+    params: {
+      manNumber: string;
+      bookNumber: BookNumberI;
+      billGroup: BillGroupI;
+    };
   };
 }
 
@@ -74,26 +83,46 @@ const PropertiesScreen = ({ properties, setMRProperties, route }: PropI) => {
     setLoading(true);
     const pay: MeterReadingPropertiesReducerI = {};
 
-    const { data } = await fetchAllCustomerDetailsByBillGroup(bookNumber);
-    const { success, payload } = data;
-    // console.log(data);
-    if (success) {
-      payload.recordset.forEach((p) => {
-        p = new Property(p);
-        let items = pay[p.BOOK_NO];
-        if (!items) {
-          items = [];
-        }
+    try {
+      const { data } = await fetchAllCustomerDetailsByBillGroup(bookNumber);
+      const { success, payload } = data;
+      // console.log(data);
+      if (success) {
+        payload.recordset.forEach((p) => {
+          p = new Property(p);
+          let items = pay[p.BOOK_NO];
+          if (!items) {
+            items = [];
+          }
 
-        pay[p.BOOK_NO] = [...items, p];
-      });
+          pay[p.BOOK_NO] = [...items, p];
+        });
 
-      Object.keys(pay).forEach((key) => {
-        pay[key] = removeDuplicates<PropertyI>(pay[key]);
-      });
+        Object.keys(pay).forEach((key) => {
+          pay[key] = removeDuplicates<PropertyI>(pay[key]);
+        });
 
-      setMRProperties(pay);
-      setDisplayList(pay[bookNumber.CODE]);
+        setMRProperties(pay);
+        setDisplayList(pay[bookNumber.CODE]);
+      } else {
+        Alert.alert(
+          "Load Failure",
+          "Failed to load book numbers. Please try again later.",
+          [
+            {
+              text: "Cancel",
+              onPress: () => navigator.navigate(Strings.HomeTabNavigator),
+            },
+            { text: "RETRY", onPress: fetchProperties },
+          ]
+        );
+      }
+    } catch (e) {
+      Alert.alert(
+        Strings.SELF_REPORTING_PROBLEM.title,
+        Strings.SELF_REPORTING_PROBLEM.message,
+        [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
+      );
     }
     setLoading(false);
   };

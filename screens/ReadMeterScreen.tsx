@@ -8,8 +8,9 @@ import {
   Dimensions,
   Platform,
   Picker,
+  Modal,
 } from "react-native";
-import { FAB, Button, TextInput, Menu, Provider } from "react-native-paper";
+import { FAB, Button, TextInput, ActivityIndicator } from "react-native-paper";
 import Colors from "../constants/Colors";
 import * as Location from "expo-location";
 import { useNavigation } from "@react-navigation/native";
@@ -19,7 +20,7 @@ import Strings from "../constants/Strings";
 import { InputItemType } from "../types/input-item";
 import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
-import { PropertyI, BillGroupI } from "../models/meter-reading";
+import { PropertyI, BillGroupI, MeterReadingI } from "../models/meter-reading";
 import ImageUploadComponent from "./reusable/ImageUploadComponent";
 import { UploadFileI } from "../models/upload-file";
 import {
@@ -39,7 +40,11 @@ import {
 } from "../redux/actions/access-notes";
 import { AccessNotesReducerI } from "../redux/reducers/access-notes";
 import { NotesI, NoAccessI } from "../models/access-description";
-import { fetchNoAccessOptions, fetchAccessNotes } from "../models/axios";
+import {
+  fetchNoAccessOptions,
+  fetchAccessNotes,
+  createMeterReading,
+} from "../models/axios";
 
 const ASPECT_RATIO = width / height;
 const LATITUDE = -15.37496;
@@ -208,10 +213,59 @@ const ReadMeterScreen = ({
     map.animateToRegion(region, 100);
   };
 
-  // console.log(displayItems.notes)
+  const submitMeterReading = () => {
+    const date = new Date();
+    const lds = date.toLocaleDateString().split("/");
+
+    const reading: MeterReadingI = {
+      bill_group: billGroup.GROUP_ID,
+      current_reading: meterReading.value,
+      current_reading_date: `${lds[2]}-${lds[0]}-${lds[1]}`,
+      current_reading_datetime: date.toISOString(),
+      x_gps: region.longitude,
+      y_gps: region.latitude,
+      access_code: access.value,
+      description_code: note.value,
+      connection_id: 97681,
+      attachements: uploadFiles as UploadFileI[],
+    };
+
+    setLoading(true);
+    createMeterReading(reading)
+      .then(({ status, data }) => {
+        if (status === 200 && data.success) {
+          Alert.alert(
+            Strings.METER_READING_SUBMIT_SUCCESS.title,
+            Strings.METER_READING_SUBMIT_SUCCESS.message,
+            [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
+          );
+        } else {
+          Alert.alert(
+            Strings.METER_READING_SUBMIT_FAILURE.title,
+            Strings.METER_READING_SUBMIT_FAILURE.message
+          );
+        }
+      })
+      .catch(() =>
+        Alert.alert(
+          Strings.SELF_REPORTING_PROBLEM.title,
+          Strings.SELF_REPORTING_PROBLEM.message,
+          [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
+        )
+      )
+      .finally(() => setLoading(false));
+  };
 
   return (
     <ScrollView style={container}>
+      <Modal animationType="slide" transparent visible={loading}>
+        <View style={[styles.centeredView, { backgroundColor: "#00000077" }]}>
+          <View style={styles.modalView}>
+            <ActivityIndicator size="large" color={Colors.LwscOrange} />
+          </View>
+        </View>
+      </Modal>
+
       <View style={mapContainer}>
         <MapView
           ref={(ref) => (map = ref as MapView)}
@@ -416,13 +470,19 @@ const ReadMeterScreen = ({
           <Picker
             selectedValue={access.value}
             onValueChange={(itemValue, index) => {
-              console.log(itemValue, index);
+              // console.log(itemValue, index);
+              console.log(
+                !displayItems.notes.some(
+                  (value) => value.CODE === itemValue.CODE
+                ),
+                itemValue !== "-- Select Access Description --"
+              );
               setAccess({
                 value: itemValue,
                 error:
                   !displayItems.no_access.some(
-                    (value, index, arrr) => value.code === itemValue.code
-                  ) || itemValue !== "-- Select Access Description --",
+                    (value) => value.code === itemValue.code
+                  ) && itemValue !== "-- Select Access Description --",
               });
             }}
           >
@@ -431,7 +491,7 @@ const ReadMeterScreen = ({
               value="-- Select Access Description --"
             />
             {displayItems.no_access.map((noac) => {
-              console.log(noac);
+              // console.log(noac);
               return (
                 <Picker.Item
                   key={`${noac.DESCRIBE}_${noac.code}`}
@@ -455,13 +515,18 @@ const ReadMeterScreen = ({
           <Picker
             selectedValue={note.value}
             onValueChange={(itemValue, index) => {
-              console.log(itemValue, index);
+              console.log(
+                !displayItems.notes.some(
+                  (value) => value.CODE === itemValue.CODE
+                ),
+                itemValue !== "-- Select Note --"
+              );
               setNote({
                 value: itemValue,
                 error:
                   !displayItems.notes.some(
-                    (value, index, arrr) => value.CODE === itemValue.CODE
-                  ) || itemValue !== "-- Select Note --",
+                    (value) => value.CODE === itemValue.CODE
+                  ) && itemValue !== "-- Select Note --",
               });
             }}
           >
@@ -486,10 +551,19 @@ const ReadMeterScreen = ({
           }}
           color={`${Colors.LwscBlue}bb`}
           loading={loading}
-          //   icon="send"
-          disabled={loading}
+          disabled={
+            loading ||
+            meterReading.error ||
+            meterReading.value === 0 ||
+            note.value === "-- Select Note --" ||
+            note.error ||
+            access.value === "-- Select Access Description --" ||
+            access.error ||
+            !uploadFiles ||
+            !uploadFiles.length
+          }
           mode="outlined"
-          // onPress={async () => await submitImage()}
+          onPress={submitMeterReading}
         >
           Submit Reading
         </Button>
@@ -568,5 +642,26 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginVertical: 20,
     backgroundColor: "transparent",
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });

@@ -1,9 +1,24 @@
+import { UploadFileI } from "./upload-file";
+
 interface MeterImage {
   title: string;
   file_extension: string;
   file_name: string;
   remote_location: string;
   local_location: string;
+}
+
+export interface MeterReadingI {
+  bill_group: string;
+  current_reading: number;
+  current_reading_date: string;
+  current_reading_datetime: string;
+  x_gps: number;
+  y_gps: number;
+  access_code: string;
+  description_code: string;
+  connection_id: string | number;
+  attachements: UploadFileI[];
 }
 
 export interface MeterReading {

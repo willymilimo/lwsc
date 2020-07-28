@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, Modal } from "react-native";
+import { StyleSheet, Text, View, Modal, Alert } from "react-native";
 import { BillGroupI, BookNumberI, BookNumber } from "../models/meter-reading";
 import { RootReducerI } from "../redux/reducers";
 import { bindActionCreators } from "redux";
@@ -68,7 +68,7 @@ const BookNumbersScreen = ({ bookNumbers, setBookNumbers, route }: PropI) => {
         navigator.navigate(Strings.PropertiesScreen, {
           manNumber,
           bookNumber: item,
-          billGroup: billGroup
+          billGroup: billGroup,
         })
       }
       title={item.DESCRIBE}
@@ -89,27 +89,69 @@ const BookNumbersScreen = ({ bookNumbers, setBookNumbers, route }: PropI) => {
   );
 
   const fetchBookNumbers = async () => {
+    // setLoading(true);
+    // // const bns: { [key: string]: BookNumberI } = {};
+    // const { data } = await fetchAllBookNumbers();
+    // const { success, payload } = data;
+    // if (success) {
+    //   const pay: BookNumberReducerI = {};
+    //   payload.recordset.forEach((bg) => {
+    //     bg = new BookNumber(bg);
+    //     let items = pay[bg.BILLGROUP];
+
+    //     if (!items) items = [];
+    //     if (bg.CODE) {
+    //       pay[bg.BILLGROUP] = [...items, bg];
+    //     }
+    //   });
+
+    //   setBookNumbers(pay);
+    //   setDisplayList(Object.values(pay[billGroup.GROUP_ID]));
+    // }
+
     setLoading(true);
-    // const bns: { [key: string]: BookNumberI } = {};
-    const { data } = await fetchAllBookNumbers();
-    const { success, payload } = data;
-    if (success) {
-      const pay: BookNumberReducerI = {};
-      payload.recordset.forEach((bg) => {
-        bg = new BookNumber(bg);
-        let items = pay[bg.BILLGROUP];
 
-        if (!items) items = [];
-        if (bg.CODE) {
-          pay[bg.BILLGROUP] = [...items, bg];
+    fetchAllBookNumbers()
+      .then(({ status, data }) => {
+        const { success, payload } = data;
+
+        if (status === 200 && success) {
+          const pay: BookNumberReducerI = {};
+          
+          payload.recordset.forEach((bg) => {
+            bg = new BookNumber(bg);
+            let items = pay[bg.BILLGROUP];
+
+            if (!items) items = [];
+            if (bg.CODE) {
+              pay[bg.BILLGROUP] = [...items, bg];
+            }
+          });
+
+          setBookNumbers(pay);
+          setDisplayList(Object.values(pay[billGroup.GROUP_ID]));
+        } else {
+          Alert.alert(
+            "Load Failure",
+            "Failed to load book numbers. Please try again later.",
+            [
+              {
+                text: "Cancel",
+                onPress: () => navigator.navigate(Strings.HomeTabNavigator),
+              },
+              { text: "RETRY", onPress: fetchBookNumbers },
+            ]
+          );
         }
-      });
-
-      setBookNumbers(pay);
-      setDisplayList(Object.values(pay[billGroup.GROUP_ID]));
-    }
-
-    setLoading(false);
+      })
+      .catch((e) =>
+        Alert.alert(
+          Strings.SELF_REPORTING_PROBLEM.title,
+          Strings.SELF_REPORTING_PROBLEM.message,
+          [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
+        )
+      )
+      .finally(() => setLoading(false));
   };
 
   return (

@@ -96,7 +96,7 @@ const StackNavigator = ({
   setAccessNotes,
 }: SNT) => {
   NetInfo.configure({
-    reachabilityUrl: "https://41.72.107.14:300/api/v1/services/types/fetch",
+    reachabilityUrl: "https://41.72.107.14:3000/api/v1/services/types/fetch",
     reachabilityTest: async (response) => response.status === 200,
     reachabilityLongTimeout: 60 * 1000, // 60s
     reachabilityShortTimeout: 5 * 1000, // 5s
