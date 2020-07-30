@@ -119,24 +119,24 @@ const NotificationsScreen = ({
     setLoading(false);
   };
 
-  console.log(loading);
   return (
     <SafeAreaView style={container}>
-      <Modal animationType="slide" transparent visible={loading}>
+      {loading ? (
         <View style={[styles.centeredView, { backgroundColor: "#00000077" }]}>
           <View style={styles.modalView}>
             <ActivityIndicator size="large" color={Colors.LwscOrange} />
           </View>
         </View>
-      </Modal>
-      <FlatList
-        removeClippedSubviews={true}
-        maxToRenderPerBatch={20}
-        initialNumToRender={20}
-        data={notifications}
-        keyExtractor={(item) => item._id}
-        renderItem={renderListItem}
-      />
+      ) : (
+        <FlatList
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={20}
+          initialNumToRender={20}
+          data={notifications}
+          keyExtractor={(item) => item._id}
+          renderItem={renderListItem}
+        />
+      )}
     </SafeAreaView>
   );
 };

@@ -295,17 +295,17 @@ const StackNavigator = ({
   //   };
   // }, [notifications]);
 
-  React.useEffect(() => {
-    let is_subscribed = true;
+  // React.useEffect(() => {
+  //   let is_subscribed = true;
 
-    if (is_subscribed) {
-      setActiveTheme(themeReducer.theme);
-    }
+  //   if (is_subscribed) {
+  //     setActiveTheme(themeReducer.theme);
+  //   }
 
-    return () => {
-      is_subscribed = false;
-    };
-  }, [themeReducer]);
+  //   return () => {
+  //     is_subscribed = false;
+  //   };
+  // }, [themeReducer]);
 
   React.useEffect(() => {
     let is_subscribed = true;

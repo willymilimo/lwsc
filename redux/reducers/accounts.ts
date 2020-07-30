@@ -29,12 +29,19 @@ export default function (
       state = { ...state, [payload.MeterNumber]: payload };
       break;
     case Actions.ADD_METER_NUMBER:
-        payload = payload as string;
-        state = { ...state, [payload]: payload };
-        break;
+      payload = payload as string;
+      state = { ...state, [payload]: payload };
+      break;
     case Actions.DELETE_ACCOUNT:
       payload = payload as string;
-      delete state[payload];
+      const result: any = {};
+      Object.keys(state).forEach((key) => {
+        if (key !== payload) {
+          result[key] = state[key];
+        }
+      });
+
+      state = result;
       break;
   }
 
@@ -44,7 +51,7 @@ export default function (
       Actions.ADD_ACCOUNT,
       Actions.DELETE_ACCOUNT,
       Actions.ADD_ACCUNT_PROPERTY,
-      Actions.ADD_METER_NUMBER
+      Actions.ADD_METER_NUMBER,
     ].includes(type)
   ) {
     AsyncStorage.setItem(Strings.ACCOUNTS_STORAGE, JSON.stringify(state));

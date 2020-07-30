@@ -83,7 +83,7 @@ const ManageAccountScreen = ({
   useEffect(() => {
     let is_subscribed = true;
     const identities = Object.values(accounts);
-    console.log(accounts);
+    // console.log(accounts);
     if (is_subscribed && identities.length) {
       // updateAccount()
       identities.forEach((identity) => {
@@ -113,6 +113,8 @@ const ManageAccountScreen = ({
       if (!Object.keys(accounts).includes(identity)) {
         if (type === AddType.meter) {
           addMeterNumber(identity);
+          setShowDialog(false);
+          setMeterAccountNo("");
         } else {
           setLoading(true);
 
@@ -140,6 +142,7 @@ const ManageAccountScreen = ({
                 addAccountProperty(new Property(payload as PropertyI));
               }
 
+              setShowDialog(false);
               Alert.alert(
                 `${type} Added Successfully`,
                 `Your ${type} has been added successfully.`
@@ -153,19 +156,21 @@ const ManageAccountScreen = ({
               );
             }
           } catch (err) {
+            setShowDialog(false);
             const { title, message } = Strings.SELF_REPORTING_PROBLEM;
             Alert.alert(title, message, [
               { onPress: () => navigator.navigate(Strings.HomeTabNavigator) },
             ]);
           }
 
-          setShowDialog(false);
         }
       } else if (!isInit) {
         Alert.alert(
           `${type} Already Added`,
           `The specified ${type} number has already been added to your profile. Select it from the list of added ${type.toLowerCase()} numbers.`
         );
+        setShowDialog(false);
+        setMeterAccountNo("");
       }
       setLoading(false);
     }
@@ -285,11 +290,11 @@ const ManageAccountScreen = ({
           name: `${Platform.OS === "ios" ? "ios" : "md"}-add`,
           type: Ionicons,
         }}
-        style={{ bottom: 75 }}
+        style={{ bottom: 20 }}
         backgroundColor={Colors.LwscBlue}
         color="white"
       />
-      <LwscFAB
+      {/* <LwscFAB
         visible={!showDialog}
         onPress={() => {
           setIsBuyForAnother(true);
@@ -303,7 +308,7 @@ const ManageAccountScreen = ({
         }}
         backgroundColor={Colors.LwscBlue}
         color="white"
-      />
+      /> */}
     </View>
   );
 };

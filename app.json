@@ -28,7 +28,8 @@
     },
     "android": {
       "package": "com.lwsc.utility",
-      "versionCode": 1
+      "versionCode": 1,
+       "useNextNotificationsApi": true
     },
     "packagerOpts": {
       "config": "metro.config.js",
