@@ -89,26 +89,6 @@ const BookNumbersScreen = ({ bookNumbers, setBookNumbers, route }: PropI) => {
   );
 
   const fetchBookNumbers = async () => {
-    // setLoading(true);
-    // // const bns: { [key: string]: BookNumberI } = {};
-    // const { data } = await fetchAllBookNumbers();
-    // const { success, payload } = data;
-    // if (success) {
-    //   const pay: BookNumberReducerI = {};
-    //   payload.recordset.forEach((bg) => {
-    //     bg = new BookNumber(bg);
-    //     let items = pay[bg.BILLGROUP];
-
-    //     if (!items) items = [];
-    //     if (bg.CODE) {
-    //       pay[bg.BILLGROUP] = [...items, bg];
-    //     }
-    //   });
-
-    //   setBookNumbers(pay);
-    //   setDisplayList(Object.values(pay[billGroup.GROUP_ID]));
-    // }
-
     setLoading(true);
 
     fetchAllBookNumbers()
@@ -117,7 +97,7 @@ const BookNumbersScreen = ({ bookNumbers, setBookNumbers, route }: PropI) => {
 
         if (status === 200 && success) {
           const pay: BookNumberReducerI = {};
-          
+
           payload.recordset.forEach((bg) => {
             bg = new BookNumber(bg);
             let items = pay[bg.BILLGROUP];

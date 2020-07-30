@@ -6,7 +6,7 @@ import Strings from "../../constants/Strings";
 const initState: NotificationI[] = [];
 
 export default function (state = initState, action: ActionI<any>) {
-  const { type, payload } = action;
+  let { type, payload } = action;
 
   switch (type) {
     case Actions.SET_NOTIFICATIONS:
@@ -14,11 +14,27 @@ export default function (state = initState, action: ActionI<any>) {
       break;
 
     case Actions.ADD_NOTIFICATIONS:
-      state = [...state, payload];
+      payload = payload as NotificationI;
+      if (!state.some((item) => item._id === payload._id)) {
+        state = [...state, payload];
+      }
+      break;
+
+    case Actions.SET_NOTIFICATION_READ:
+      state = state.map((item) => {
+        if (item._id == payload) item.is_read = true;
+        return item;
+      });
       break;
   }
 
-  if (payload) {
+  if (
+    [
+      Actions.SET_NOTIFICATIONS,
+      Actions.ADD_NOTIFICATIONS,
+      Actions.SET_NOTIFICATION_READ,
+    ].includes(type)
+  ) {
     AsyncStorage.setItem(Strings.NOTIFICATIONS_STORAGE, JSON.stringify(state));
   }
 

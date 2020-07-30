@@ -83,13 +83,14 @@ const ManageAccountScreen = ({
   useEffect(() => {
     let is_subscribed = true;
     const identities = Object.values(accounts);
+    console.log(accounts);
     if (is_subscribed && identities.length) {
       // updateAccount()
       identities.forEach((identity) => {
         if (identity instanceof Account) {
           updateAccount(AddType.account, identity.CUSTKEY);
         } else {
-          updateAccount(AddType.meter, (identity as PropertyI).MeterNumber);
+          updateAccount(AddType.meter, identity as string);
         }
       });
     }

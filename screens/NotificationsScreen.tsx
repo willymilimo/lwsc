@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   SafeAreaView,
@@ -6,210 +6,184 @@ import {
   Platform,
   Text,
   Alert,
+  Modal,
 } from "react-native";
 import { FlatList, TouchableHighlight } from "react-native-gesture-handler";
-import { NotificationI } from "../models/notification";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { NotificationType, NotificationStatus } from "../types/notification";
+import { NotificationI, Notification } from "../models/notification";
 import Colors from "../constants/Colors";
-import { Divider } from "react-native-paper";
+import { Divider, ActivityIndicator } from "react-native-paper";
+import { fetchNotifications } from "../models/axios";
+import Strings from "../constants/Strings";
+import { useNavigation } from "@react-navigation/native";
+import { RootReducerI } from "../redux/reducers";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import {
+  setNotificationRead,
+  addNotification,
+} from "../redux/actions/notifications";
 
-function Icon(type: NotificationType) {
-  switch (type) {
-    case NotificationType.disconnection:
-      return (
-        <MaterialCommunityIcons
-          size={30}
-          color="#1081e9"
-          name="pipe-disconnected"
-        />
-      );
-    case NotificationType.reconnection:
-      return (
-        <MaterialCommunityIcons
-          size={30}
-          color="#1081e9"
-          name="pipe-disconnected"
-        />
-      );
-    case NotificationType["payment-success"]:
-      return (
-        <Ionicons
-          color="#00bb27"
-          size={30}
-          name={`${
-            Platform.OS === "ios" ? "ios" : "md"
-          }-checkmark-circle-outline`}
-        />
-      );
-    case NotificationType["payment-failure"]:
-      return (
-        <Ionicons
-          color={Colors.LwscOrange}
-          size={30}
-          name={`${Platform.OS === "ios" ? "ios" : "md"}-warning`}
-        />
-      );
-    case NotificationType.notice:
-      return (
-        <Ionicons
-          color={`${Colors.LwscBlack}88`}
-          size={30}
-          name={`${
-            Platform.OS === "ios" ? "ios" : "md"
-          }-information-circle-outline`}
-        />
-      );
-  }
+interface PropI {
+  notifications: NotificationI[];
+  addNotification(notification: NotificationI): void;
+  setNotificationRead(id: string): void;
 }
 
-function Item({ date, title, message, type, status }: NotificationI) {
-  return (
-    <React.Fragment>
-      <TouchableHighlight
-        underlayColor="#55555539"
-        onPress={() => {
-          Alert.alert(title, message);
-        }}
-        style={{
-          padding: 10,
-          // marginBottom: 5,
-          backgroundColor:
-            status === NotificationStatus.read
-              ? "#fcfcfc"
-              : `${Colors.linkBlue}11`,
-        }}
-      >
-        <View
+const NotificationsScreen = ({
+  notifications,
+  addNotification,
+  setNotificationRead,
+}: PropI) => {
+  const { container } = styles;
+  const navigator = useNavigation();
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let is_subscribed = true;
+
+    if (is_subscribed) {
+      getchNotifications();
+    }
+    return () => {
+      is_subscribed = false;
+    };
+  }, []);
+
+  const renderListItem = ({ item }: { item: NotificationI }) => {
+    const { _id, is_read, title, description, create_on } = item;
+    return (
+      <>
+        <TouchableHighlight
+          underlayColor="#55555539"
+          onPress={() => {
+            Alert.alert(title, description, [
+              { onPress: () => setNotificationRead(_id) },
+            ]);
+          }}
           style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            paddingHorizontal: 10,
+            padding: 10,
+            backgroundColor: is_read ? "#fcfcfc" : `${Colors.linkBlue}11`,
           }}
         >
-          {Icon(type)}
-          <View style={{ paddingHorizontal: 10 }}>
-            <Text
-              style={{
-                textTransform: "capitalize",
-                fontWeight: "bold",
-                color: `${Colors.LwscBlack}bb`,
-              }}
-              ellipsizeMode="tail"
-              numberOfLines={1}
-            >
-              {date}
-            </Text>
-            <Text
-              ellipsizeMode="tail"
-              numberOfLines={1}
-              style={{ color: `${Colors.LwscBlackLighter}` }}
-            >
-              {message}
-            </Text>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 10,
+            }}
+          >
+            <View style={{ paddingHorizontal: 10 }}>
+              <Text
+                style={{
+                  textTransform: "capitalize",
+                  fontWeight: "bold",
+                  color: `${Colors.LwscBlack}bb`,
+                }}
+                ellipsizeMode="tail"
+                numberOfLines={1}
+              >
+                {create_on.toLocaleString()}
+              </Text>
+              <Text
+                ellipsizeMode="tail"
+                numberOfLines={1}
+                style={{ color: `${Colors.LwscBlackLighter}` }}
+              >
+                {description}
+              </Text>
+            </View>
           </View>
-        </View>
-      </TouchableHighlight>
-      <Divider style={{ marginVertical: 0 }} />
-    </React.Fragment>
-  );
-}
+        </TouchableHighlight>
+        <Divider style={{ marginVertical: 0 }} />
+      </>
+    );
+  };
 
-const DATA = [
-  {
-    _id: "5e9d529cd0b97ea29959edca",
-    date: "Monday, April 20, 2020 4:15 AM",
-    title: "do esse",
-    status: NotificationStatus.unread,
-    message:
-      "ea deserunt ut consequat non anim ad ullamco enim Lorem ut magna eu consectetur deserunt culpa esse fugiat cillum nisi",
-    type: NotificationType.reconnection,
-  },
-  {
-    _id: "5e9d529c0ea90b1ffcceb841",
-    date: "Monday, April 20, 2020 1:35 AM",
-    status: NotificationStatus.read,
-    title: "ut velit id nisi magna duis",
-    message:
-      "proident duis proident sit ad reprehenderit pariatur adipisicing aliqua nulla ad in culpa in ad tempor ut duis cupidatat fugiat",
-    type: NotificationType.notice,
-  },
-  {
-    _id: "5e9d529ca84b48cc3afa76d8",
-    date: "Monday, April 20, 2020 1:08 AM",
-    status: NotificationStatus.unread,
-    title: "officia nisi et",
-    message:
-      "veniam labore sit sit minim excepteur occaecat fugiat culpa consequat duis et Lorem ullamco tempor do ipsum duis est veniam",
-    type: NotificationType["payment-failure"],
-  },
-  {
-    _id: "5e9d529c1092f1db9940813a",
-    date: "Monday, April 20, 2020 7:04 AM",
-    status: NotificationStatus.read,
-    title: "aute eu sint amet sit",
-    message:
-      "consequat ut dolor nostrud dolore velit ad ut esse consequat sint ad sunt voluptate non id amet aute enim nostrud",
-    type: NotificationType.disconnection,
-  },
-  {
-    _id: "5e9d529c67a33b79006bb4fa",
-    date: "Monday, April 20, 2020 5:20 AM",
-    status: NotificationStatus.read,
-    title: "cillum nostrud nisi",
-    message:
-      "aliquip sint dolore consequat aliqua pariatur elit enim irure amet tempor fugiat irure Lorem commodo ex tempor tempor ex labore",
-    type: NotificationType.disconnection,
-  },
-  {
-    _id: "5e9d529ce68c8e3c0e595de2",
-    date: "Monday, April 20, 2020 2:44 AM",
-    status: NotificationStatus.unread,
-    title: "aute quis",
-    message:
-      "elit enim ullamco consectetur occaecat anim in consequat cillum quis eu eu sit officia minim ullamco aliqua ullamco nostrud ut",
-    type: NotificationType.notice,
-  },
-  {
-    _id: "5e9d529c025a9b4454022e03",
-    date: "Monday, April 20, 2020 1:55 AM",
-    status: NotificationStatus.unread,
-    title: "officia irure enim dolor",
-    message:
-      "dolore velit consequat deserunt ut occaecat quis labore eu fugiat nisi ipsum ad exercitation veniam nostrud veniam nulla laboris commodo",
-    type: NotificationType.disconnection,
-  },
-  {
-    _id: "5e9d529c56f08276363bf755",
-    date: "Monday, April 20, 2020 6:07 AM",
-    status: NotificationStatus.read,
-    title: "pariatur sint non tempor",
-    message:
-      "reprehenderit deserunt do et quis in aliqua minim irure sit velit adipisicing qui aute minim culpa deserunt magna mollit do",
-    type: NotificationType["payment-success"],
-  },
-];
+  const getchNotifications = async () => {
+    setLoading(true);
+    try {
+      const { status, data } = await fetchNotifications();
+      if (status === 200 && data.success) {
+        // setNotifications(data.payload.map((item) => new Notification(item)));
+        data.payload.forEach((item) => addNotification(new Notification(item)));
+      } else {
+        throw new Error(JSON.stringify(data));
+      }
+    } catch (err) {
+      const { title, message } = Strings.SELF_REPORTING_PROBLEM;
+      Alert.alert(title, message, [
+        { onPress: () => navigator.navigate(Strings.HomeTabNavigator) },
+      ]);
+    }
+    setLoading(false);
+  };
 
-const NotificationsScreen = () => {
-  const { container } = styles;
+  console.log(loading);
   return (
     <SafeAreaView style={container}>
+      <Modal animationType="slide" transparent visible={loading}>
+        <View style={[styles.centeredView, { backgroundColor: "#00000077" }]}>
+          <View style={styles.modalView}>
+            <ActivityIndicator size="large" color={Colors.LwscOrange} />
+          </View>
+        </View>
+      </Modal>
       <FlatList
-        data={DATA}
-        renderItem={({ item }) => Item(item)}
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={20}
+        initialNumToRender={20}
+        data={notifications}
         keyExtractor={(item) => item._id}
+        renderItem={renderListItem}
       />
     </SafeAreaView>
   );
 };
 
-export default NotificationsScreen;
+const mapPropsToState = ({ notifications }: RootReducerI) => ({
+  notifications,
+});
+
+const matchDispatchToProps = (dispatch: any) =>
+  bindActionCreators(
+    {
+      addNotification,
+      setNotificationRead,
+    },
+    dispatch
+  );
+
+export default connect(
+  mapPropsToState,
+  matchDispatchToProps
+)(NotificationsScreen);
 
 const styles = StyleSheet.create({
   container: {
     display: "flex",
     flex: 1,
     backgroundColor: "#fff",
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
   },
 });

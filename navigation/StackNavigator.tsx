@@ -30,7 +30,7 @@ import Strings from "../constants/Strings";
 import { setThemeReducer } from "../redux/actions/theme";
 import { RootReducerI } from "../redux/reducers";
 import { ThemeReducer } from "../types/theme";
-import { NotificationI } from "../models/notification";
+import { NotificationI, Notification } from "../models/notification";
 import {
   setNotifications,
   addNotification,
@@ -165,6 +165,7 @@ const StackNavigator = ({
       let properties;
       let accessNotes;
       let activeAccount;
+      let notifications;
 
       try {
         theme = await AsyncStorage.getItem(Strings.THEME_STORAGE);
@@ -174,7 +175,9 @@ const StackNavigator = ({
           Strings.PAYMENT_HISTORY_STORAGE
         );
 
-        // await AsyncStorage.removeItem(Strings.BILL_GROUP_STORAGE)
+        notifications = await AsyncStorage.getItem(
+          Strings.NOTIFICATIONS_STORAGE
+        );
         // await AsyncStorage.removeItem(Strings.BOOK_NUMBER_STORAGE)
         // await AsyncStorage.removeItem(Strings.MR_PROPERTY_STORAGE)
         billGroups = await AsyncStorage.getItem(Strings.BILL_GROUP_STORAGE);
@@ -267,22 +270,30 @@ const StackNavigator = ({
       if (activeAccount) {
         setActiveAccount(JSON.parse(activeAccount));
       }
+
+      if (notifications) {
+        setNotifications(
+          JSON.parse(notifications).map(
+            (item: NotificationI) => new Notification(item)
+          )
+        );
+      }
     };
 
     bootstrapAsync();
   }, []);
 
-  React.useEffect(() => {
-    let is_subscribed = true;
+  // React.useEffect(() => {
+  //   let is_subscribed = true;
 
-    if (is_subscribed) {
-      setNotifications(notifications);
-    }
+  //   if (is_subscribed) {
+  //     setNotifications(notifications);
+  //   }
 
-    return () => {
-      is_subscribed = false;
-    };
-  }, [notifications]);
+  //   return () => {
+  //     is_subscribed = false;
+  //   };
+  // }, [notifications]);
 
   React.useEffect(() => {
     let is_subscribed = true;

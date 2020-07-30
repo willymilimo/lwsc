@@ -11,6 +11,7 @@ export interface NotificationI {
   description: string;
   icon: string;
   create_on: Date;
+  is_read: boolean;
 }
 
 export class Notification implements NotificationI {
@@ -19,12 +20,21 @@ export class Notification implements NotificationI {
   description: string;
   icon: string;
   create_on: Date;
+  is_read: boolean;
 
-  constructor({ _id, title, description, icon, create_on }: NotificationI) {
+  constructor({
+    _id,
+    title,
+    description,
+    icon,
+    create_on,
+    is_read,
+  }: NotificationI) {
     this._id = _id;
     this.title = title;
     this.description = description;
     this.icon = icon;
     this.create_on = new Date(create_on);
+    this.is_read = !!is_read;
   }
 }

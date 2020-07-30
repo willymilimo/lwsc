@@ -21,10 +21,11 @@ const PaymentHistoryListScreen = ({ accounts }: PaymentHistoryScreenI) => {
   const navigator = useNavigation();
 
   const payItems = Object.values(accounts);
+  console.log(payItems);
   return (
     <View style={styles.container}>
       <ScrollView style={box}>
-        {payItems.length ? (
+        {payItems.length ? (  // 41130324183  03008164
           payItems.map((acc) => (
             <BillComponent
               key={Math.random().toString(36).substring(10)}
@@ -62,7 +63,9 @@ const PaymentHistoryListScreen = ({ accounts }: PaymentHistoryScreenI) => {
       </ScrollView>
       <LwscFAB
         visible={true}
-        onPress={() => navigator.navigate(Strings.HomeTabNavigator, {screen: "Accounts"})}
+        onPress={() =>
+          navigator.navigate(Strings.HomeTabNavigator, { screen: "Accounts" })
+        }
         label="Add Account/Meter"
         labelStyle={{ width: 145 }}
         icon={{

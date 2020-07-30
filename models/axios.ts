@@ -19,6 +19,7 @@ import { UploadFileI } from "./upload-file";
 import { StatementI } from "./statement";
 import { ServiceReportI } from "./service-report";
 import { NotesI, NoAccessI } from "./access-description";
+import { NotificationI } from "./notification";
 
 // axios.defaults.auth = Strings.API_CREDS;
 axios.defaults.headers.Authorization =
@@ -234,4 +235,10 @@ export const createMeterReading = async (
   reading: MeterReadingI
 ): Promise<AxiosResponse<IResponse<boolean>>> => {
   return await axios.post("billing/meter-reading/create", reading);
+};
+
+export const fetchNotifications = async (): Promise<
+  AxiosResponse<IResponse<NotificationI[]>>
+> => {
+  return await axios.get("notifications");
 };

@@ -1,12 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Statement } from "../models/statement";
-import {
-  Title,
-  Divider,
-  Subheading,
-  Caption,
-} from "react-native-paper";
+import { Title, Divider, Subheading, Caption } from "react-native-paper";
 import Colors from "../constants/Colors";
 import { PaymentChannelC } from "../types/payment-channel";
 import { toFixed } from "../helpers/functions";
@@ -34,7 +29,7 @@ const PaymentStatementScreen = ({ route }: PropI) => {
     fullName,
     gen_token_response,
   } = new Statement(JSON.parse(statement));
-//   console.log(gen_token_response);
+  //   console.log(gen_token_response);
   return (
     <View
       style={[
@@ -178,9 +173,12 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
   },
-  value: {},
+  value: {
+    fontSize: 12,
+  },
   flexWrap: {
     flex: 1,
     flexWrap: "wrap",
+    fontSize: 12,
   },
 });

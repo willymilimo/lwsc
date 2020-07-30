@@ -22,7 +22,7 @@ import { PrepaidI } from "../models/prepaid";
 interface PaymentMethodScreenI {
   navigation: NavType;
   route: {
-    params: AccountI | PrepaidI;
+    params: AccountI | PrepaidI | string;
   };
 }
 
@@ -36,7 +36,11 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
       {params instanceof Account ? (
         <BillComponent account={params} />
       ) : (
-        <PrepaidComponent>{(params as PrepaidI).meterNumber}</PrepaidComponent>
+        <PrepaidComponent>
+          {typeof params === "string"
+            ? params
+            : (params as PrepaidI).meterNumber}
+        </PrepaidComponent>
       )}
       <View style={{ padding: 10 }}>
         <Text
