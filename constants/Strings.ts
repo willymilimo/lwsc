@@ -28,6 +28,7 @@ export default {
   BookNumbersScreen: "Select Book Number",
   PropertiesScreen: "Select Property",
   PaymentHistoryListScreen: "Choose Account",
+  PaymentStatementScreen: "Payment Statement",
 
   /*************** Begin REDUCER TYPES *****************/
   WHITE_THEME: "WHITE_THEME",

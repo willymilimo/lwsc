@@ -2,7 +2,12 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, Modal, Alert } from "react-native";
 import { AccountI, Account } from "../models/account";
 import { PropertyI } from "../models/meter-reading";
-import { ActivityIndicator, List, Divider } from "react-native-paper";
+import {
+  ActivityIndicator,
+  List,
+  Divider,
+  Searchbar,
+} from "react-native-paper";
 import Colors from "../constants/Colors";
 import { fetchPaymentHistory } from "../models/axios";
 import { IdentityType } from "../types/identity-type";
@@ -13,7 +18,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { FlatList } from "react-native-gesture-handler";
 
 interface PropI {
-  route: { params: { identity: AccountI | PropertyI } };
+  route: { params: { identity: AccountI | PropertyI | string } };
 }
 
 const PaymentHistoryScreen = ({ route }: PropI) => {
@@ -23,6 +28,27 @@ const PaymentHistoryScreen = ({ route }: PropI) => {
   const { container } = styles;
   const [loading, setLoading] = useState(false);
   const [paymentHistory, setPaymentHistory] = useState<StatementI[]>([]);
+  const [filteredDisplayList, setFilteredDisplayList] = useState<StatementI[]>(
+    []
+  );
+  const [searchQuery, setSearchQuery] = React.useState("");
+
+  const onChangeSearch = (query: string) => {
+    setSearchQuery(query);
+    if (query.length > 1) {
+      query = query.toLocaleLowerCase();
+      const filtered = paymentHistory.filter(
+        (bn) =>
+          bn.naration.toLocaleLowerCase().indexOf(query) !== -1 ||
+          bn.created_on.toDateString().indexOf(query) !== -1 ||
+          JSON.stringify(bn.payment_channel).indexOf(query) !== -1
+      );
+      // console.log(filtered.length);
+      setFilteredDisplayList(filtered);
+    } else {
+      setFilteredDisplayList([]);
+    }
+  };
 
   useEffect(() => {
     let is_subscribed = true;
@@ -34,26 +60,31 @@ const PaymentHistoryScreen = ({ route }: PropI) => {
     return () => {
       is_subscribed = false;
     };
-  }, []);
+  }, [identity]);
 
   const renderListItem = ({ item }: { item: StatementI }) => {
-    //   const desc =c
-    // console.log(item);
+    const { confirm_trans_success, naration, created_on } = item;
     return (
       <>
         <List.Item
-          style={{ backgroundColor: "white" }}
-          onPress={() => {}}
-          title="Ttile"
-          description="Description"
+          style={{
+            backgroundColor: confirm_trans_success ? "#00bb2710" : "#ff000010",
+          }}
+          onPress={() =>
+            navigator.navigate(Strings.PaymentStatementScreen, {
+              statement: JSON.stringify(item),
+            })
+          }
+          title={naration}
+          description={created_on.toDateString()}
           left={(props) => (
             <List.Icon
               {...props}
               icon={() => (
                 <MaterialCommunityIcons
                   size={34}
-                  color={Colors.gray3AColor}
-                  name="home-city-outline"
+                  color={confirm_trans_success ? "#00bb27" : Colors.errorColor}
+                  name="history"
                 />
               )}
             />
@@ -72,6 +103,9 @@ const PaymentHistoryScreen = ({ route }: PropI) => {
 
     if (identity instanceof Account) {
       id = identity.CUSTKEY;
+    } else if (typeof identity === "string") {
+      id = identity;
+      type = IdentityType.Meter;
     } else {
       id = (identity as PropertyI).MeterNumber;
       type = IdentityType.Meter;
@@ -79,8 +113,8 @@ const PaymentHistoryScreen = ({ route }: PropI) => {
 
     fetchPaymentHistory(id, type)
       .then(({ status, data }) => {
+        // console.log(data);
         if (status === 200 && data.success) {
-          // console.log(data.payload);
           setPaymentHistory(data.payload.map((item) => new Statement(item)));
         } else {
           Alert.alert(
@@ -100,6 +134,7 @@ const PaymentHistoryScreen = ({ route }: PropI) => {
         }
       })
       .catch((err) => {
+        console.log(err);
         const { title, message } = Strings.SELF_REPORTING_PROBLEM;
         Alert.alert(title, message, [
           { onPress: () => navigator.navigate(Strings.HomeTabNavigator) },
@@ -117,15 +152,22 @@ const PaymentHistoryScreen = ({ route }: PropI) => {
           </View>
         </View>
       </Modal>
+
+      <Searchbar
+        placeholder={`Search History`}
+        onChangeText={onChangeSearch}
+        value={searchQuery}
+      />
+
       {paymentHistory.length ? (
         <FlatList
           removeClippedSubviews={true}
           maxToRenderPerBatch={20}
           initialNumToRender={20}
-          data={paymentHistory}
-          keyExtractor={(item: StatementI) =>
-            Math.random().toString(36).substring(10)
+          data={
+            filteredDisplayList.length ? filteredDisplayList : paymentHistory
           }
+          keyExtractor={({ _id }: StatementI) => _id}
           renderItem={renderListItem}
         />
       ) : (

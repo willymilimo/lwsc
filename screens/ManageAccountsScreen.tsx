@@ -21,6 +21,7 @@ import {
   addAccount,
   deleteAccount,
   addAccountProperty,
+  addMeterNumber,
 } from "../redux/actions/accounts";
 import { AccountI, Account } from "../models/account";
 import {
@@ -45,6 +46,7 @@ interface MakePaymentScreenI {
   accounts: AccountReducerI;
   activeAccount: ActiveAccountReducerI;
   addAccount(account: AccountI): void;
+  addMeterNumber(meterNumber: string): void;
   addAccountProperty(property: PropertyI): void;
   deleteAccount(meter_account_no: string | number): void;
   setActiveAccount(activeAccount: ActiveAccountReducerI): void;
@@ -55,6 +57,7 @@ const ManageAccountScreen = ({
   navigation,
   accounts,
   activeAccount,
+  addMeterNumber,
   addAccount,
   addAccountProperty,
   deleteAccount,
@@ -107,50 +110,55 @@ const ManageAccountScreen = ({
   ) => {
     if (identity.length) {
       if (!Object.keys(accounts).includes(identity)) {
-        setLoading(true);
+        if (type === AddType.meter) {
+          addMeterNumber(identity);
+        } else {
+          setLoading(true);
 
-        try {
-          const promise =
-            type === AddType.account
-              ? await getCustomerByAccountNumber(identity)
-              : await getCustomerByMeterNumber(identity);
+          try {
+            const promise =
+              type === AddType.account
+                ? await getCustomerByAccountNumber(identity)
+                : await getCustomerByMeterNumber(identity);
 
-          const { status, data } = promise;
+            const { status, data } = promise;
 
-          if (status === 200 && data.success) {
-            setMeterAccountNo("");
-            setActiveAccount({ [identity]: type });
-            const payload = data.payload;
+            if (status === 200 && data.success) {
+              setMeterAccountNo("");
+              setActiveAccount({ [identity]: type });
+              const payload = data.payload;
 
-            if (type === AddType.account) {
-              addAccount(
-                new Account({
-                  ...(payload as AccountI),
-                  IS_METERED: false,
-                })
+              if (type === AddType.account) {
+                addAccount(
+                  new Account({
+                    ...(payload as AccountI),
+                    IS_METERED: false,
+                  })
+                );
+              } else {
+                addAccountProperty(new Property(payload as PropertyI));
+              }
+
+              Alert.alert(
+                `${type} Added Successfully`,
+                `Your ${type} has been added successfully.`
               );
             } else {
-              addAccountProperty(new Property(payload as PropertyI));
+              Alert.alert(
+                `${type} not Added`,
+                data.error
+                  ? data.error.toString()
+                  : `Specified ${type} number not found`
+              );
             }
-
-            setShowDialog(false);
-            Alert.alert(
-              `${type} Added Successfully`,
-              `Your ${type} has been added successfully.`
-            );
-          } else {
-            Alert.alert(
-              `${type} not Added`,
-              data.error
-                ? data.error.toString()
-                : `Specified ${type} number not found`
-            );
+          } catch (err) {
+            const { title, message } = Strings.SELF_REPORTING_PROBLEM;
+            Alert.alert(title, message, [
+              { onPress: () => navigator.navigate(Strings.HomeTabNavigator) },
+            ]);
           }
-        } catch (err) {
-          const { title, message } = Strings.SELF_REPORTING_PROBLEM;
-          Alert.alert(title, message, [
-            { onPress: () => navigator.navigate(Strings.HomeTabNavigator) },
-          ]);
+
+          setShowDialog(false);
         }
       } else if (!isInit) {
         Alert.alert(
@@ -184,6 +192,8 @@ const ManageAccountScreen = ({
                     deleteAccount(
                       isAccount
                         ? (acc as AccountI).CUSTKEY
+                        : typeof acc === "string"
+                        ? acc
                         : (acc as PropertyI).MeterNumber
                     );
                   }}
@@ -306,6 +316,7 @@ const matchDispatchToProps = (dispatch: any) =>
   bindActionCreators(
     {
       addAccount,
+      addMeterNumber,
       deleteAccount,
       setActiveAccount,
       addAccountProperty,

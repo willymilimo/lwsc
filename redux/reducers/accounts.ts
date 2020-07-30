@@ -5,7 +5,7 @@ import Strings from "../../constants/Strings";
 import { PropertyI } from "../../models/meter-reading";
 
 export interface AccountReducerI {
-  [key: string]: AccountI | PropertyI;
+  [key: string]: AccountI | PropertyI | string;
 }
 
 const initState: AccountReducerI = {};
@@ -28,6 +28,10 @@ export default function (
       payload = payload as PropertyI;
       state = { ...state, [payload.MeterNumber]: payload };
       break;
+    case Actions.ADD_METER_NUMBER:
+        payload = payload as string;
+        state = { ...state, [payload]: payload };
+        break;
     case Actions.DELETE_ACCOUNT:
       payload = payload as string;
       delete state[payload];
@@ -40,6 +44,7 @@ export default function (
       Actions.ADD_ACCOUNT,
       Actions.DELETE_ACCOUNT,
       Actions.ADD_ACCUNT_PROPERTY,
+      Actions.ADD_METER_NUMBER
     ].includes(type)
   ) {
     AsyncStorage.setItem(Strings.ACCOUNTS_STORAGE, JSON.stringify(state));

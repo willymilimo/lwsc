@@ -16,7 +16,7 @@ import { PropertyI, Property } from "../models/meter-reading";
 import { FAB } from "react-native-paper";
 
 export interface BillComponentI {
-  account: AccountI | PropertyI;
+  account: AccountI | PropertyI | string;
   onPress?(e: GestureResponderEvent): void;
   style?: object;
   onRemove?(): void;
@@ -38,6 +38,8 @@ export default function BillComponent({
   // console.log(account);
   const numero = isProperty
     ? (account as PropertyI).PreviousReading
+    : typeof account === "string"
+    ? ""
     : (account as AccountI).BALANCE.toFixed(2).replace(
         /\d(?=(\d{3})+\.)/g,
         "$&,"
@@ -70,26 +72,30 @@ export default function BillComponent({
         >
           {isProperty
             ? (account as PropertyI).displayPlotAddress
+            : typeof account === "string"
+            ? account
             : (account as AccountI).FULL_NAME}
         </Text>
-        <View style={itemContainer}>
-          <Text style={itemTitle}>Home Address</Text>
-          <View style={itemStyle}>
-            <Ionicons
-              color={Colors.LwscOrange}
-              size={20}
-              name={`${Platform.OS === "ios" ? "ios" : "md"}-home`}
-            />
-            <Text style={textStyle}>
-              {isProperty
-                ? (account as PropertyI).displayAddress
-                : (account as AccountI).ADDRESS}
-            </Text>
+        {typeof account !== "string" && (
+          <View style={itemContainer}>
+            <Text style={itemTitle}>Home Address</Text>
+            <View style={itemStyle}>
+              <Ionicons
+                color={Colors.LwscOrange}
+                size={20}
+                name={`${Platform.OS === "ios" ? "ios" : "md"}-home`}
+              />
+              <Text style={textStyle}>
+                {isProperty
+                  ? (account as PropertyI).displayAddress
+                  : (account as AccountI).ADDRESS}
+              </Text>
+            </View>
           </View>
-        </View>
+        )}
         <View style={itemContainer}>
           <Text style={itemTitle}>{`${
-            isProperty ? "Meter" : "Account"
+            isProperty || typeof account === "string" ? "Meter" : "Account"
           } Number`}</Text>
           <View style={itemStyle}>
             <Ionicons
@@ -100,23 +106,27 @@ export default function BillComponent({
             <Text style={textStyle}>
               {isProperty
                 ? (account as PropertyI).MeterNumber
+                : typeof account === "string"
+                ? account
                 : (account as AccountI).CUSTKEY}
             </Text>
           </View>
         </View>
-        <View style={itemContainer}>
-          <Text style={itemTitle}>
-            {isProperty ? "Previous Meter Reading" : "Bill Balance"}
-          </Text>
-          <View style={itemStyle}>
-            <Ionicons
-              color={Colors.LwscOrange}
-              size={20}
-              name={`${Platform.OS === "ios" ? "ios" : "md"}-card`}
-            />
-            <Text style={textStyle}>{numero}</Text>
+        {typeof account !== "string" && (
+          <View style={itemContainer}>
+            <Text style={itemTitle}>
+              {isProperty ? "Previous Meter Reading" : "Bill Balance"}
+            </Text>
+            <View style={itemStyle}>
+              <Ionicons
+                color={Colors.LwscOrange}
+                size={20}
+                name={`${Platform.OS === "ios" ? "ios" : "md"}-card`}
+              />
+              <Text style={textStyle}>{numero}</Text>
+            </View>
           </View>
-        </View>
+        )}
         {onRemove && (
           <LwscFAB
             style={{ right: 15, top: 15 }}

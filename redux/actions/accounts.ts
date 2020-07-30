@@ -22,6 +22,11 @@ export const addAccountProperty = (
   payload: property,
 });
 
+export const addMeterNumber = (meterNumber: string): ActionI<string> => ({
+  type: Actions.ADD_METER_NUMBER,
+  payload: meterNumber,
+});
+
 export const deleteAccount = (cuskey: string | number): ActionI<string> => ({
   type: Actions.DELETE_ACCOUNT,
   payload: cuskey as string,

@@ -67,6 +67,7 @@ import { setActiveAccount } from "../redux/actions/active-account";
 import { ActiveAccountReducerI } from "../redux/reducers/active-account";
 import PaymentHistoryScreen from "../screens/PaymentHistoryScreen";
 import PaymentHistoryListScreen from "../screens/PaymentHistoryListScreen";
+import PaymentStatementScreen from "../screens/PaymentStatementScreen";
 
 const Stack = createStackNavigator();
 
@@ -208,7 +209,9 @@ const StackNavigator = ({
             const element = accounts[key];
             accounts[key] = element.CUSTKEY
               ? new Account(element)
-              : new Property(element);
+              : element.MeterNumber
+              ? new Property(element)
+              : element;
           }
         }
         setAccounts(accounts);
@@ -431,6 +434,10 @@ const StackNavigator = ({
       <Stack.Screen
         name={Strings.PaymentHistoryListScreen}
         component={PaymentHistoryListScreen}
+      />
+      <Stack.Screen
+        name={Strings.PaymentStatementScreen}
+        component={PaymentStatementScreen}
       />
     </Stack.Navigator>
   );
