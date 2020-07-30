@@ -98,7 +98,7 @@ export default {
     border: '#c3e6cb',
   },
   danger: {
-    color: '#796769',//'#a27b7e',// '#721c24',
+    color: '#721c24',
     background: '#f8d7da',
     border: '#f5c6cb',
   },

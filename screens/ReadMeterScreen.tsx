@@ -10,7 +10,13 @@ import {
   Picker,
   Modal,
 } from "react-native";
-import { FAB, Button, TextInput, ActivityIndicator } from "react-native-paper";
+import {
+  FAB,
+  Button,
+  TextInput,
+  ActivityIndicator,
+  Subheading,
+} from "react-native-paper";
 import Colors from "../constants/Colors";
 import * as Location from "expo-location";
 import { useNavigation } from "@react-navigation/native";
@@ -361,6 +367,7 @@ const ReadMeterScreen = ({
         <ImageUploadComponent
           buttonName="Capture Meter Reading"
           uploadCallback={setUploadFiles}
+          deleteCallback={() => setUploadFiles(undefined)}
         />
         <View>
           <MeterItem
@@ -526,6 +533,38 @@ const ReadMeterScreen = ({
             ))}
           </Picker>
         </View>
+
+        {(meterReading.error ||
+          meterReading.value === 0 ||
+          note.value === "-- Select Note --" ||
+          note.error ||
+          access.value === "-- Select Access Description --" ||
+          access.error ||
+          !uploadFiles ||
+          !uploadFiles.length) && (
+          <Subheading
+            style={{
+              color: "maroon",
+              borderColor: Colors.danger.border,
+              backgroundColor: Colors.danger.background,
+              padding: 8,
+              borderRadius: 5,
+              textAlign: "center",
+              marginTop: 10,
+            }}
+          >
+            {!uploadFiles || !uploadFiles.length
+              ? "Ensure you capture the meter reading"
+              : meterReading.error || meterReading.value === 0
+              ? "Ensure meter reading is greater or equal to previous reading"
+              : access.value === "-- Select Access Description --" ||
+                access.error
+              ? "Ensure you select an access description"
+              : note.value === "-- Select Note --" || note.error
+              ? "Ensure you select a note"
+              : ""}
+          </Subheading>
+        )}
 
         <Button
           style={{ marginTop: 15 }}

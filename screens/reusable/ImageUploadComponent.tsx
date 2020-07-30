@@ -20,11 +20,13 @@ import { UploadFileI } from "../../models/upload-file";
 interface IUC {
   buttonName?: string;
   uploadCallback(uploadFile: UploadFileI[]): void;
+  deleteCallback?(): void;
 }
 
 export default function ImageUploadComponent({
   buttonName,
   uploadCallback,
+  deleteCallback,
 }: IUC) {
   const navigator = useNavigation();
   const [loading, setLoading] = useState(false);
@@ -154,7 +156,10 @@ export default function ImageUploadComponent({
             style={styles.fab}
             small
             icon="delete-forever"
-            onPress={() => setImage(null)}
+            onPress={() => {
+              setImage(null);
+              if (typeof deleteCallback === "function") deleteCallback();
+            }}
           />
           <Image
             style={{
