@@ -98,7 +98,7 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
   }, []);
 
   const handleSubmit = () => {
-    setLoading(false);
+    setLoading(true);
     const name = fullName.value.split(" ");
     const first_name = name[0];
     let last_name = first_name;
@@ -379,7 +379,14 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
             backgroundColor: `${Colors.linkBlue}22`,
           }}
           color={`${Colors.LwscBlue}bb`}
-          disabled={fullName.error || address.error || phone.error}
+          disabled={
+            loading ||
+            !fullName.value.length ||
+            fullName.error ||
+            !address.value ||
+            address.error ||
+            phone.error
+          }
           loading={loading}
           //   icon="send"
           mode="outlined"

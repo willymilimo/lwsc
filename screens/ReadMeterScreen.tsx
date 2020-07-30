@@ -227,6 +227,7 @@ const ReadMeterScreen = ({
       access_code: access.value,
       description_code: note.value,
       connection_id: property.connection_id,
+      staffNumber: manNumber,
       attachements: uploadFiles as UploadFileI[],
     };
 

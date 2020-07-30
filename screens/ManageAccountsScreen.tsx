@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { StyleSheet, View, Platform, Alert, BackHandler } from "react-native";
+import { StyleSheet, View, Platform, Alert } from "react-native";
 import {
   Portal,
   TextInput,
@@ -7,12 +7,12 @@ import {
   Button,
   Dialog,
   Text,
+  FAB,
 } from "react-native-paper";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { ScrollView } from "react-native-gesture-handler";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
-import NetInfo from "@react-native-community/netinfo";
 
 import Colors from "../constants/Colors";
 import LwscFAB from "../components/LwscFAB";
@@ -32,8 +32,10 @@ import Strings from "../constants/Strings";
 import { AccountReducerI } from "../redux/reducers/accounts";
 import BillComponent from "../components/BillComponent";
 import { NavType } from "../types/nav-type";
-import { Prepaid } from "../models/prepaid";
-import { setActiveAccount } from "../redux/actions/active-account";
+import {
+  setActiveAccount,
+  unsetActiveAccount,
+} from "../redux/actions/active-account";
 import { ActiveAccountReducerI } from "../redux/reducers/active-account";
 import { PropertyI, Property } from "../models/meter-reading";
 import { useNavigation } from "@react-navigation/native";
@@ -46,9 +48,10 @@ interface MakePaymentScreenI {
   addAccountProperty(property: PropertyI): void;
   deleteAccount(meter_account_no: string | number): void;
   setActiveAccount(activeAccount: ActiveAccountReducerI): void;
+  unsetActiveAccount(): void;
 }
 
-const MakePaymentScreen = ({
+const ManageAccountScreen = ({
   navigation,
   accounts,
   activeAccount,
@@ -56,6 +59,7 @@ const MakePaymentScreen = ({
   addAccountProperty,
   deleteAccount,
   setActiveAccount,
+  unsetActiveAccount,
 }: MakePaymentScreenI) => {
   const navigator = useNavigation();
   const {
@@ -75,71 +79,47 @@ const MakePaymentScreen = ({
 
   useEffect(() => {
     let is_subscribed = true;
-    const keys = Object.keys(accounts);
-    if (is_subscribed && keys.length) {
-      const updateAccounts = async () => {
-        setLoading(true);
-        for (let i = 0; i < keys.length; i++) {
-          const accnt = keys[i];
-          try {
-            const { data, status } = await getCustomerByAccountNumber(
-              accnt,
-              AddType.account
-            );
-            if (status === 200 && data.success) {
-              addAccount(
-                new Account({
-                  ...data.payload,
-                  IS_METERED: type == AddType.meter,
-                })
-              );
-            } else {
-              deleteAccount(accnt);
-            }
-          } catch (exc) {
-            Alert.alert(
-              Strings.SELF_REPORTING_PROBLEM.title,
-              Strings.SELF_REPORTING_PROBLEM.message
-            );
-            break;
-          }
+    const identities = Object.values(accounts);
+    if (is_subscribed && identities.length) {
+      // updateAccount()
+      identities.forEach((identity) => {
+        if (identity instanceof Account) {
+          updateAccount(AddType.account, identity.CUSTKEY);
+        } else {
+          updateAccount(AddType.meter, (identity as PropertyI).MeterNumber);
         }
-        setLoading(false);
-      };
-
-      updateAccounts();
+      });
     }
 
     return () => {
       is_subscribed = false;
     };
-  }, []);
+  }, [accounts]);
 
   const handleAccountMeterSubmit = async () => {
-    if (type === AddType.meter) {
-      setShowDialog(false);
-      setMeterAccountNo("");
-      navigation.navigate(
-        Strings.PaymentMethodScreen,
-        new Prepaid({
-          meterNumber: meterAccountNo,
-        })
-      );
-    } else if (meterAccountNo.length) {
-      if (!Object.keys(accounts).includes(meterAccountNo)) {
+    await updateAccount(type, meterAccountNo, false);
+  };
+
+  const updateAccount = async (
+    type: AddType,
+    identity: string,
+    isInit = true
+  ) => {
+    if (identity.length) {
+      if (!Object.keys(accounts).includes(identity)) {
         setLoading(true);
 
         try {
           const promise =
             type === AddType.account
-              ? await getCustomerByAccountNumber(meterAccountNo)
-              : await getCustomerByMeterNumber(meterAccountNo);
+              ? await getCustomerByAccountNumber(identity)
+              : await getCustomerByMeterNumber(identity);
 
           const { status, data } = promise;
 
           if (status === 200 && data.success) {
             setMeterAccountNo("");
-            setActiveAccount({ [meterAccountNo]: type });
+            setActiveAccount({ [identity]: type });
             const payload = data.payload;
 
             if (type === AddType.account) {
@@ -172,12 +152,13 @@ const MakePaymentScreen = ({
             { onPress: () => navigator.navigate(Strings.HomeTabNavigator) },
           ]);
         }
-      } else {
+      } else if (!isInit) {
         Alert.alert(
           `${type} Already Added`,
           `The specified ${type} number has already been added to your profile. Select it from the list of added ${type.toLowerCase()} numbers.`
         );
       }
+      setLoading(false);
     }
   };
 
@@ -187,15 +168,36 @@ const MakePaymentScreen = ({
     <View style={container}>
       <ScrollView style={box}>
         {payItems.length ? (
-          payItems.map((acc) => (
-            <BillComponent
-              key={`${acc.CUSTKEY} - ${acc.ID_NO} - ${acc.CUSTOMER_ID}`}
-              account={acc}
-              onPress={() =>
-                navigation.navigate(Strings.PaymentMethodScreen, acc)
-              }
-            />
-          ))
+          payItems.map((acc) => {
+            const isAccount = acc instanceof Account;
+            return (
+              <View key={Math.random().toString(36).substring(10)}>
+                <FAB
+                  style={styles.fab}
+                  small
+                  icon="delete-forever"
+                  onPress={() => {
+                    console.log(acc);
+                    if (payItems.length === 1) {
+                      unsetActiveAccount();
+                    }
+                    deleteAccount(
+                      isAccount
+                        ? (acc as AccountI).CUSTKEY
+                        : (acc as PropertyI).MeterNumber
+                    );
+                  }}
+                />
+                <BillComponent
+                  key={Math.random().toString(36).substring(10)}
+                  account={acc}
+                  onPress={() =>
+                    navigation.navigate(Strings.PaymentMethodScreen, acc)
+                  }
+                />
+              </View>
+            );
+          })
         ) : (
           <View style={missingAccount}>
             <Text style={maText}>
@@ -307,6 +309,7 @@ const matchDispatchToProps = (dispatch: any) =>
       deleteAccount,
       setActiveAccount,
       addAccountProperty,
+      unsetActiveAccount,
     },
     dispatch
   );
@@ -314,7 +317,7 @@ const matchDispatchToProps = (dispatch: any) =>
 export default connect(
   mapStateToProps,
   matchDispatchToProps
-)(MakePaymentScreen);
+)(ManageAccountScreen);
 
 const styles = StyleSheet.create({
   container: {
@@ -347,5 +350,13 @@ const styles = StyleSheet.create({
   },
   maText: {
     marginBottom: 10,
+  },
+  fab: {
+    backgroundColor: "red",
+    position: "absolute",
+    zIndex: 999,
+    margin: 16,
+    right: -15,
+    top: -15,
   },
 });

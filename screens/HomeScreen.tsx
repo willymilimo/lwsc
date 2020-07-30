@@ -235,9 +235,19 @@ const btns = [
     color: "#fdd02333",
     component: Strings.LodgeComplaintScreen,
   },
+  {
+    icon: (
+      <MaterialCommunityIcons
+        name="history"
+        color="#1081e9"
+        size={25}
+      />
+    ),
+    label: "Payment History",
+    color: "#1081e923",
+    component: Strings.PaymentHistoryListScreen,
+  },
 ];
-
-const columnSize = (numCols: number) => Layouts.window.width / numCols;
 
 const styles = StyleSheet.create({
   container: {

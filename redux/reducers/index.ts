@@ -10,6 +10,7 @@ import billGroups from "./bill-groups";
 import bookNumbers from "./book-number";
 import properties from "./meter-reading-proerties";
 import accessNotes from "./access-notes";
+import activeAccount from "./active-account";
 import serviceConstants, { ServiceConstantsI } from "./service-constants";
 import { NotificationI } from "../../models/notification";
 import { PayPointReducer } from "../../types/paypoint";
@@ -34,6 +35,7 @@ export interface RootReducerI {
   bookNumbers: BookNumberReducerI;
   properties: MeterReadingPropertiesReducerI;
   accessNotes: AccessNotesReducerI;
+  activeAccount: string;
 }
 
 export default combineReducers({
@@ -49,4 +51,5 @@ export default combineReducers({
   bookNumbers,
   properties,
   accessNotes,
+  activeAccount,
 });

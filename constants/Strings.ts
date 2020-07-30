@@ -27,6 +27,7 @@ export default {
   BillGroupScreen: "Select Bill Group",
   BookNumbersScreen: "Select Book Number",
   PropertiesScreen: "Select Property",
+  PaymentHistoryListScreen: "Choose Account",
 
   /*************** Begin REDUCER TYPES *****************/
   WHITE_THEME: "WHITE_THEME",
@@ -50,6 +51,7 @@ export default {
   BOOK_NUMBER_STORAGE: "BOOK_NUMBER_STORAGE",
   MR_PROPERTY_STORAGE: "MR_PROPERTY_STORAGE",
   ACCESS_NOTES_STORAGE: "ACCESS_NOTES_STORAGE",
+  ACTIVE_ACCOUNT_STORAGE: "ACTIVE_ACCOUNT_STORAGE",
   /*************** End Storage Constants *****************/
 
   // API
@@ -175,7 +177,8 @@ export default {
 
   METER_READING_SUBMIT_FAILURE: {
     title: "Failed to Submit",
-    message: "Failed to submit meter reading. Please ensure all input is valid.",
+    message:
+      "Failed to submit meter reading. Please ensure all input is valid.",
   },
 
   IMG_UPLOAD_FAILURE: {

@@ -1,156 +1,34 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Alert, Platform } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { FlatList, TouchableHighlight } from "react-native-gesture-handler";
-import { connect } from "react-redux";
-import { RootReducerI } from "../redux/reducers";
-import { SimpleLineIcons, Ionicons } from "@expo/vector-icons";
-import {
-  Divider,
-  ActivityIndicator,
-  Appbar,
-  Portal,
-  Dialog,
-  RadioButton,
-  TextInput,
-  Button,
-} from "react-native-paper";
+import React, { useState, useEffect } from "react";
+import { StyleSheet, Text, View, Modal, Alert } from "react-native";
+import { AccountI, Account } from "../models/account";
+import { PropertyI } from "../models/meter-reading";
+import { ActivityIndicator, List, Divider } from "react-native-paper";
 import Colors from "../constants/Colors";
-import { bindActionCreators } from "redux";
-import { setPaymentHistory } from "../redux/actions/payment-history";
 import { fetchPaymentHistory } from "../models/axios";
-import { AccountReducerI } from "../redux/reducers/accounts";
-import Strings from "../constants/Strings";
-import { useNavigation } from "@react-navigation/native";
 import { IdentityType } from "../types/identity-type";
-import { StatementI } from "../models/statement";
-import LwscFAB from "../components/LwscFAB";
+import { useNavigation } from "@react-navigation/native";
+import Strings from "../constants/Strings";
+import { StatementI, Statement } from "../models/statement";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { FlatList } from "react-native-gesture-handler";
 
-interface PaymentHistoryScreenI {
-  paymentHistory: StatementI[];
-  accounts: AccountReducerI;
-  setPaymentHistory(history: StatementI[]): void;
+interface PropI {
+  route: { params: { identity: AccountI | PropertyI } };
 }
 
-function Item({
-  init_trans_success,
-  confirm_trans_success,
-  _id,
-  transaction_id,
-  customer_type,
-  account_number,
-  meter_number,
-  naration,
-  first_name,
-  last_name,
-  amount,
-  phone_number,
-  email,
-  bill_group,
-  value_date,
-  created_on,
-  payment_channel,
-  init_trans_response,
-}: StatementI) {
-  return (
-    <React.Fragment>
-      <TouchableHighlight
-        underlayColor="#55555539"
-        onPress={() => {
-          // Alert.alert(payment_type, payment_description);
-        }}
-        style={{
-          padding: 10,
-          backgroundColor: "#fcfcfc",
-        }}
-      >
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            paddingHorizontal: 10,
-          }}
-        >
-          <SimpleLineIcons name="clock" size={25} />
-          <View style={{ paddingHorizontal: 10 }}>
-            <Text
-              style={{
-                textTransform: "capitalize",
-                fontWeight: "bold",
-                color: `${Colors.LwscBlack}bb`,
-              }}
-              ellipsizeMode="tail"
-              numberOfLines={1}
-            >
-              {payment_channel}
-            </Text>
-            <Text
-              ellipsizeMode="tail"
-              numberOfLines={1}
-              style={{ color: `${Colors.LwscBlackLighter}` }}
-            >
-              {created_on.toLocaleString()}
-            </Text>
-          </View>
-        </View>
-      </TouchableHighlight>
-      <Divider style={{ marginVertical: 0 }} />
-    </React.Fragment>
-  );
-}
-
-const PaymentHistoryScreen = ({
-  paymentHistory,
-  accounts,
-  setPaymentHistory,
-}: PaymentHistoryScreenI) => {
-  const { container, radioLabelStyle, flexRow } = styles;
-  const accountKeys = Object.keys(accounts);
+const PaymentHistoryScreen = ({ route }: PropI) => {
   const navigator = useNavigation();
+  const { identity } = route.params;
+  const isAccount = identity instanceof Account;
+  const { container } = styles;
   const [loading, setLoading] = useState(false);
-  const [selectedAccount, setSelectedAccount] = useState(
-    accountKeys.length ? accounts[accountKeys[0]] : null
-  );
-  const [showDialog, setShowDialog] = useState(false);
-  const [type, setType] = useState(IdentityType.Account);
-  // console.log(accounts)
+  const [paymentHistory, setPaymentHistory] = useState<StatementI[]>([]);
 
   useEffect(() => {
     let is_subscribed = true;
 
-    if (is_subscribed) {
-      setLoading(true);
-      fetchPaymentHistory("", IdentityType.Account)
-        .then(({ status, data }) => {
-          if (status === 200 && data.success) {
-            setPaymentHistory(data.payload);
-          } else {
-            Alert.alert(
-              Strings.SELF_REPORTING_PROBLEM.title,
-              Strings.SELF_REPORTING_PROBLEM.message,
-              [
-                {
-                  text: "OK",
-                  onPress: () => navigator.navigate(Strings.HomeScreen),
-                },
-              ]
-            );
-          }
-        })
-        .catch((err) => {
-          Alert.alert(
-            Strings.SELF_REPORTING_PROBLEM.title,
-            Strings.SELF_REPORTING_PROBLEM.message,
-            [
-              {
-                text: "OK",
-                onPress: () => navigator.navigate(Strings.HomeScreen),
-              },
-            ]
-          );
-        })
-        .finally(() => setLoading(false));
+    if (is_subscribed && identity) {
+      getPaymentHistory();
     }
 
     return () => {
@@ -158,116 +36,134 @@ const PaymentHistoryScreen = ({
     };
   }, []);
 
-  return (
-    <SafeAreaView style={container}>
-      {selectedAccount && (
-        <Appbar style={{}}>
-          <Appbar.Content
-            title={selectedAccount.CUSTKEY}
-            subtitle={selectedAccount.FULL_NAME}
-          />
-          <Appbar.Action
-            icon={() => (
-              <Ionicons
-                name={`${
-                  Platform.OS === "ios" ? "ios" : "md"
-                }-add-circle-outline`}
-                size={25}
-                color="white"
-              />
-            )}
-            style={{
-              alignSelf: "flex-end",
-              position: "absolute",
-              right: 40,
-              top: 5,
-            }}
-            onPress={() =>
-              navigator.navigate(Strings.HomeTabNavigator, {
-                screen: "Accounts",
-              })
-            }
-          />
-          <Appbar.Action
-            icon={`dots-${Platform.OS === "ios" ? "horizontal" : "vertical"}`}
-            style={{
-              alignSelf: "flex-end",
-              position: "absolute",
-              right: 0,
-              top: 5,
-            }}
-            onPress={() => {}}
-          />
-        </Appbar>
-      )}
-
-      {loading ? (
-        <ActivityIndicator
-          size={50}
-          color={Colors.colorGreen}
-          style={{ alignSelf: "center", marginTop: 20 }}
+  const renderListItem = ({ item }: { item: StatementI }) => {
+    //   const desc =c
+    // console.log(item);
+    return (
+      <>
+        <List.Item
+          style={{ backgroundColor: "white" }}
+          onPress={() => {}}
+          title="Ttile"
+          description="Description"
+          left={(props) => (
+            <List.Icon
+              {...props}
+              icon={() => (
+                <MaterialCommunityIcons
+                  size={34}
+                  color={Colors.gray3AColor}
+                  name="home-city-outline"
+                />
+              )}
+            />
+          )}
         />
-      ) : paymentHistory.length ? (
+        <Divider />
+      </>
+    );
+  };
+
+  const getPaymentHistory = async () => {
+    setLoading(true);
+
+    let id = "";
+    let type = IdentityType.Account;
+
+    if (identity instanceof Account) {
+      id = identity.CUSTKEY;
+    } else {
+      id = (identity as PropertyI).MeterNumber;
+      type = IdentityType.Meter;
+    }
+
+    fetchPaymentHistory(id, type)
+      .then(({ status, data }) => {
+        if (status === 200 && data.success) {
+          // console.log(data.payload);
+          setPaymentHistory(data.payload.map((item) => new Statement(item)));
+        } else {
+          Alert.alert(
+            "Unsuccessful",
+            "Failed to fetch Payment History. Please try again.",
+            [
+              {
+                text: "Cancel",
+                onPress: () => navigator.navigate(Strings.HomeTabNavigator),
+              },
+              {
+                text: "Retry",
+                onPress: getPaymentHistory,
+              },
+            ]
+          );
+        }
+      })
+      .catch((err) => {
+        const { title, message } = Strings.SELF_REPORTING_PROBLEM;
+        Alert.alert(title, message, [
+          { onPress: () => navigator.navigate(Strings.HomeTabNavigator) },
+        ]);
+      })
+      .finally(() => setLoading(false));
+  };
+
+  return (
+    <View style={container}>
+      <Modal animationType="slide" transparent visible={loading}>
+        <View style={[styles.centeredView, { backgroundColor: "#00000077" }]}>
+          <View style={styles.modalView}>
+            <ActivityIndicator size="large" color={Colors.LwscOrange} />
+          </View>
+        </View>
+      </Modal>
+      {paymentHistory.length ? (
         <FlatList
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={20}
+          initialNumToRender={20}
           data={paymentHistory}
-          renderItem={({ item }) => Item(item)}
-          keyExtractor={(item) => item._id}
+          keyExtractor={(item: StatementI) =>
+            Math.random().toString(36).substring(10)
+          }
+          renderItem={renderListItem}
         />
       ) : (
-        <Text style={{ margin: 10, color: `${Colors.LwscBlack}bb` }}>
-          You have not made any payments thus far.
-        </Text>
+        <Text style={{ margin: 15 }}>{`You have not made any payments on this ${
+          isAccount ? "Account" : "Meter"
+        } yet.`}</Text>
       )}
-      <LwscFAB
-        visible={true}
-        onPress={() =>
-          navigator.navigate(Strings.HomeTabNavigator, { screen: "Accounts" })
-        }
-        label="Add Account/Meter"
-        labelStyle={{ width: 145 }}
-        icon={{
-          name: `${Platform.OS === "ios" ? "ios" : "md"}-add`,
-          type: Ionicons,
-        }}
-        style={{ bottom: 20 }}
-        backgroundColor={Colors.LwscBlue}
-        color="white"
-      />
-    </SafeAreaView>
+    </View>
   );
 };
 
-const mapStateToProps = ({ paymentHistory, accounts }: RootReducerI) => ({
-  paymentHistory,
-  accounts,
-});
-
-const mapDispatchToProps = (dispatch: any) =>
-  bindActionCreators(
-    {
-      setPaymentHistory,
-    },
-    dispatch
-  );
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(PaymentHistoryScreen);
+export default PaymentHistoryScreen;
 
 const styles = StyleSheet.create({
   container: {
     display: "flex",
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "white",
+  },
+  centeredView: {
     flex: 1,
-    backgroundColor: "#fff",
-  },
-  flexRow: {
-    display: "flex",
-    flexDirection: "row",
+    justifyContent: "center",
     alignItems: "center",
-    marginBottom: 5,
+    marginTop: 22,
   },
-  radioLabelStyle: {
-    fontSize: 16,
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });

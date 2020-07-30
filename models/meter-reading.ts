@@ -19,6 +19,7 @@ export interface MeterReadingI {
   description_code: string;
   connection_id: string | number;
   attachements: UploadFileI[];
+  staffNumber?: string;
 }
 
 export interface MeterReading {
@@ -94,6 +95,10 @@ export interface PropertyI {
   key: string;
   previousReadingDate: Date;
   connection_id: string;
+  displayAddress?: string;
+  displayPlotAddress?: string;
+  _PLOT_NO?: string;
+  _Customer_Address?: string;
 }
 
 export class Property implements PropertyI {
@@ -123,7 +128,9 @@ export class Property implements PropertyI {
     AccountNumber,
     lineNumber,
     Customer_Address,
+    _Customer_Address,
     PLOT_NO,
+    _PLOT_NO,
     MeterNumber,
     PreviousReading,
     PreviousReadingDate,
@@ -140,8 +147,8 @@ export class Property implements PropertyI {
     this.WALK_NO = WALK_NO;
     this.AccountNumber = AccountNumber;
     this.lineNumber = lineNumber;
-    this._Customer_Address = Customer_Address;
-    this._PLOT_NO = PLOT_NO;
+    this._Customer_Address = _Customer_Address || Customer_Address;
+    this._PLOT_NO = _PLOT_NO || PLOT_NO;
     this.MeterNumber = MeterNumber;
     this.PreviousReading = PreviousReading;
     this.PreviousReadingDate = PreviousReadingDate;
@@ -167,5 +174,13 @@ export class Property implements PropertyI {
 
   get previousReadingDate(): Date {
     return new Date(this.PreviousReadingDate);
+  }
+
+  get displayAddress(): string {
+    return `${this.PLOT_NO} ${this.Customer_Address} ${this.Township}`.trim();
+  }
+
+  get displayPlotAddress(): string {
+    return `${this.PLOT_NO} ${this.Customer_Address}`.trim();
   }
 }

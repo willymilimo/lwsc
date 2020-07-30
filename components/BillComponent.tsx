@@ -12,9 +12,11 @@ import Colors from "../constants/Colors";
 import { Ionicons, Entypo } from "@expo/vector-icons";
 import { AccountI } from "../models/account";
 import LwscFAB from "./LwscFAB";
+import { PropertyI, Property } from "../models/meter-reading";
+import { FAB } from "react-native-paper";
 
 export interface BillComponentI {
-  account: AccountI;
+  account: AccountI | PropertyI;
   onPress?(e: GestureResponderEvent): void;
   style?: object;
   onRemove?(): void;
@@ -31,6 +33,16 @@ export default function BillComponent({
   onRemove,
 }: BillComponentI) {
   // console.log(onEdit, onRemove);
+  const isProperty = account instanceof Property;
+  // console.log(`isProperty: ${isProperty}`);
+  // console.log(account);
+  const numero = isProperty
+    ? (account as PropertyI).PreviousReading
+    : (account as AccountI).BALANCE.toFixed(2).replace(
+        /\d(?=(\d{3})+\.)/g,
+        "$&,"
+      );
+
   const {
     hightlightStyle,
     itemStyle,
@@ -56,7 +68,9 @@ export default function BillComponent({
             fontWeight: "bold",
           }}
         >
-          {account.FULL_NAME}
+          {isProperty
+            ? (account as PropertyI).displayPlotAddress
+            : (account as AccountI).FULL_NAME}
         </Text>
         <View style={itemContainer}>
           <Text style={itemTitle}>Home Address</Text>
@@ -66,12 +80,16 @@ export default function BillComponent({
               size={20}
               name={`${Platform.OS === "ios" ? "ios" : "md"}-home`}
             />
-            <Text style={textStyle}>{account.ADDRESS}</Text>
+            <Text style={textStyle}>
+              {isProperty
+                ? (account as PropertyI).displayAddress
+                : (account as AccountI).ADDRESS}
+            </Text>
           </View>
         </View>
         <View style={itemContainer}>
           <Text style={itemTitle}>{`${
-            account.IS_METERED ? "Meter" : "Account"
+            isProperty ? "Meter" : "Account"
           } Number`}</Text>
           <View style={itemStyle}>
             <Ionicons
@@ -79,29 +97,24 @@ export default function BillComponent({
               size={20}
               name={`${Platform.OS === "ios" ? "ios" : "md"}-speedometer`}
             />
-            <Text style={textStyle}>{account.CUSTKEY}</Text>
+            <Text style={textStyle}>
+              {isProperty
+                ? (account as PropertyI).MeterNumber
+                : (account as AccountI).CUSTKEY}
+            </Text>
           </View>
         </View>
-        {/* <View style={itemStyle}>
-          <MaterialCommunityIcons
-            color={Colors.LwscOrange}
-            size={20}
-            name={`water-pump`}
-          />
-          <Text style={textStyle}>{`${meter_reading || usage} Litres`}</Text>
-        </View> */}
         <View style={itemContainer}>
-          <Text style={itemTitle}>Bill Balance</Text>
+          <Text style={itemTitle}>
+            {isProperty ? "Previous Meter Reading" : "Bill Balance"}
+          </Text>
           <View style={itemStyle}>
             <Ionicons
               color={Colors.LwscOrange}
               size={20}
               name={`${Platform.OS === "ios" ? "ios" : "md"}-card`}
             />
-            <Text style={textStyle}>{`ZMW ${account.BALANCE.toFixed(2).replace(
-              /\d(?=(\d{3})+\.)/g,
-              "$&,"
-            )}`}</Text>
+            <Text style={textStyle}>{numero}</Text>
           </View>
         </View>
         {onRemove && (
@@ -157,7 +170,7 @@ const styles = StyleSheet.create({
   },
   itemTitle: {
     fontWeight: "bold",
-    color: '#0009'
+    color: "#0009",
   },
   textStyle: {
     marginLeft: 10,

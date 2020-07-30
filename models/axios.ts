@@ -11,6 +11,7 @@ import {
   BookNumberI,
   PropertyI,
   MeterReadingI,
+  Property,
 } from "./meter-reading";
 import { ServiceItemI } from "./service-item";
 import { ServiceApplicationI } from "./service-application";
@@ -47,15 +48,48 @@ export default axios;
 const api_root = "http://41.72.107.14:3000/api/v1";
 
 export const getCustomerByAccountNumber = async (
-  account_number: string,
-  type: AddType
+  account_number: string
 ): Promise<AxiosResponse<IResponse<AccountI>>> => {
-  const url =
-    type === AddType.account
-      ? `customers?account_number=${account_number}`
-      : `customers?meter_number=${account_number}`;
+  return await axios.get(`customers?account_number=${account_number}`);
+};
 
-  return await axios.get(url);
+export const getCustomerByMeterNumber = async (
+  meterNumber: string
+): Promise<AxiosResponse<IResponse<PropertyI>>> => {
+  return new Promise((resolve, reject) => {
+    resolve({
+      statusText: "Ok",
+      headers: {},
+      config: {},
+      status: 200,
+      data: {
+        error: "",
+        message: "",
+        success: true,
+        payload: new Property({
+          BILLGROUP: "KBL",
+          Township: "Woodlands",
+          BOOK_NO: "B-01",
+          WALK_NO: 1,
+          AccountNumber: "05045573",
+          lineNumber: "010411/000",
+          Customer_Address: "STATE HOUSE INDEPENDENCE AVE",
+          PLOT_NO: "",
+          MeterNumber: "Nr. 41057944",
+          connection_id: "94165",
+          PreviousReading: 60238,
+          PreviousReadingDate: "2020-03-18T00:00:00.000Z",
+          CurrentReadingDate: "2020-07-28T00:00:00.000Z",
+          CurrentReading: 60390,
+          MessagesNote: "Meter underground",
+          MessagesAccess: " ",
+          Meter_Status: "Operational",
+          key: "",
+          previousReadingDate: new Date(),
+        }),
+      },
+    });
+  });
 };
 
 export const makeMoMoPayment = async (payment: PaymentI) => {

@@ -2,16 +2,17 @@ import { AccountI } from "../../models/account";
 import Actions, { ActionI } from "../Actions";
 import { AsyncStorage } from "react-native";
 import Strings from "../../constants/Strings";
+import { PropertyI } from "../../models/meter-reading";
 
 export interface AccountReducerI {
-  [key: string]: AccountI;
+  [key: string]: AccountI | PropertyI;
 }
 
 const initState: AccountReducerI = {};
 
 export default function (
   state = initState,
-  action: ActionI<AccountReducerI | AccountI | string>
+  action: ActionI<AccountReducerI | AccountI | PropertyI | string>
 ): AccountReducerI {
   let { type, payload } = action;
 
@@ -22,6 +23,10 @@ export default function (
     case Actions.ADD_ACCOUNT:
       payload = payload as AccountI;
       state = { ...state, [payload.CUSTKEY]: payload };
+      break;
+    case Actions.ADD_ACCUNT_PROPERTY:
+      payload = payload as PropertyI;
+      state = { ...state, [payload.MeterNumber]: payload };
       break;
     case Actions.DELETE_ACCOUNT:
       payload = payload as string;
@@ -34,6 +39,7 @@ export default function (
       Actions.SET_ACCOUNTS,
       Actions.ADD_ACCOUNT,
       Actions.DELETE_ACCOUNT,
+      Actions.ADD_ACCUNT_PROPERTY,
     ].includes(type)
   ) {
     AsyncStorage.setItem(Strings.ACCOUNTS_STORAGE, JSON.stringify(state));

@@ -17,7 +17,7 @@ import Constants from "expo-constants";
 import HomeTabNavigator from "./HomeTabNavigator";
 import NotificationsScreen from "../screens/NotificationsScreen";
 import LocatePaypointScreen from "../screens/LocatePaypointScreen";
-import ManageAccounts from "../screens/ManageAccounts";
+import ManageAccountsScreen from "../screens/ManageAccountsScreen";
 import PaymentMethodScreen from "../screens/PaymentMethodScreen";
 import ServicesScreen from "../screens/ServicesScreen";
 import FeedbackScreen from "../screens/FeedbackScreen";
@@ -57,12 +57,16 @@ import { setMRProperties } from "../redux/actions/meter-reading-properties";
 import { BillGroupReducerI } from "../redux/reducers/bill-groups";
 import { BookNumberReducerI } from "../redux/reducers/book-number";
 import { MeterReadingPropertiesReducerI } from "../redux/reducers/meter-reading-proerties";
-import { BookNumberI, BookNumber, Property } from "../models/meter-reading";
+import { BookNumber, Property } from "../models/meter-reading";
 import BillGroupScreen from "../screens/BillGroupScreen";
 import BookNumbersScreen from "../screens/BookNumbersScreen";
 import PropertiesScreen from "../screens/PropertiesScreen";
 import { AccessNotesReducerI } from "../redux/reducers/access-notes";
 import { setAccessNotes } from "../redux/actions/access-notes";
+import { setActiveAccount } from "../redux/actions/active-account";
+import { ActiveAccountReducerI } from "../redux/reducers/active-account";
+import PaymentHistoryScreen from "../screens/PaymentHistoryScreen";
+import PaymentHistoryListScreen from "../screens/PaymentHistoryListScreen";
 
 const Stack = createStackNavigator();
 
@@ -78,6 +82,7 @@ interface SNI {
   setBookNumbers(bookNumbers: BookNumberReducerI): void;
   setMRProperties(properties: MeterReadingPropertiesReducerI): void;
   setAccessNotes(accessNotes: AccessNotesReducerI): void;
+  setActiveAccount(activeAccount: ActiveAccountReducerI): void;
 }
 
 type SNT = SNI;
@@ -94,6 +99,7 @@ const StackNavigator = ({
   setBookNumbers,
   setMRProperties,
   setAccessNotes,
+  setActiveAccount,
 }: SNT) => {
   NetInfo.configure({
     reachabilityUrl: "https://41.72.107.14:3000/api/v1/services/types/fetch",
@@ -157,6 +163,7 @@ const StackNavigator = ({
       let bookNumbers;
       let properties;
       let accessNotes;
+      let activeAccount;
 
       try {
         theme = await AsyncStorage.getItem(Strings.THEME_STORAGE);
@@ -173,9 +180,12 @@ const StackNavigator = ({
         bookNumbers = await AsyncStorage.getItem(Strings.BOOK_NUMBER_STORAGE);
         properties = await AsyncStorage.getItem(Strings.MR_PROPERTY_STORAGE);
 
-
         // await AsyncStorage.removeItem(Strings.ACCESS_NOTES_STORAGE)
         accessNotes = await AsyncStorage.getItem(Strings.ACCESS_NOTES_STORAGE);
+
+        activeAccount = await AsyncStorage.getItem(
+          Strings.ACTIVE_ACCOUNT_STORAGE
+        );
       } catch (e) {
         // Restoring token failed
       }
@@ -196,7 +206,9 @@ const StackNavigator = ({
         for (const key in accounts) {
           if (accounts.hasOwnProperty(key)) {
             const element = accounts[key];
-            accounts[key] = new Account(element);
+            accounts[key] = element.CUSTKEY
+              ? new Account(element)
+              : new Property(element);
           }
         }
         setAccounts(accounts);
@@ -247,6 +259,10 @@ const StackNavigator = ({
 
       if (accessNotes) {
         setAccessNotes(JSON.parse(accessNotes));
+      }
+
+      if (activeAccount) {
+        setActiveAccount(JSON.parse(activeAccount));
       }
     };
 
@@ -348,7 +364,7 @@ const StackNavigator = ({
       />
       <Stack.Screen
         name={Strings.ManageAccountsScreen}
-        component={ManageAccounts}
+        component={ManageAccountsScreen}
       />
       <Stack.Screen
         name={Strings.PaymentMethodScreen}
@@ -408,6 +424,14 @@ const StackNavigator = ({
         name={Strings.PropertiesScreen}
         component={PropertiesScreen}
       />
+      <Stack.Screen
+        name={Strings.PaymentHistoryScreen}
+        component={PaymentHistoryScreen}
+      />
+      <Stack.Screen
+        name={Strings.PaymentHistoryListScreen}
+        component={PaymentHistoryListScreen}
+      />
     </Stack.Navigator>
   );
 };
@@ -429,6 +453,7 @@ const mapDispatchToProps = (dispatch: any) =>
       setBookNumbers,
       setMRProperties,
       setAccessNotes,
+      setActiveAccount,
     },
     dispatch
   );

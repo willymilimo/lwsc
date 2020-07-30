@@ -1,13 +1,12 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-import HomeScreen from "../screens/HomeScreen";
 import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
 import { ThemeType } from "../types/theme";
-import PaymentHistoryScreen from "../screens/PaymentHistoryScreen";
+import HomeScreen from "../screens/HomeScreen";
 import NotificationsScreen from "../screens/NotificationsScreen";
-import MakePaymentScreen from "../screens/MakePaymentScreen";
+import ManageAccountsScreen from "../screens/ManageAccountsScreen";
 
 interface HTNI {
   route: any;
@@ -20,7 +19,7 @@ const Tab = createBottomTabNavigator();
 
 const HomeTabNavigator = ({ route, theme }: HTNT) => {
   const [activeTheme, setActiveTheme] = React.useState(theme);
-  const initialRouteName = route.params && route.params.screen || "Home";
+  const initialRouteName = (route.params && route.params.screen) || "Home";
 
   React.useEffect(() => {
     let is_subscribed = true;
@@ -43,7 +42,7 @@ const HomeTabNavigator = ({ route, theme }: HTNT) => {
 
           if (route.name === "Home") {
             iconName = `${focused ? "ios" : "md"}-home`;
-          } else if (route.name === "Notices") {
+          } else if (route.name === "Notifications") {
             iconName = `${focused ? "ios" : "md"}-notifications`;
           } else if (route.name === "Accounts") {
             iconName = `${focused ? "ios" : "md"}-speedometer`;
@@ -67,9 +66,9 @@ const HomeTabNavigator = ({ route, theme }: HTNT) => {
         component={HomeScreen}
         initialParams={route.params}
       />
-      <Tab.Screen name="Notices" component={NotificationsScreen} />
-      <Tab.Screen name="Accounts" component={MakePaymentScreen} />
-      <Tab.Screen name="History" component={PaymentHistoryScreen} />
+      <Tab.Screen name="Notifications" component={NotificationsScreen} />
+      <Tab.Screen name="Accounts" component={ManageAccountsScreen} />
+      {/* <Tab.Screen name="History" component={PaymentHistoryScreen} /> */}
     </Tab.Navigator>
   );
 };
