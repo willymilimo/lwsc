@@ -20,6 +20,7 @@ import { StatementI } from "./statement";
 import { ServiceReportI } from "./service-report";
 import { NotesI, NoAccessI } from "./access-description";
 import { NotificationI } from "./notification";
+import { PaypointI } from "./pay-point";
 
 // axios.defaults.auth = Strings.API_CREDS;
 axios.defaults.headers.Authorization =
@@ -241,4 +242,18 @@ export const fetchNotifications = async (): Promise<
   AxiosResponse<IResponse<NotificationI[]>>
 > => {
   return await axios.get("notifications");
+};
+
+export const submitPushToken = async (
+  token: string
+): Promise<AxiosResponse<IResponse<boolean>>> => {
+  // middleware.microtech.co.zm:3000/api/v1/notifications/push/token/create
+  return await axios.post("notifications/push/token/create", { token });
+};
+
+export const fetchPayPoints = async (): Promise<
+  AxiosResponse<IResponse<PaypointI[]>>
+> => {
+  // middleware.microtech.co.zm:3000/api/v1/notifications/push/token/create
+  return await axios.get("gis/pay-points/fetch");
 };

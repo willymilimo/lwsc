@@ -11,9 +11,9 @@ import bookNumbers from "./book-number";
 import properties from "./meter-reading-proerties";
 import accessNotes from "./access-notes";
 import activeAccount from "./active-account";
+import pushTokenSubmitted from "./push-token";
 import serviceConstants, { ServiceConstantsI } from "./service-constants";
 import { NotificationI } from "../../models/notification";
-import { PayPointReducer } from "../../types/paypoint";
 import { ServiceItemI } from "../../models/service-item";
 import { StatementI } from "../../models/statement";
 import { BillGroupReducerI } from "./bill-groups";
@@ -21,13 +21,14 @@ import { BookNumberReducerI } from "./book-number";
 import { MeterReadingPropertiesReducerI } from "./meter-reading-proerties";
 import { ThemeReducer } from "../../types/theme";
 import { AccessNotesReducerI } from "./access-notes";
+import { PaypointI } from "../../models/pay-point";
 
 export interface RootReducerI {
   theme: ThemeReducer;
   notifications: NotificationI[];
   accounts: AccountReducerI;
   serviceConstants: ServiceConstantsI;
-  payPoints: PayPointReducer;
+  payPoints: PaypointI[];
   paymentHistory: StatementI[];
   services: ServiceItemI[];
   user: string;
@@ -36,6 +37,7 @@ export interface RootReducerI {
   properties: MeterReadingPropertiesReducerI;
   accessNotes: AccessNotesReducerI;
   activeAccount: string;
+  pushTokenSubmitted: boolean;
 }
 
 export default combineReducers({
@@ -52,4 +54,5 @@ export default combineReducers({
   properties,
   accessNotes,
   activeAccount,
+  pushTokenSubmitted,
 });

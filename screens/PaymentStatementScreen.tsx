@@ -5,6 +5,7 @@ import { Title, Divider, Subheading, Caption } from "react-native-paper";
 import Colors from "../constants/Colors";
 import { PaymentChannelC } from "../types/payment-channel";
 import { toFixed } from "../helpers/functions";
+import { ScrollView } from "react-native-gesture-handler";
 
 interface PropI {
   route: { params: { statement: string } };
@@ -31,7 +32,7 @@ const PaymentStatementScreen = ({ route }: PropI) => {
   } = new Statement(JSON.parse(statement));
   //   console.log(gen_token_response);
   return (
-    <View
+    <ScrollView
       style={[
         container,
         { backgroundColor: confirm_trans_success ? "#00bb2710" : "#ff000010" },
@@ -146,7 +147,7 @@ const PaymentStatementScreen = ({ route }: PropI) => {
           </View>
         </>
       )}
-    </View>
+    </ScrollView>
   );
 };
 
