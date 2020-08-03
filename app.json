@@ -46,6 +46,18 @@
         "wasm",
         "svg"
       ]
+    },
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps",
+          "config": {
+            "organization": "Arrant Technologiest Limited",
+            "project": "arrant-technologiest-limited",
+            "authToken": "dd39b8eb71fd45b0bdfadd67aea9d712a71304df437843d599c682b4418b2830"
+          }
+        }
+      ]
     }
   }
 }

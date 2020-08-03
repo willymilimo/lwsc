@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, SafeAreaView } from "react-native";
+import { StyleSheet, Text, View, SafeAreaView, Image } from "react-native";
 import { connect } from "react-redux";
 import {
   FontAwesome,
@@ -15,7 +15,8 @@ import Layouts from "../constants/Layouts";
 import { ScrollView, TouchableHighlight } from "react-native-gesture-handler";
 import Carousel from "../components/Carousel";
 import { RootReducerI } from "../redux/reducers";
-import { banner_1, banner_2, banner_3 } from "../constants/Images";
+import { banner_1, banner_2, banner_3, zmw_100 } from "../constants/Images";
+import Consumption from "../assets/consumption.svg";
 import Strings from "../constants/Strings";
 import { useNavigation, Route } from "@react-navigation/native";
 import { ThemeReducer } from "../types/theme";
@@ -90,7 +91,11 @@ const HomeScreen = ({ theme, route }: HomeI) => {
               >
                 <TouchableHighlight
                   underlayColor="#55555533"
-                  onPress={() => navigation.navigate(btn.component)}
+                  onPress={() =>
+                    navigation.navigate(btn.component, {
+                      isConsumption: btn.label === "Consumption",
+                    })
+                  }
                   style={{
                     padding: 5,
                     height: "100%",
@@ -136,6 +141,12 @@ const HomeScreen = ({ theme, route }: HomeI) => {
               </View>
             </View>
           ))}
+          <View
+            style={{
+              width: Layouts.window.width / 3,
+              height: Layouts.window.width / 3,
+            }}
+          />
         </View>
       </ScrollView>
       <View
@@ -176,9 +187,11 @@ const HomeScreen = ({ theme, route }: HomeI) => {
 
 const btns = [
   {
-    icon: <FontAwesome name="credit-card" color="#00bb27" size={20} />,
+    icon: (
+      <Image style={{ width: 35, height: (94 * 35) / 192 }} source={zmw_100} />
+    ) /* <FontAwesome name="credit-card" color="#00bb27" size={20} />*/,
     label: "Make Payment",
-    color: `#00bb2723`,
+    color: `#efefef`,
     component: Strings.MakePaymentScreen,
   },
   {
@@ -221,6 +234,12 @@ const btns = [
     icon: <MaterialCommunityIcons name="history" color="#1081e9" size={25} />,
     label: "Payment History",
     color: "#1081e923",
+    component: Strings.PaymentHistoryListScreen,
+  },
+  {
+    icon: <Consumption width={20} height={20} fill="#1081e9" />,
+    label: "Consumption",
+    color: "#00000011",
     component: Strings.PaymentHistoryListScreen,
   },
 ];

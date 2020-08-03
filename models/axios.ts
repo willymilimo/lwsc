@@ -21,6 +21,7 @@ import { ServiceReportI } from "./service-report";
 import { NotesI, NoAccessI } from "./access-description";
 import { NotificationI } from "./notification";
 import { PaypointI } from "./pay-point";
+import { ConsumptionI } from "./consumption";
 
 // axios.defaults.auth = Strings.API_CREDS;
 axios.defaults.headers.Authorization =
@@ -247,13 +248,21 @@ export const fetchNotifications = async (): Promise<
 export const submitPushToken = async (
   token: string
 ): Promise<AxiosResponse<IResponse<boolean>>> => {
-  // middleware.microtech.co.zm:3000/api/v1/notifications/push/token/create
   return await axios.post("notifications/push/token/create", { token });
 };
 
 export const fetchPayPoints = async (): Promise<
   AxiosResponse<IResponse<PaypointI[]>>
 > => {
-  // middleware.microtech.co.zm:3000/api/v1/notifications/push/token/create
   return await axios.get("gis/pay-points/fetch");
+};
+
+export const fetchComsumption = async (
+  accountNumber: string,
+  startDate: string,
+  endDate: string
+): Promise<AxiosResponse<IResponse<ConsumptionI[]>>> => {
+  return await axios.get(
+    `billing/consumption/records/fetch?account_number=${accountNumber}&lower_limit_date=${startDate}&upper_limit_date=${endDate}`
+  );
 };

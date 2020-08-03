@@ -49,7 +49,6 @@ import ReConnection from "../screens/service_forms/ReConnection";
 import ApplyForPaymentScheduleScreen from "../screens/ApplyForPaymentScheduleScreen";
 import ReadMeterScreen from "../screens/ReadMeterScreen";
 import LwscStaffAuthScreen from "../screens/LwscStaffAuthScreen";
-import { PayPointReducer } from "../types/paypoint";
 import { setBillGroups } from "../redux/actions/bill-groups";
 import { setBookNumbers } from "../redux/actions/book-numbers";
 import { setMRProperties } from "../redux/actions/meter-reading-properties";
@@ -69,6 +68,8 @@ import PaymentHistoryListScreen from "../screens/PaymentHistoryListScreen";
 import PaymentStatementScreen from "../screens/PaymentStatementScreen";
 import { setPushToken } from "../redux/actions/push-token";
 import { submitPushToken } from "../models/axios";
+import { PaypointI } from "../models/pay-point";
+import ConsumptionScreen from "../screens/ConsumptionScreen";
 
 const Stack = createStackNavigator();
 
@@ -81,7 +82,7 @@ interface SNI {
   setNotifications(notifications: NotificationI[]): void;
   addNotification(notifications: NotificationI): void;
   setAccounts(accounts: AccountReducerI): void;
-  setPayPoints(paypoints: PayPointReducer): void;
+  setPayPoints(paypoints: PaypointI[]): void;
   setBillGroups(billGroups: BillGroupReducerI): void;
   setBookNumbers(bookNumbers: BookNumberReducerI): void;
   setMRProperties(properties: MeterReadingPropertiesReducerI): void;
@@ -113,8 +114,8 @@ const StackNavigator = ({
     reachabilityShortTimeout: 5 * 1000, // 5s
     reachabilityRequestTimeout: 15 * 1000, // 15s
   });
-  
-  const [bootstrapping, setBootstrapping] = React.useState(true)
+
+  const [bootstrapping, setBootstrapping] = React.useState(true);
   const [token, setToken] = React.useState("");
   const [pushNotification, setPushNotification] = React.useState(null);
   const [activeTheme, setActiveTheme] = React.useState(themeReducer.theme);
@@ -199,9 +200,7 @@ const StackNavigator = ({
           Strings.ACTIVE_ACCOUNT_STORAGE
         );
 
-        pushTokenStr = await AsyncStorage.getItem(
-          Strings.PUSH_TOKEN_STORAGE
-        );
+        pushTokenStr = await AsyncStorage.getItem(Strings.PUSH_TOKEN_STORAGE);
         // console.log(pushTokenStr)
       } catch (e) {
         // Restoring token failed
@@ -228,7 +227,7 @@ const StackNavigator = ({
       }
 
       if (paypoints) {
-        console.log(paypoints);
+        // console.log(paypoints);
         paypoints = paypoints == "undefined" ? [] : JSON.parse(paypoints);
 
         setPayPoints(JSON.parse(paypoints));
@@ -279,10 +278,10 @@ const StackNavigator = ({
         );
       }
 
-      console.log(`pushTokenStr: ${pushTokenStr}`)
+      console.log(`pushTokenStr: ${pushTokenStr}`);
       if (pushTokenStr) {
         // setPushToken(pushTokenStr);
-        setToken(pushTokenStr)
+        setToken(pushTokenStr);
       }
 
       setBootstrapping(false);
@@ -292,9 +291,7 @@ const StackNavigator = ({
   }, []);
 
   React.useEffect(() => {
-    console.log(token, bootstrapping)
-    if (!bootstrapping) {
-      console.log(`inside token: ${token}\ninside bootstrapping: ${bootstrapping}`)
+    if (!(bootstrapping || token)) {
       registerForPushNotificationsAsync();
     }
   }, [bootstrapping]);
@@ -329,7 +326,7 @@ const StackNavigator = ({
   const submitToken = async (token: string) => {
     try {
       const { status, data } = await submitPushToken(token);
-      console.log(data)
+      console.log(data);
 
       if (status === 200 && data.success) {
         setPushToken(token);
@@ -445,6 +442,10 @@ const StackNavigator = ({
       <Stack.Screen
         name={Strings.PaymentStatementScreen}
         component={PaymentStatementScreen}
+      />
+      <Stack.Screen
+        name={Strings.ConsumptionScreen}
+        component={ConsumptionScreen}
       />
     </Stack.Navigator>
   );

@@ -13,27 +13,37 @@ import LwscFAB from "../components/LwscFAB";
 import { Ionicons } from "@expo/vector-icons";
 
 interface PaymentHistoryScreenI {
+  route: { params: { isConsumption: boolean } };
   accounts: AccountReducerI;
 }
 
-const PaymentHistoryListScreen = ({ accounts }: PaymentHistoryScreenI) => {
+const PaymentHistoryListScreen = ({
+  accounts,
+  route,
+}: PaymentHistoryScreenI) => {
   const { box, missingAccount, maText } = styles;
   const navigator = useNavigation();
+  const { isConsumption } = route.params;
 
   const payItems = Object.values(accounts);
   console.log(payItems);
   return (
     <View style={styles.container}>
       <ScrollView style={box}>
-        {payItems.length ? (  // 41130324183  03008164
+        {payItems.length ? ( // 41130324183  03008164
           payItems.map((acc) => (
             <BillComponent
               key={Math.random().toString(36).substring(10)}
               account={acc}
               onPress={() =>
-                navigator.navigate(Strings.PaymentHistoryScreen, {
-                  identity: acc,
-                })
+                navigator.navigate(
+                  isConsumption
+                    ? Strings.ConsumptionScreen
+                    : Strings.PaymentHistoryScreen,
+                  {
+                    identity: acc,
+                  }
+                )
               }
             />
           ))
@@ -54,7 +64,12 @@ const PaymentHistoryListScreen = ({ accounts }: PaymentHistoryScreenI) => {
               //   loading={loading}
               //   icon="send"
               mode="outlined"
-              onPress={() => {}}
+              onPress={() =>
+                navigator.navigate(Strings.HomeTabNavigator, {
+                  screen: "Accounts",
+                  showAddDialog: true,
+                })
+              }
             >
               Add Account/Meter
             </Button>
@@ -64,7 +79,10 @@ const PaymentHistoryListScreen = ({ accounts }: PaymentHistoryScreenI) => {
       <LwscFAB
         visible={true}
         onPress={() =>
-          navigator.navigate(Strings.HomeTabNavigator, { screen: "Accounts" })
+          navigator.navigate(Strings.HomeTabNavigator, {
+            screen: "Accounts",
+            showAddDialog: true,
+          })
         }
         label="Add Account/Meter"
         labelStyle={{ width: 145 }}

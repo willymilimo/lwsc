@@ -20,7 +20,6 @@ import SewerConnection from "../assets/sewer_connection.svg";
 import FeacalSludgeMgt from "../assets/feacal_sludge_mgt.svg";
 import OnsiteSanitation from "../assets/onsite_sanitation.svg";
 import ChangeConnection from "../assets/change_connection.svg";
-import { ServiceType } from "../types/service-type";
 import { ServiceItemI, ServiceItem, AppIcon } from "../models/service-item";
 import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
@@ -45,11 +44,11 @@ const ServicesScreen = ({
   useEffect(() => {
     let is_subscribed = true;
 
-    if (is_subscribed) {
-      if (!serviceTypes.length) {
-        setLoading(true);
-        fetchServices()
-          .then(({ status, data }) => {
+    if (!serviceTypes.length) {
+      setLoading(true);
+      fetchServices()
+        .then(({ status, data }) => {
+          if (is_subscribed) {
             const { success, payload, error, message } = data;
             // console.log(status, data)
 
@@ -61,14 +60,18 @@ const ServicesScreen = ({
                 error || message || "Failed to retrieve services."
               );
             }
-          })
-          .catch((err) => {
-            // console.log(err);
+          }
+        })
+        .catch((err) => {
+          // console.log(err);
+          if (is_subscribed) {
             const { title, message } = Strings.SELF_REPORTING_PROBLEM;
             Alert.alert(title, message);
-          })
-          .finally(() => setLoading(false));
-      }
+          }
+        })
+        .finally(() => {
+          if (is_subscribed) setLoading(false);
+        });
     }
 
     return () => {

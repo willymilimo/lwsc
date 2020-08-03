@@ -7,3 +7,5 @@ export const mtn_money = require("../assets/mtn_money.jpg");
 export const zampay = require("../assets/zampay.png");
 export const debit_card = require("../assets/debit_card.png");
 export const water_truck = require("../assets/water_truck.svg")
+export const visa_mastercard = require("../assets/visa_mastercard.png")
+export const zmw_100 = require("../assets/zmw_100.jpg")

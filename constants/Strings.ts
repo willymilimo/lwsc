@@ -29,6 +29,7 @@ export default {
   PropertiesScreen: "Select Property",
   PaymentHistoryListScreen: "Choose Account",
   PaymentStatementScreen: "Payment Statement",
+  ConsumptionScreen: "Consumption",
 
   /*************** Begin REDUCER TYPES *****************/
   WHITE_THEME: "WHITE_THEME",
