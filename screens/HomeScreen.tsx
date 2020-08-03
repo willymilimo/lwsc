@@ -8,7 +8,6 @@ import {
   Entypo,
   MaterialIcons,
   AntDesign,
-  SimpleLineIcons,
   FontAwesome5,
 } from "@expo/vector-icons";
 import Colors from "../constants/Colors";
@@ -19,7 +18,6 @@ import { RootReducerI } from "../redux/reducers";
 import { banner_1, banner_2, banner_3 } from "../constants/Images";
 import Strings from "../constants/Strings";
 import { useNavigation, Route } from "@react-navigation/native";
-import LwscButton from "../components/LwscButton";
 import { ThemeReducer } from "../types/theme";
 
 interface HomeI {
@@ -36,32 +34,6 @@ const HomeScreen = ({ theme, route }: HomeI) => {
     iconContainer,
   } = styles;
   const navigation = useNavigation();
-  
-
-  // console.log(route);
-
-  // React.useEffect(() => {
-  //   let is_subscribed = true;
-
-  //   console.log(
-  //     is_subscribed,
-  //     !!route.params,
-  //     (route.params as { toNotifications: boolean }).toNotifications
-  //   )
-
-  //   if (
-  //     is_subscribed &&
-  //     route.params &&
-  //     (route.params as { toNotifications: boolean }).toNotifications
-  //   ) {
-  //     console.log('here...')
-  //     navigation.navigate(Strings.NotificationsScreen);
-  //   }
-
-  //   return () => {
-  //     is_subscribed = false;
-  //   };
-  // }, [route]);
 
   return (
     <SafeAreaView style={container}>
@@ -140,15 +112,25 @@ const HomeScreen = ({ theme, route }: HomeI) => {
                     >
                       {btn.icon}
                     </View>
-                    <Text
+                    <View
                       style={{
-                        marginHorizontal: 5,
-                        fontWeight: "600",
-                        textAlign: "center",
+                        // flex: btn.label.length < 11 ? 0.66 : 1,
+                        alignContent: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
                       }}
                     >
-                      {btn.label}
-                    </Text>
+                      <Text
+                        style={{
+                          marginHorizontal: 5,
+                          fontWeight: "600",
+                          textAlign: "center",
+                          fontSize: Layouts.isSmallDevice ? 11 : 13,
+                        }}
+                      >
+                        {btn.label}
+                      </Text>
+                    </View>
                   </React.Fragment>
                 </TouchableHighlight>
               </View>
@@ -236,13 +218,7 @@ const btns = [
     component: Strings.LodgeComplaintScreen,
   },
   {
-    icon: (
-      <MaterialCommunityIcons
-        name="history"
-        color="#1081e9"
-        size={25}
-      />
-    ),
+    icon: <MaterialCommunityIcons name="history" color="#1081e9" size={25} />,
     label: "Payment History",
     color: "#1081e923",
     component: Strings.PaymentHistoryListScreen,

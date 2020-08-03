@@ -12,10 +12,8 @@ import {
 import { ActivityIndicator } from "react-native-paper";
 import Strings from "../constants/Strings";
 import Colors from "../constants/Colors";
-import LwscButton from "../components/LwscButton";
 import Layouts from "../constants/Layouts";
 import { NavType } from "../types/nav-type";
-import WaterTruck from "../assets/water_truck.svg";
 import WaterTap from "../assets/water_tap.svg";
 import SewerHome from "../assets/sewer_home.svg";
 import SewerConnection from "../assets/sewer_connection.svg";
@@ -51,7 +49,7 @@ const ServicesScreen = ({
       if (!serviceTypes.length) {
         setLoading(true);
         fetchServices()
-          .then(({status, data}) => {
+          .then(({ status, data }) => {
             const { success, payload, error, message } = data;
             // console.log(status, data)
 
@@ -140,270 +138,96 @@ const ServicesScreen = ({
     <ScrollView style={container}>
       <View style={btnsBox}>
         {loading ? (
-          <View style={{display: 'flex', flex: 1, alignItems: 'center'}}><ActivityIndicator size={50} animating={true} color={Colors.colorGreen} /></View>
+          <View style={{ display: "flex", flex: 1, alignItems: "center" }}>
+            <ActivityIndicator
+              size={50}
+              animating={true}
+              color={Colors.colorGreen}
+            />
+          </View>
         ) : !serviceTypes.length ? (
-          <Text style={{paddingHorizontal: 10}}>No services available</Text>
+          <Text style={{ paddingHorizontal: 10 }}>No services available</Text>
         ) : (
-          serviceTypes.map(({ _id, thumbnail_img, title, app_icon }) => (
-            <View
-              key={_id}
-              style={{
-                width: Layouts.window.width / 3,
-                height: Layouts.window.width / 3,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
+          serviceTypes.map((service) => {
+            const { _id, thumbnail_img, title, app_icon } = service;
+            return (
               <View
+                key={_id}
                 style={{
-                  width: "82%",
-                  height: "82%",
-                  borderRadius: 10,
-                  backgroundColor: "#fff",
-                  shadowColor: `${Colors.linkBlue}22`,
-
-                  elevation: 5,
-
-                  shadowOffset: {
-                    width: 1,
-                    height: 1,
-                  },
-                  shadowOpacity: 0.25,
-                  shadowRadius: 1,
-                }}
-              >
-                <TouchableHighlight
-                  underlayColor="#55555533"
-                  onPress={() =>
-                    navigation.navigate(Strings.GeneralServiceForm, {
-                      title: title,
-                      type: _id,
-                    })
-                  }
-                  style={{
-                    padding: 5,
-                    height: "100%",
-                    borderRadius: 10,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <React.Fragment>
-                    <View
-                      style={[
-                        iconContainer,
-                        {
-                          height: "55%",
-                          width: "55%",
-                          backgroundColor: app_icon.bgColor,
-                        },
-                      ]}
-                    >
-                      {createIcon(thumbnail_img, app_icon)}
-                    </View>
-                    <Text
-                      style={{
-                        marginHorizontal: 5,
-                        fontWeight: "600",
-                        textAlign: "center",
-                      }}
-                    >
-                      {title}
-                    </Text>
-                  </React.Fragment>
-                </TouchableHighlight>
-              </View>
-            </View>
-          ))
-        )}
-        {/* {btns.map((btn) => (
-          <View
-            key={btn.label}
-            style={{
-              width: Layouts.window.width / 3,
-              height: Layouts.window.width / 3,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <View
-              style={{
-                width: "82%",
-                height: "82%",
-                borderRadius: 10,
-                backgroundColor: "#fff",
-                shadowColor: `${Colors.linkBlue}22`,
-
-                elevation: 5,
-
-                shadowOffset: {
-                  width: 1,
-                  height: 1,
-                },
-                shadowOpacity: 0.25,
-                shadowRadius: 1,
-              }}
-            >
-              <TouchableHighlight
-                underlayColor="#55555533"
-                onPress={() =>
-                  navigation.navigate(btn.component, {
-                    title: btn.label,
-                    type: ServiceType,
-                  })
-                }
-                style={{
-                  padding: 5,
-                  height: "100%",
-                  borderRadius: 10,
+                  width: Layouts.window.width / 3,
+                  height: Layouts.window.width / 3,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <React.Fragment>
-                  <View
-                    style={[
-                      iconContainer,
-                      {
-                        height: "55%",
-                        width: "55%",
-                        backgroundColor: btn.color,
-                      },
-                    ]}
-                  >
-                    {btn.icon}
-                  </View>
-                  <Text
+                <View
+                  style={{
+                    width: "82%",
+                    height: "82%",
+                    borderRadius: 10,
+                    backgroundColor: "#fff",
+                    shadowColor: `${Colors.linkBlue}22`,
+
+                    elevation: 5,
+
+                    shadowOffset: {
+                      width: 1,
+                      height: 1,
+                    },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 1,
+                  }}
+                >
+                  <TouchableHighlight
+                    underlayColor="#55555533"
+                    onPress={() =>
+                      navigation.navigate(Strings.GeneralServiceForm, {
+                        title: title,
+                        service,
+                      })
+                    }
                     style={{
-                      marginHorizontal: 5,
-                      fontWeight: "600",
-                      textAlign: "center",
+                      padding: 5,
+                      height: "100%",
+                      borderRadius: 10,
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                   >
-                    {btn.label}
-                  </Text>
-                </React.Fragment>
-              </TouchableHighlight>
-            </View>
-          </View>
-        ))} */}
+                    <React.Fragment>
+                      <View
+                        style={[
+                          iconContainer,
+                          {
+                            height: "55%",
+                            width: "55%",
+                            backgroundColor: app_icon.bgColor,
+                          },
+                        ]}
+                      >
+                        {createIcon(thumbnail_img, app_icon)}
+                      </View>
+                      <Text
+                        style={{
+                          marginHorizontal: 5,
+                          fontWeight: "600",
+                          textAlign: "center",
+                          fontSize: Layouts.isSmallDevice ? 11 : 13,
+                        }}
+                      >
+                        {title}
+                      </Text>
+                    </React.Fragment>
+                  </TouchableHighlight>
+                </View>
+              </View>
+            );
+          })
+        )}
       </View>
     </ScrollView>
   );
 };
-
-const btns = [
-  // {
-  //   icon: <WaterTruck width={100} height={33} fill="#1081e9" />,
-  //   label: "Bowser",
-  //   color: `#1081e923`,
-  //   component: Strings.BowserForm,
-  //   type: ServiceType.Bowser,
-  // },
-  // {
-  //   icon: (
-  //     <FontAwesome5 name="tachometer-alt" color={Colors.LwscBlack} size={26} />
-  //   ),
-  //   label: "Open Account",
-  //   color: "#00000023",
-  //   component: Strings.OpenAccountForm,
-  // },
-  {
-    icon: (
-      <MaterialCommunityIcons
-        size={27}
-        color="#7d7d7d"
-        name="pipe-disconnected"
-      />
-    ),
-    label: "Reconnection",
-    color: "#adadad23",
-    component: Strings.ReConnection,
-    type: ServiceType.LeakDetection,
-  },
-  {
-    icon: <MaterialCommunityIcons color="#1ac3ee" name="pipe-leak" size={25} />,
-    label: "Leak Detection",
-    color: "#1ac3ee23",
-    component: Strings.GeneralServiceForm,
-    type: ServiceType.LeakDetection,
-  },
-  {
-    icon: (
-      <FontAwesome5
-        name="tachometer-alt"
-        color={`${Colors.LwscBlack}bb`}
-        size={26}
-      />
-    ),
-    label: "Meter Test",
-    color: "#00000023",
-    component: Strings.LocatePayPointScreen,
-    type: ServiceType.MeterTest,
-  },
-  {
-    icon: <ChangeConnection width={30} height={30} fill="#a25d1a" />,
-    label: "Change of Connection",
-    color: "#adadad23",
-    component: Strings.GeneralServiceForm,
-    type: ServiceType.ChangeOfConnection,
-  },
-  {
-    icon: <SewerHome width={40} height={28} fill="#00bb27" />,
-    label: "Sewer Unblocking",
-    color: "#1ac3ee23", // brown
-    component: Strings.GeneralServiceForm,
-    type: ServiceType.SewerUnblocking,
-  },
-  {
-    icon: <WaterTap width={40} height={28} fill="#9f8771" />,
-    label: "Water Connection",
-    color: "#9f877123",
-    component: Strings.GeneralServiceForm,
-    type: ServiceType.WaterConnection,
-  },
-  {
-    icon: <SewerConnection width={28} height={28} fill="#0190d4" />,
-    label: "Sewer Connection",
-    color: "#1ac3ee23",
-    component: Strings.GeneralServiceForm,
-    type: ServiceType.SewerConnection,
-  },
-  {
-    icon: <OnsiteSanitation width={28} height={28} fill={Colors.LwscOrange} />,
-    label: "Onsite Sanitation",
-    color: `${Colors.LwscOrange}19`,
-    component: Strings.GeneralServiceForm,
-    type: ServiceType.OnsiteSanitation,
-  },
-  {
-    icon: <FeacalSludgeMgt width={28} height={28} fill="#a25d1a" />,
-    label: "Feacal Sludge Mgt",
-    color: "#a25d1a23",
-    component: Strings.GeneralServiceForm,
-    type: ServiceType.FeacalSludgeMgt,
-  },
-];
-/**
-1.      Leak Detection investigation
-2.      Meter Test
-3.      Pipe Locating
-4.      Change of Connection
-5.      Private Sewer unblocking
-6.      Meter Separation
-7.      New water connection
-8.      New Sewer Connection
-9.      Onsite Sanitation Services
-10.     Feacal Sludge Management
-
-(
-      <MaterialCommunityIcons
-        size={27}
-        color="#7d7d7d"
-        name="pipe-disconnected"
-      />
-    )
- */
 
 const mapPropsToState = ({ services }: RootReducerI) => ({
   serviceTypes: services,

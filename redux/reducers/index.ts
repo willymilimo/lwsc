@@ -11,7 +11,7 @@ import bookNumbers from "./book-number";
 import properties from "./meter-reading-proerties";
 import accessNotes from "./access-notes";
 import activeAccount from "./active-account";
-import pushTokenSubmitted from "./push-token";
+import pushToken from "./push-token";
 import serviceConstants, { ServiceConstantsI } from "./service-constants";
 import { NotificationI } from "../../models/notification";
 import { ServiceItemI } from "../../models/service-item";
@@ -37,7 +37,7 @@ export interface RootReducerI {
   properties: MeterReadingPropertiesReducerI;
   accessNotes: AccessNotesReducerI;
   activeAccount: string;
-  pushTokenSubmitted: boolean;
+  pushToken: string;
 }
 
 export default combineReducers({
@@ -54,5 +54,5 @@ export default combineReducers({
   properties,
   accessNotes,
   activeAccount,
-  pushTokenSubmitted,
+  pushToken,
 });

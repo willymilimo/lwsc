@@ -2,9 +2,9 @@ import Actions, { ActionI } from "../Actions";
 import Strings from "../../constants/Strings";
 import { AsyncStorage } from "react-native";
 
-const initState = false;
+const initState = "";
 
-export default function (state = initState, action: ActionI<boolean>): boolean {
+export default function (state = initState, action: ActionI<string>): string {
   switch (action.type) {
     case Actions.SET_PUSH_TOKEN_SUBMITTED:
       state = action.payload;
@@ -12,7 +12,8 @@ export default function (state = initState, action: ActionI<boolean>): boolean {
   }
 
   if ([Actions.SET_PUSH_TOKEN_SUBMITTED].includes(action.type)) {
-    AsyncStorage.setItem(Strings.PUSH_TOKEN_STORAGE, JSON.stringify(state));
+    console.log(`storing token: ${state}`)
+    AsyncStorage.setItem(Strings.PUSH_TOKEN_STORAGE, state);
   }
 
   return state;

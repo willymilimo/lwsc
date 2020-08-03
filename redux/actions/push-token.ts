@@ -1,8 +1,8 @@
 import Actions, { ActionI } from "../Actions";
 
-export const setPushTokenSubmitted = (
-  isSubmitted: boolean
-): ActionI<boolean> => ({
+export const setPushToken = (
+  token: string
+): ActionI<string> => ({
   type: Actions.SET_PUSH_TOKEN_SUBMITTED,
-  payload: isSubmitted,
+  payload: token,
 });

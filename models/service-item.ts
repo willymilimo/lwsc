@@ -17,6 +17,7 @@ export interface ServiceItemI {
   thumbnail_img: string;
   app_icon: AppIcon;
   title: string;
+  post_service: boolean;
 }
 
 export class ServiceItem implements ServiceItemI {
@@ -27,6 +28,7 @@ export class ServiceItem implements ServiceItemI {
   thumbnail_img: string;
   app_icon: AppIcon;
   title: string;
+  post_service: boolean;
 
   constructor({
     _id,
@@ -36,6 +38,7 @@ export class ServiceItem implements ServiceItemI {
     thumbnail_img,
     app_icon,
     title,
+    post_service,
   }: ServiceItemI) {
     this._id = _id;
     this.is_active = is_active;
@@ -44,6 +47,7 @@ export class ServiceItem implements ServiceItemI {
     this.thumbnail_img = thumbnail_img;
     this.title = title === "Recconnection" ? "Reconnection" : title;
     this.app_icon = app_icon;
+    this.post_service = post_service;
 
     if (app_icon.type === "svg") {
       const size = app_icon.size.toString();

@@ -1,3 +1,5 @@
+import { LocationI } from "./location";
+
 export interface PayPointI {
   name: string;
   latitude: number;
@@ -28,10 +30,6 @@ export interface PaypointI {
   };
   title: string;
   description: string;
-  coordinates: {
-    _id: string;
-    longitude: string;
-    latitude: string;
-  };
+  coordinates: LocationI;
   __v: 0;
 }

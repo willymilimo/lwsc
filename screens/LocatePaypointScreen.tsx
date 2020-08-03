@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, Alert, Text } from "react-native";
+import { StyleSheet, Alert, Text, Platform, Linking } from "react-native";
 import Colors from "../constants/Colors";
 import { List, ActivityIndicator } from "react-native-paper";
 import { Entypo } from "@expo/vector-icons";
@@ -12,7 +12,8 @@ import { bindActionCreators } from "redux";
 import { fetchPayPoints } from "../models/axios";
 import Strings from "../constants/Strings";
 import { useNavigation } from "@react-navigation/native";
-
+import { uuid } from "../helpers/functions";
+import { LocationI } from "../models/location";
 
 interface LPSI {
   payPoints: PaypointI[];
@@ -31,7 +32,7 @@ const LocatePaypointScreen = ({ payPoints, setPayPoints }: LPSI) => {
         // console.log(data.payload);
         if (status === 200 && data.success) {
           setPayPoints(data.payload);
-          console.log(payPoints)
+          // console.log(payPoints);
         } else throw new Error();
       })
       .catch((err) => {
@@ -49,6 +50,19 @@ const LocatePaypointScreen = ({ payPoints, setPayPoints }: LPSI) => {
     getPaypoints();
   }, []);
 
+  const openMaps = ({ latitude, longitude }: LocationI) => {
+    // let { address, postalCode, city } = {};
+
+    let daddr = encodeURIComponent(`${latitude},${longitude}`);
+    console.log(daddr)
+
+    if (Platform.OS === "ios") {
+      Linking.openURL(`https://maps.apple.com/maps?daddr=${daddr}`);
+    } else {
+      Linking.openURL(`https://maps.google.com/maps?daddr=${daddr}`);
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       {loading ? (
@@ -60,7 +74,8 @@ const LocatePaypointScreen = ({ payPoints, setPayPoints }: LPSI) => {
       ) : payPoints.length ? (
         payPoints.map((item) => (
           <List.Item
-            onPress={() => {}}
+            key={uuid()}
+            onPress={() => openMaps(item.coordinates)}
             title={item.title}
             description={item.description}
             left={(props) => (

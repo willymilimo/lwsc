@@ -1,23 +1,46 @@
 import React from "react";
-import { StyleSheet, Text, View, Dimensions, Alert, Modal } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Dimensions,
+  Alert,
+  Modal,
+  Picker,
+} from "react-native";
 import { ServiceType } from "../../types/service-type";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import Colors from "../../constants/Colors";
-import { Button, TextInput, FAB, ActivityIndicator } from "react-native-paper";
+import {
+  Button,
+  TextInput,
+  FAB,
+  ActivityIndicator,
+  Subheading,
+} from "react-native-paper";
 import { ControlIT } from "../../models/control";
 import Regex from "../../constants/Regex";
 import { ServiceApplicationI } from "../../models/service-application";
-import { applyForService } from "../../models/axios";
+import { applyForService, fetchAllBillGroups } from "../../models/axios";
 import Strings from "../../constants/Strings";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { ServiceItemI } from "../../models/service-item";
+import { connect } from "react-redux";
+import { setBillGroups } from "../../redux/actions/bill-groups";
+import { bindActionCreators } from "redux";
+import { RootReducerI } from "../../redux/reducers";
+import { BillGroupI } from "../../models/meter-reading";
+import { BillGroupReducerI } from "../../redux/reducers/bill-groups";
 const { width, height } = Dimensions.get("window");
 
 interface GeneralServiceFormI {
   navigation: any;
-  route: { params: { title: string; type: string } };
+  billGroups: BillGroupReducerI;
+  route: { params: { title: string; service: ServiceItemI } };
+  setBillGroups(billGroups: BillGroupReducerI): void;
 }
 
 const ASPECT_RATIO = width / height;
@@ -26,10 +49,15 @@ const LONGITUDE = 28.382121;
 const LATITUDE_DELTA = 0.00922;
 const LONGITUDE_DELTA = 0.00921; //LATITUDE_DELTA * ASPECT_RATIO;
 
-const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
+const GeneralServiceForm = ({
+  navigation,
+  route,
+  billGroups,
+  setBillGroups,
+}: GeneralServiceFormI) => {
   let mapRef: MapView;
   const navigator = useNavigation();
-  const { title, type } = route.params;
+  const { title, service } = route.params;
   const { container, mapContainer, map } = styles;
   const [region, setRegion] = React.useState({
     latitude: LATITUDE,
@@ -62,6 +90,62 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
     value: "",
     error: false,
   });
+  const [billGroup, setBillGroup] = React.useState<ControlIT<string>>({
+    value: "-- Select Area --",
+    error: false,
+  });
+  const [displayList, setDisplayList] = React.useState<BillGroupI[]>(
+    Object.values(billGroups)
+  );
+
+  React.useEffect(() => {
+    let is_subscribed = true;
+
+    if (is_subscribed && !Object.keys(billGroups).length) {
+      fetchBillGroups();
+    }
+
+    return () => {
+      is_subscribed = false;
+    };
+  }, [billGroups]);
+
+  const fetchBillGroups = async () => {
+    setLoading(true);
+    fetchAllBillGroups()
+      .then(({ status, data }) => {
+        const { success, payload } = data;
+
+        // console.log(status, data);
+
+        if (status === 200 && success) {
+          const pay: BillGroupReducerI = {};
+          payload.recordset.forEach((bg) => (pay[bg.GROUP_ID] = bg));
+          setBillGroups(pay);
+          setDisplayList(Object.values(pay));
+        } else {
+          Alert.alert(
+            "Load Failure",
+            "Failed to load bill groups. Please try again later.",
+            [
+              {
+                text: "Cancel",
+                onPress: () => navigator.navigate(Strings.HomeTabNavigator),
+              },
+              { text: "RETRY", onPress: fetchBillGroups },
+            ]
+          );
+        }
+      })
+      .catch((e) =>
+        Alert.alert(
+          Strings.SELF_REPORTING_PROBLEM.title,
+          Strings.SELF_REPORTING_PROBLEM.message,
+          [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
+        )
+      )
+      .finally(() => setLoading(false));
+  };
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -107,7 +191,7 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
       last_name = name.reverse().toString();
     }
     const application: ServiceApplicationI = {
-      service_type: type,
+      service_type: service._id,
       first_name,
       last_name,
       phone: phone.value,
@@ -119,6 +203,7 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
       meter_number: account_meter.value,
       customer_account_id: account_meter.value,
       customer_id: account_meter.value,
+      bill_group: billGroup.value,
     };
 
     applyForService(application)
@@ -167,6 +252,10 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
     });
     mapRef.animateToRegion(region, 100);
   };
+
+  const invalidPostService =
+    service.post_service &&
+    (account_meter.error || account_meter.value.length === 0);
 
   return (
     <ScrollView style={container}>
@@ -336,21 +425,23 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
           }
         />
 
-        <TextInput
-          style={{ marginTop: 10 }}
-          mode="outlined"
-          label="Account/Meter Number (optional)"
-          placeholder="e.g. 1020893"
-          value={account_meter.value}
-          error={account_meter.error}
-          disabled={loading}
-          onChangeText={(text) =>
-            setAccountMeter({
-              value: text,
-              error: text.length > 0 && !/^\d{5,}$/g.test(text),
-            })
-          }
-        />
+        {service.post_service && (
+          <TextInput
+            style={{ marginTop: 10 }}
+            mode="outlined"
+            label="Account/Meter Number"
+            placeholder="e.g. 1020893"
+            value={account_meter.value}
+            error={account_meter.error}
+            disabled={loading}
+            onChangeText={(text) =>
+              setAccountMeter({
+                value: text,
+                error: text.length > 0 && !/^\d{5,}$/g.test(text),
+              })
+            }
+          />
+        )}
 
         <TextInput
           style={{ marginTop: 10 }}
@@ -370,6 +461,71 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
           }
         />
 
+        <View
+          style={{
+            borderWidth: 1,
+            borderBottomColor: Colors.borderColorDark,
+            borderStyle: "solid",
+            borderRadius: 5,
+            marginTop: 10,
+          }}
+        >
+          <Picker
+            selectedValue={billGroup.value}
+            onValueChange={(itemValue, index) => {
+              setBillGroup({
+                value: itemValue,
+                error: !displayList.some(
+                  (value) => value.GROUP_ID === itemValue
+                ),
+              });
+            }}
+          >
+            <Picker.Item label="-- Select Area --" value="-- Select Area --" />
+            {displayList.map((bg) => (
+              <Picker.Item
+                key={`${bg.DESCRIPTION}_${bg.GROUP_ID}`}
+                label={bg.DESCRIPTION}
+                value={bg.GROUP_ID}
+              />
+            ))}
+          </Picker>
+        </View>
+
+        {(fullName.error ||
+          fullName.value.length === 0 ||
+          phone.error ||
+          phone.value.length === 0 ||
+          address.error ||
+          address.value.length === 0 ||
+          invalidPostService ||
+          billGroup.error ||
+          billGroup.value === "-- Select Area --") && (
+          <Subheading
+            style={{
+              color: "maroon",
+              borderColor: Colors.danger.border,
+              backgroundColor: Colors.danger.background,
+              padding: 8,
+              borderRadius: 5,
+              textAlign: "center",
+              marginTop: 10,
+            }}
+          >
+            {fullName.error || fullName.value.length === 0
+              ? "Full Name is required"
+              : phone.error || phone.value.length === 0
+              ? "Please input valid Phone Number"
+              : address.error || address.value.length === 0
+              ? "Address is required"
+              : invalidPostService
+              ? "Account/Meter Number is required"
+              : billGroup.error || billGroup.value === "-- Select Area --"
+              ? "Please select a valid area"
+              : ""}
+          </Subheading>
+        )}
+
         <Button
           style={{ marginTop: 15 }}
           contentStyle={{
@@ -381,11 +537,15 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
           color={`${Colors.LwscBlue}bb`}
           disabled={
             loading ||
-            !fullName.value.length ||
             fullName.error ||
-            !address.value ||
+            fullName.value.length === 0 ||
+            phone.error ||
+            phone.value.length === 0 ||
             address.error ||
-            phone.error
+            address.value.length === 0 ||
+            invalidPostService ||
+            billGroup.error ||
+            billGroup.value === "-- Select Area --"
           }
           loading={loading}
           //   icon="send"
@@ -399,7 +559,21 @@ const GeneralServiceForm = ({ navigation, route }: GeneralServiceFormI) => {
   );
 };
 
-export default GeneralServiceForm;
+const mapPropsToState = ({ billGroups }: RootReducerI) => ({ billGroups });
+
+const matchDispatchToProps = (dispatch: any) =>
+  bindActionCreators(
+    {
+      setBillGroups,
+    },
+    dispatch
+  );
+
+export default connect(
+  mapPropsToState,
+  matchDispatchToProps
+)(GeneralServiceForm);
+// export default GeneralServiceForm;
 
 const styles = StyleSheet.create({
   container: {

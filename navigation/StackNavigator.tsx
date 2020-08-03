@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { connect } from "react-redux";
 import {
@@ -39,7 +39,6 @@ import { setAccounts } from "../redux/actions/accounts";
 import { AccountReducerI } from "../redux/reducers/accounts";
 import { Account } from "../models/account";
 import { setPayPoints } from "../redux/actions/pay-points";
-import { PayPoint } from "../models/pay-point";
 import MeterReadingScreen from "../screens/MeterReadingScreen";
 import { setPaymentHistory } from "../redux/actions/payment-history";
 import { PaymentHistory } from "../models/payment-history";
@@ -68,17 +67,17 @@ import { ActiveAccountReducerI } from "../redux/reducers/active-account";
 import PaymentHistoryScreen from "../screens/PaymentHistoryScreen";
 import PaymentHistoryListScreen from "../screens/PaymentHistoryListScreen";
 import PaymentStatementScreen from "../screens/PaymentStatementScreen";
-import { setPushTokenSubmitted } from "../redux/actions/push-token";
+import { setPushToken } from "../redux/actions/push-token";
 import { submitPushToken } from "../models/axios";
 
 const Stack = createStackNavigator();
 
 interface SNI {
   themeReducer: ThemeReducer;
-  pushTokenSubmitted: boolean;
+  pushToken: string;
   notifications: NotificationI[];
   setThemeReducer(themeReducer: ThemeReducer): void;
-  setPushTokenSubmitted(isSubmitted: boolean): void;
+  setPushToken(token: string): void;
   setNotifications(notifications: NotificationI[]): void;
   addNotification(notifications: NotificationI): void;
   setAccounts(accounts: AccountReducerI): void;
@@ -95,7 +94,7 @@ type SNT = SNI;
 const StackNavigator = ({
   setThemeReducer,
   themeReducer,
-  pushTokenSubmitted,
+  // pushToken,
   notifications,
   setNotifications,
   addNotification,
@@ -114,8 +113,9 @@ const StackNavigator = ({
     reachabilityShortTimeout: 5 * 1000, // 5s
     reachabilityRequestTimeout: 15 * 1000, // 15s
   });
-
-  const [pushToken, setPushToken] = React.useState("");
+  
+  const [bootstrapping, setBootstrapping] = React.useState(true)
+  const [token, setToken] = React.useState("");
   const [pushNotification, setPushNotification] = React.useState(null);
   const [activeTheme, setActiveTheme] = React.useState(themeReducer.theme);
 
@@ -136,12 +136,9 @@ const StackNavigator = ({
         return;
       }
       const token = await Notifications.getExpoPushTokenAsync();
-      // console.log(token);
-      setPushToken(token);
-
-      if (!pushTokenSubmitted) {
-        submitToken(token);
-      }
+      console.log(`token: ${token}`);
+      // setPushTokenLocal(token);
+      submitToken(token);
     } else {
       alert("Must use physical device for Push Notifications");
     }
@@ -175,7 +172,7 @@ const StackNavigator = ({
       let accessNotes;
       let activeAccount;
       let notifications;
-      let isTokenSubmittedStr;
+      let pushTokenStr;
 
       try {
         theme = await AsyncStorage.getItem(Strings.THEME_STORAGE);
@@ -202,20 +199,15 @@ const StackNavigator = ({
           Strings.ACTIVE_ACCOUNT_STORAGE
         );
 
-        isTokenSubmittedStr = await AsyncStorage.getItem(
+        pushTokenStr = await AsyncStorage.getItem(
           Strings.PUSH_TOKEN_STORAGE
         );
+        // console.log(pushTokenStr)
       } catch (e) {
         // Restoring token failed
       }
 
-      // After restoring token, we may need to validate it in production apps
-
-      // This will switch to the App screen or Auth screen and this loading
-      // screen will be unmounted and thrown away.
-      // dispatch({ type: "RESTORE_TOKEN", token: userToken });
       if (theme) {
-        // console.log(theme);
         setThemeReducer(JSON.parse(theme));
         setActiveTheme(JSON.parse(theme).theme);
       }
@@ -236,15 +228,6 @@ const StackNavigator = ({
       }
 
       if (paypoints) {
-        // const pp: any = {};
-        // const regions = JSON.parse(paypoints);
-        // for (const key in regions) {
-        //   if (regions.hasOwnProperty(key)) {
-        //     const region = regions[key];
-        //     pp[key] = region.map((p: any) => new PayPoint(p));
-        //   }
-        // }
-        // const pp: any = []
         console.log(paypoints);
         paypoints = paypoints == "undefined" ? [] : JSON.parse(paypoints);
 
@@ -258,7 +241,6 @@ const StackNavigator = ({
       }
 
       if (billGroups) {
-        // console.log(JSON.parse(billGroups));
         setBillGroups(JSON.parse(billGroups));
       }
 
@@ -297,49 +279,25 @@ const StackNavigator = ({
         );
       }
 
-      if (isTokenSubmittedStr) {
-        setPushTokenSubmitted(JSON.parse(isTokenSubmittedStr));
+      console.log(`pushTokenStr: ${pushTokenStr}`)
+      if (pushTokenStr) {
+        // setPushToken(pushTokenStr);
+        setToken(pushTokenStr)
       }
+
+      setBootstrapping(false);
     };
 
     bootstrapAsync();
   }, []);
 
-  // React.useEffect(() => {
-  //   let is_subscribed = true;
-
-  //   if (is_subscribed) {
-  //     setNotifications(notifications);
-  //   }
-
-  //   return () => {
-  //     is_subscribed = false;
-  //   };
-  // }, [notifications]);
-
-  // React.useEffect(() => {
-  //   let is_subscribed = true;
-
-  //   if (is_subscribed) {
-  //     setActiveTheme(themeReducer.theme);
-  //   }
-
-  //   return () => {
-  //     is_subscribed = false;
-  //   };
-  // }, [themeReducer]);
-
   React.useEffect(() => {
-    let is_subscribed = true;
-
-    if (is_subscribed) {
+    console.log(token, bootstrapping)
+    if (!bootstrapping) {
+      console.log(`inside token: ${token}\ninside bootstrapping: ${bootstrapping}`)
       registerForPushNotificationsAsync();
     }
-
-    return () => {
-      is_subscribed = false;
-    };
-  }, [pushTokenSubmitted]);
+  }, [bootstrapping]);
 
   React.useEffect(() => {
     let notificationSubscription = Notifications.addListener(
@@ -371,9 +329,10 @@ const StackNavigator = ({
   const submitToken = async (token: string) => {
     try {
       const { status, data } = await submitPushToken(token);
+      console.log(data)
 
       if (status === 200 && data.success) {
-        setPushTokenSubmitted(true);
+        setPushToken(token);
         console.log(data);
       } else {
         throw new Error("failed to submit token");
@@ -494,10 +453,10 @@ const StackNavigator = ({
 const mapStateToProps = ({
   theme,
   notifications,
-  pushTokenSubmitted,
+  pushToken,
 }: RootReducerI) => ({
   themeReducer: theme,
-  pushTokenSubmitted,
+  pushToken,
   notifications,
 });
 
@@ -514,7 +473,7 @@ const mapDispatchToProps = (dispatch: any) =>
       setMRProperties,
       setAccessNotes,
       setActiveAccount,
-      setPushTokenSubmitted,
+      setPushToken,
     },
     dispatch
   );

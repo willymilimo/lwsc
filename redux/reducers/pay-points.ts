@@ -23,7 +23,7 @@ export default function (
   }
 
   if (type === Actions.SET_PAY_POINTS) {
-    console.log(type, state)
+    // console.log(type, state)
     AsyncStorage.setItem(Strings.PAYPOINTS_STORAGE, JSON.stringify(state));
   }
 
