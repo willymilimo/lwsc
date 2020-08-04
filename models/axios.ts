@@ -261,7 +261,7 @@ export const fetchComsumption = async (
   accountNumber: string,
   startDate: string,
   endDate: string
-): Promise<AxiosResponse<IResponse<ConsumptionI[]>>> => {
+): Promise<AxiosResponse<IResponse<{ recordset: ConsumptionI[] }>>> => {
   return await axios.get(
     `billing/consumption/records/fetch?account_number=${accountNumber}&lower_limit_date=${startDate}&upper_limit_date=${endDate}`
   );

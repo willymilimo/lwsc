@@ -105,7 +105,7 @@ const BillGroupScreen = ({ billGroups, setBillGroups, route }: PropsI) => {
 
   return (
     <View style={styles.container}>
-      <Modal animationType="slide" transparent visible={loading}>
+      {loading ? (
         <View style={[styles.centeredView, { backgroundColor: "#00000077" }]}>
           <View style={styles.modalView}>
             <ActivityIndicator size="large" color={Colors.LwscOrange} />
@@ -125,15 +125,16 @@ const BillGroupScreen = ({ billGroups, setBillGroups, route }: PropsI) => {
             >{`Please wait...`}</Text>
           </View>
         </View>
-      </Modal>
-      <FlatList
-        removeClippedSubviews={true}
-        maxToRenderPerBatch={20}
-        initialNumToRender={20}
-        data={displayList}
-        keyExtractor={(item: BillGroupI) => item.GROUP_ID}
-        renderItem={renderListItem}
-      />
+      ) : (
+        <FlatList
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={20}
+          initialNumToRender={20}
+          data={displayList}
+          keyExtractor={(item: BillGroupI) => item.GROUP_ID}
+          renderItem={renderListItem}
+        />
+      )}
     </View>
   );
 };
@@ -158,7 +159,7 @@ const styles = StyleSheet.create({
     // paddingHorizontal: 15,
   },
   centeredView: {
-    flex: 1,
+    // flex: 1,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 22,
