@@ -1,19 +1,40 @@
-import React, { useEffect } from "react";
-import { createStackNavigator } from "@react-navigation/stack";
-import { connect } from "react-redux";
-import {
-  AsyncStorage,
-  Vibration,
-  Platform,
-  Alert,
-  BackHandler,
-} from "react-native";
-import { bindActionCreators } from "redux";
-import { Notifications } from "expo";
-import * as Permissions from "expo-permissions";
-import NetInfo from "@react-native-community/netinfo";
 import Constants from "expo-constants";
-
+import * as Notifications from "expo-notifications";
+import * as Permissions from "expo-permissions";
+import React, { useState, useEffect, useRef } from "react";
+import { createStackNavigator } from "@react-navigation/stack";
+import { Platform, AsyncStorage } from "react-native";
+import { RootReducerI } from "../redux/reducers";
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
+import { setThemeReducer } from "../redux/actions/theme";
+import {
+  setNotifications,
+  addNotification,
+} from "../redux/actions/notifications";
+import { setAccounts } from "../redux/actions/accounts";
+import { setPayPoints } from "../redux/actions/pay-points";
+import { setBillGroups } from "../redux/actions/bill-groups";
+import { setBookNumbers } from "../redux/actions/book-numbers";
+import { setMRProperties } from "../redux/actions/meter-reading-properties";
+import { setAccessNotes } from "../redux/actions/access-notes";
+import { setActiveAccount } from "../redux/actions/active-account";
+import { setPushToken } from "../redux/actions/push-token";
+import { ThemeReducer } from "../types/theme";
+import { NotificationI, Notification } from "../models/notification";
+import { AccountReducerI } from "../redux/reducers/accounts";
+import { PaypointI } from "../models/pay-point";
+import { BillGroupReducerI } from "../redux/reducers/bill-groups";
+import { BookNumberReducerI } from "../redux/reducers/book-number";
+import { MeterReadingPropertiesReducerI } from "../redux/reducers/meter-reading-proerties";
+import { AccessNotesReducerI } from "../redux/reducers/access-notes";
+import { ActiveAccountReducerI } from "../redux/reducers/active-account";
+import { BookNumber, Property } from "../models/meter-reading";
+import Strings from "../constants/Strings";
+import { Account } from "../models/account";
+import { PaymentHistory } from "../models/payment-history";
+import { setPaymentHistory } from "../redux/actions/payment-history";
+import { StatementI } from "../models/statement";
 import HomeTabNavigator from "./HomeTabNavigator";
 import NotificationsScreen from "../screens/NotificationsScreen";
 import LocatePaypointScreen from "../screens/LocatePaypointScreen";
@@ -22,26 +43,11 @@ import PaymentMethodScreen from "../screens/PaymentMethodScreen";
 import ServicesScreen from "../screens/ServicesScreen";
 import FeedbackScreen from "../screens/FeedbackScreen";
 import MakePaymentScreen from "../screens/MakePaymentScreen";
-import AccountOpeningDomestic from "../screens/service_forms/AccountOpeningDomestic";
-import Boswer from "../screens/service_forms/Boswer";
 import PaymentScreen from "../screens/PaymentScreen";
 import WebviewScreen from "../screens/WebviewScreen";
-import Strings from "../constants/Strings";
-import { setThemeReducer } from "../redux/actions/theme";
-import { RootReducerI } from "../redux/reducers";
-import { ThemeReducer } from "../types/theme";
-import { NotificationI, Notification } from "../models/notification";
-import {
-  setNotifications,
-  addNotification,
-} from "../redux/actions/notifications";
-import { setAccounts } from "../redux/actions/accounts";
-import { AccountReducerI } from "../redux/reducers/accounts";
-import { Account } from "../models/account";
-import { setPayPoints } from "../redux/actions/pay-points";
+import Boswer from "../screens/service_forms/Boswer";
+import AccountOpeningDomestic from "../screens/service_forms/AccountOpeningDomestic";
 import MeterReadingScreen from "../screens/MeterReadingScreen";
-import { setPaymentHistory } from "../redux/actions/payment-history";
-import { PaymentHistory } from "../models/payment-history";
 import ReportLeakageScreen from "../screens/ReportLeakageScreen";
 import LodgeComplaintScreen from "../screens/LodgeComplaintScreen";
 import GeneralServiceForm from "../screens/service_forms/GeneralServiceForm";
@@ -49,28 +55,23 @@ import ReConnection from "../screens/service_forms/ReConnection";
 import ApplyForPaymentScheduleScreen from "../screens/ApplyForPaymentScheduleScreen";
 import ReadMeterScreen from "../screens/ReadMeterScreen";
 import LwscStaffAuthScreen from "../screens/LwscStaffAuthScreen";
-import { setBillGroups } from "../redux/actions/bill-groups";
-import { setBookNumbers } from "../redux/actions/book-numbers";
-import { setMRProperties } from "../redux/actions/meter-reading-properties";
-import { BillGroupReducerI } from "../redux/reducers/bill-groups";
-import { BookNumberReducerI } from "../redux/reducers/book-number";
-import { MeterReadingPropertiesReducerI } from "../redux/reducers/meter-reading-proerties";
-import { BookNumber, Property } from "../models/meter-reading";
 import BillGroupScreen from "../screens/BillGroupScreen";
 import BookNumbersScreen from "../screens/BookNumbersScreen";
 import PropertiesScreen from "../screens/PropertiesScreen";
-import { AccessNotesReducerI } from "../redux/reducers/access-notes";
-import { setAccessNotes } from "../redux/actions/access-notes";
-import { setActiveAccount } from "../redux/actions/active-account";
-import { ActiveAccountReducerI } from "../redux/reducers/active-account";
 import PaymentHistoryScreen from "../screens/PaymentHistoryScreen";
 import PaymentHistoryListScreen from "../screens/PaymentHistoryListScreen";
 import PaymentStatementScreen from "../screens/PaymentStatementScreen";
-import { setPushToken } from "../redux/actions/push-token";
-import { submitPushToken } from "../models/axios";
-import { PaypointI } from "../models/pay-point";
 import ConsumptionScreen from "../screens/ConsumptionScreen";
 import ConsumptionDetails from "../screens/ConsumptionDetails";
+import { submitPushToken } from "../models/axios";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 const Stack = createStackNavigator();
 
@@ -89,9 +90,8 @@ interface SNI {
   setMRProperties(properties: MeterReadingPropertiesReducerI): void;
   setAccessNotes(accessNotes: AccessNotesReducerI): void;
   setActiveAccount(activeAccount: ActiveAccountReducerI): void;
+  setPaymentHistory(history: StatementI[]): void;
 }
-
-type SNT = SNI;
 
 const StackNavigator = ({
   setThemeReducer,
@@ -107,232 +107,144 @@ const StackNavigator = ({
   setMRProperties,
   setAccessNotes,
   setActiveAccount,
-}: SNT) => {
-  NetInfo.configure({
-    reachabilityUrl: "https://41.72.107.14:3000/api/v1/services/types/fetch",
-    reachabilityTest: async (response) => response.status === 200,
-    reachabilityLongTimeout: 60 * 1000, // 60s
-    reachabilityShortTimeout: 5 * 1000, // 5s
-    reachabilityRequestTimeout: 15 * 1000, // 15s
-  });
-
-  const [bootstrapping, setBootstrapping] = React.useState(true);
-  const [token, setToken] = React.useState("");
-  const [pushNotification, setPushNotification] = React.useState(null);
+  setPaymentHistory,
+}: SNI) => {
+  const [expoPushToken, setExpoPushToken] = useState("");
+  const [notification, setNotification] = useState(false);
+  const [landScreen, setLandScreen] = useState({ screen: "Home" });
+  const notificationListener = useRef();
+  const responseListener = useRef();
   const [activeTheme, setActiveTheme] = React.useState(themeReducer.theme);
 
-  const registerForPushNotificationsAsync = async () => {
-    if (Constants.isDevice) {
-      const { status: existingStatus } = await Permissions.getAsync(
-        Permissions.NOTIFICATIONS
+  const bootstrapAsync = async () => {
+    let theme;
+    let accounts;
+    let paypoints;
+    let paymentHistory;
+    let billGroups;
+    let bookNumbers;
+    let properties;
+    let accessNotes;
+    let activeAccount;
+    let notifications;
+    let pushTokenStr;
+
+    try {
+      theme = await AsyncStorage.getItem(Strings.THEME_STORAGE);
+      accounts = await AsyncStorage.getItem(Strings.ACCOUNTS_STORAGE);
+      await AsyncStorage.removeItem(Strings.PAYPOINTS_STORAGE);
+      paypoints = await AsyncStorage.getItem(Strings.PAYPOINTS_STORAGE);
+      paymentHistory = await AsyncStorage.getItem(
+        Strings.PAYMENT_HISTORY_STORAGE
       );
-      let finalStatus = existingStatus;
-      if (existingStatus !== "granted") {
-        const { status } = await Permissions.askAsync(
-          Permissions.NOTIFICATIONS
-        );
-        finalStatus = status;
-      }
-      if (finalStatus !== "granted") {
-        alert("Failed to get push token for push notification!");
-        return;
-      }
-      const token = await Notifications.getExpoPushTokenAsync();
-      console.log(`token: ${token}`);
-      // setPushTokenLocal(token);
-      submitToken(token);
-    } else {
-      alert("Must use physical device for Push Notifications");
+
+      notifications = await AsyncStorage.getItem(Strings.NOTIFICATIONS_STORAGE);
+      // await AsyncStorage.removeItem(Strings.NOTIFICATIONS_STORAGE)
+      // await AsyncStorage.removeItem(Strings.MR_PROPERTY_STORAGE)
+      billGroups = await AsyncStorage.getItem(Strings.BILL_GROUP_STORAGE);
+      bookNumbers = await AsyncStorage.getItem(Strings.BOOK_NUMBER_STORAGE);
+      properties = await AsyncStorage.getItem(Strings.MR_PROPERTY_STORAGE);
+
+      // await AsyncStorage.removeItem(Strings.ACCESS_NOTES_STORAGE)
+      accessNotes = await AsyncStorage.getItem(Strings.ACCESS_NOTES_STORAGE);
+
+      activeAccount = await AsyncStorage.getItem(
+        Strings.ACTIVE_ACCOUNT_STORAGE
+      );
+
+      pushTokenStr = await AsyncStorage.getItem(Strings.PUSH_TOKEN_STORAGE);
+      // console.log(pushTokenStr)
+    } catch (e) {
+      // Restoring token failed
     }
 
-    if (Platform.OS === "android") {
-      Notifications.createChannelAndroidAsync("default", {
-        name: "default",
-        sound: true,
-        priority: "max",
-        vibrate: [0, 250, 250, 250],
-      });
+    if (theme) {
+      setThemeReducer(JSON.parse(theme));
+      setActiveTheme(JSON.parse(theme).theme);
     }
-  };
 
-  const handleNotification = React.useCallback((notification) => {
-    console.log(notification)
-    Vibration.vibrate(3);
-    setPushNotification(notification);
-    addNotification(notification);
-  }, []);
-
-  React.useEffect(() => {
-    // Fetch the token from storage then navigate to our appropriate place
-    const bootstrapAsync = async () => {
-      let theme;
-      let accounts;
-      let paypoints;
-      let paymentHistory;
-      let billGroups;
-      let bookNumbers;
-      let properties;
-      let accessNotes;
-      let activeAccount;
-      let notifications;
-      let pushTokenStr;
-
-      try {
-        theme = await AsyncStorage.getItem(Strings.THEME_STORAGE);
-        accounts = await AsyncStorage.getItem(Strings.ACCOUNTS_STORAGE);
-        await AsyncStorage.removeItem(Strings.PAYPOINTS_STORAGE);
-        paypoints = await AsyncStorage.getItem(Strings.PAYPOINTS_STORAGE);
-        paymentHistory = await AsyncStorage.getItem(
-          Strings.PAYMENT_HISTORY_STORAGE
-        );
-
-        notifications = await AsyncStorage.getItem(
-          Strings.NOTIFICATIONS_STORAGE
-        );
-        // await AsyncStorage.removeItem(Strings.BOOK_NUMBER_STORAGE)
-        // await AsyncStorage.removeItem(Strings.MR_PROPERTY_STORAGE)
-        billGroups = await AsyncStorage.getItem(Strings.BILL_GROUP_STORAGE);
-        bookNumbers = await AsyncStorage.getItem(Strings.BOOK_NUMBER_STORAGE);
-        properties = await AsyncStorage.getItem(Strings.MR_PROPERTY_STORAGE);
-
-        // await AsyncStorage.removeItem(Strings.ACCESS_NOTES_STORAGE)
-        accessNotes = await AsyncStorage.getItem(Strings.ACCESS_NOTES_STORAGE);
-
-        activeAccount = await AsyncStorage.getItem(
-          Strings.ACTIVE_ACCOUNT_STORAGE
-        );
-
-        pushTokenStr = await AsyncStorage.getItem(Strings.PUSH_TOKEN_STORAGE);
-        // console.log(pushTokenStr)
-      } catch (e) {
-        // Restoring token failed
-      }
-
-      if (theme) {
-        setThemeReducer(JSON.parse(theme));
-        setActiveTheme(JSON.parse(theme).theme);
-      }
-
-      if (accounts) {
-        accounts = JSON.parse(accounts);
-        for (const key in accounts) {
-          if (accounts.hasOwnProperty(key)) {
-            const element = accounts[key];
-            accounts[key] = element.CUSTKEY
-              ? new Account(element)
-              : element.MeterNumber
-              ? new Property(element)
-              : element;
-          }
+    if (accounts) {
+      accounts = JSON.parse(accounts);
+      for (const key in accounts) {
+        if (accounts.hasOwnProperty(key)) {
+          const element = accounts[key];
+          accounts[key] = element.CUSTKEY
+            ? new Account(element)
+            : element.MeterNumber
+            ? new Property(element)
+            : element;
         }
-        setAccounts(accounts);
       }
-
-      if (paypoints) {
-        // console.log(paypoints);
-        paypoints = paypoints == "undefined" ? [] : JSON.parse(paypoints);
-
-        setPayPoints(JSON.parse(paypoints));
-      }
-
-      if (paymentHistory) {
-        setPaymentHistory(
-          JSON.parse(paymentHistory).map((ph: any) => new PaymentHistory(ph))
-        );
-      }
-
-      if (billGroups) {
-        setBillGroups(JSON.parse(billGroups));
-      }
-
-      if (bookNumbers) {
-        const data: BookNumberReducerI = JSON.parse(bookNumbers);
-        Object.keys(data).forEach((key) => {
-          let bns = data[key];
-
-          bns.map((k) => new BookNumber(k)); // forEach((k) => (bns.CODE = new BookNumber(bns[k])));
-        });
-        setBookNumbers(data);
-      }
-
-      if (properties) {
-        const data: MeterReadingPropertiesReducerI = JSON.parse(properties);
-        Object.keys(data).forEach((key) => {
-          let bns = data[key];
-          data[key] = bns.map((item) => new Property(item));
-        });
-        setMRProperties(data);
-      }
-
-      if (accessNotes) {
-        setAccessNotes(JSON.parse(accessNotes));
-      }
-
-      if (activeAccount) {
-        setActiveAccount(JSON.parse(activeAccount));
-      }
-
-      if (notifications) {
-        setNotifications(
-          JSON.parse(notifications).map(
-            (item: NotificationI) => new Notification(item)
-          )
-        );
-      }
-
-      console.log(`pushTokenStr: ${pushTokenStr}`);
-      if (pushTokenStr) {
-        // setPushToken(pushTokenStr);
-        setToken(pushTokenStr);
-      }
-
-      setBootstrapping(false);
-    };
-
-    bootstrapAsync();
-  }, []);
-
-  React.useEffect(() => {
-    if (!(bootstrapping || token)) {
-      registerForPushNotificationsAsync();
+      setAccounts(accounts);
     }
-  }, [bootstrapping]);
 
-  React.useEffect(() => {
-    let notificationSubscription = Notifications.addListener(
-      handleNotification
-    );
+    if (paypoints) {
+      // console.log(paypoints);
+      paypoints = paypoints == "undefined" ? [] : JSON.parse(paypoints);
 
-    return () => {
-      notificationSubscription.remove();
-    };
-  }, [handleNotification]);
+      setPayPoints(JSON.parse(paypoints));
+    }
 
-  React.useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener((state) => {
-      // console.log(state);
-      if (!state.isConnected) {
-        Alert.alert(
-          Strings.INTERNET_FAILURE.title,
-          Strings.INTERNET_FAILURE.message,
-          [{ text: "Exit", onPress: () => BackHandler.exitApp() }]
-        );
-      }
-    });
+    if (paymentHistory) {
+      setPaymentHistory(
+        JSON.parse(paymentHistory).map((ph: any) => new PaymentHistory(ph))
+      );
+    }
 
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+    if (billGroups) {
+      setBillGroups(JSON.parse(billGroups));
+    }
+
+    if (bookNumbers) {
+      const data: BookNumberReducerI = JSON.parse(bookNumbers);
+      Object.keys(data).forEach((key) => {
+        let bns = data[key];
+
+        bns.map((k) => new BookNumber(k)); // forEach((k) => (bns.CODE = new BookNumber(bns[k])));
+      });
+      setBookNumbers(data);
+    }
+
+    if (properties) {
+      const data: MeterReadingPropertiesReducerI = JSON.parse(properties);
+      Object.keys(data).forEach((key) => {
+        let bns = data[key];
+        data[key] = bns.map((item) => new Property(item));
+      });
+      setMRProperties(data);
+    }
+
+    if (accessNotes) {
+      setAccessNotes(JSON.parse(accessNotes));
+    }
+
+    if (activeAccount) {
+      setActiveAccount(JSON.parse(activeAccount));
+    }
+
+    if (notifications) {
+      setNotifications(
+        JSON.parse(notifications).map(
+          (item: NotificationI) => new Notification(item)
+        )
+      );
+    }
+
+    // console.log(`pushTokenStr: ${pushTokenStr}`);
+    // if (pushTokenStr) {
+    //   setPushToken(pushTokenStr);
+    //   setToken(pushTokenStr);
+    // }
+
+    // setBootstrapping(false);
+  };
 
   const submitToken = async (token: string) => {
     try {
       const { status, data } = await submitPushToken(token);
-      console.log(data);
 
       if (status === 200 && data.success) {
         setPushToken(token);
-        console.log(data);
       } else {
         throw new Error("failed to submit token");
       }
@@ -340,6 +252,43 @@ const StackNavigator = ({
       // sent error report
     }
   };
+
+  useEffect(() => {
+    registerForPushNotificationsAsync().then((token) => {
+      setExpoPushToken(token as string);
+      submitToken(token as string);
+    });
+
+    // This listener is fired whenever a notification is received while the app is foregrounded
+    notificationListener.current = Notifications.addNotificationReceivedListener(
+      (notification: any) => {
+        setNotification(notification);
+        addNotification(notification);
+        // console.log(notification);
+      }
+    );
+
+    // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(
+      (response) => {
+        // const url = response.notification.request.content.data.url;
+        // console.log('RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR')
+        // console.log(response.notification);
+        addNotification(response.notification.request.content);
+        setLandScreen({ screen: "Notifications" });
+        // console.log('RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR')
+        // Linking.openUrl(url);
+      }
+    );
+
+    bootstrapAsync();
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener);
+      Notifications.removeNotificationSubscription(responseListener);
+    };
+  }, []);
+  console.log(landScreen);
 
   return (
     <Stack.Navigator
@@ -360,7 +309,7 @@ const StackNavigator = ({
       <Stack.Screen
         name={Strings.HomeTabNavigator}
         component={HomeTabNavigator}
-        // initialParams={{ toNotifications: pushNotification ? true : false }}
+        initialParams={landScreen}
         options={{ header: (props) => null }}
       />
       <Stack.Screen
@@ -457,6 +406,39 @@ const StackNavigator = ({
   );
 };
 
+async function registerForPushNotificationsAsync() {
+  let token;
+  if (Constants.isDevice) {
+    const { status: existingStatus } = await Permissions.getAsync(
+      Permissions.NOTIFICATIONS
+    );
+    let finalStatus = existingStatus;
+    if (existingStatus !== "granted") {
+      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+      finalStatus = status;
+    }
+    if (finalStatus !== "granted") {
+      alert("Failed to get push token for push notification!");
+      return;
+    }
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log(token);
+  } else {
+    alert("Must use physical device for Push Notifications");
+  }
+
+  if (Platform.OS === "android") {
+    Notifications.setNotificationChannelAsync("default", {
+      name: "default",
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: "#FF231F7C",
+    });
+  }
+
+  return token;
+}
+
 const mapStateToProps = ({
   theme,
   notifications,
@@ -481,6 +463,7 @@ const mapDispatchToProps = (dispatch: any) =>
       setAccessNotes,
       setActiveAccount,
       setPushToken,
+      setPaymentHistory,
     },
     dispatch
   );

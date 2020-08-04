@@ -34,7 +34,7 @@ export class Notification implements NotificationI {
     this.title = title;
     this.description = description;
     this.icon = icon;
-    this.create_on = new Date(create_on);
+    this.create_on = new Date(create_on || new Date());
     this.is_read = !!is_read;
   }
 }

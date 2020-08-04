@@ -16,7 +16,7 @@ export default function (state = initState, action: ActionI<any>) {
     case Actions.ADD_NOTIFICATIONS:
       payload = payload as NotificationI;
       if (!state.some((item) => item._id === payload._id)) {
-        state = [...state, payload];
+        state = [payload, ...state];
       }
       break;
 

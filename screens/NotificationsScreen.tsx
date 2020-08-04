@@ -22,6 +22,7 @@ import {
   setNotificationRead,
   addNotification,
 } from "../redux/actions/notifications";
+import { uuid } from "../helpers/functions";
 
 interface PropI {
   notifications: NotificationI[];
@@ -37,6 +38,9 @@ const NotificationsScreen = ({
   const { container } = styles;
   const navigator = useNavigation();
   const [loading, setLoading] = useState(false);
+  // console.log("NOTIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
+  // console.log(notifications);
+  // console.log("NOTIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
 
   useEffect(() => {
     let is_subscribed = true;
@@ -133,7 +137,7 @@ const NotificationsScreen = ({
           maxToRenderPerBatch={20}
           initialNumToRender={20}
           data={notifications}
-          keyExtractor={(item) => item._id}
+          keyExtractor={(item) => uuid()}
           renderItem={renderListItem}
         />
       )}

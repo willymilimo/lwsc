@@ -20,6 +20,7 @@ const Tab = createBottomTabNavigator();
 const HomeTabNavigator = ({ route, theme }: HTNT) => {
   const [activeTheme, setActiveTheme] = React.useState(theme);
   const initialRouteName = (route.params && route.params.screen) || "Home";
+  console.log(route.params)
 
   React.useEffect(() => {
     let is_subscribed = true;
