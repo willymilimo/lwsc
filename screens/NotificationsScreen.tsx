@@ -126,13 +126,14 @@ const NotificationsScreen = ({
   return (
     <SafeAreaView style={container}>
       {loading ? (
-        <View style={[styles.centeredView, { backgroundColor: "#00000077" }]}>
-          <View style={styles.modalView}>
-            <ActivityIndicator size="large" color={Colors.LwscOrange} />
-          </View>
-        </View>
+        <ActivityIndicator
+          style={{ marginTop: 50 }}
+          size="large"
+          color={Colors.LwscOrange}
+        />
       ) : (
         <FlatList
+          onRefresh={getchNotifications}
           removeClippedSubviews={true}
           maxToRenderPerBatch={20}
           initialNumToRender={20}
