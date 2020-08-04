@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, Alert } from "react-native";
-import { ConsumptionI } from "../models/consumption";
+import { ConsumptionI, Consumption } from "../models/consumption";
 import { PropertyI, Property } from "../models/meter-reading";
 import { AccountI, Account } from "../models/account";
 import { fetchComsumption } from "../models/axios";
@@ -14,7 +14,7 @@ import { Calendar } from "react-native-calendars";
 import Colors from "../constants/Colors";
 import { formatDate, uuid } from "../helpers/functions";
 import { FlatList } from "react-native-gesture-handler";
-import Consumption from "../assets/consumption.svg";
+import ConsumptionSVG from "../assets/consumption.svg";
 import FeacalSludgeMgt from "../assets/feacal_sludge_mgt.svg";
 import Strings from "../constants/Strings";
 import { useNavigation } from "@react-navigation/native";
@@ -44,8 +44,8 @@ export default function ConsumptionScreen({ route }: PropI) {
     let is_subscribed = true;
 
     if (is_subscribed && startDate.length && endDate.length) {
-        setShowCalendar(!(startDate && endDate));
-        fetchConsumptionList();
+      setShowCalendar(!(startDate && endDate));
+      fetchConsumptionList();
     }
 
     return () => {
@@ -67,7 +67,7 @@ export default function ConsumptionScreen({ route }: PropI) {
       .then(({ status, data }) => {
         if (status === 200 && data.success) {
           const { recordset } = data.payload;
-          setConsumptionList(recordset);
+          setConsumptionList(recordset.map((item) => new Consumption(item)));
         } else {
           throw new Error(
             `Failed to retrieve consumption for ${id} in period ${start} - ${end}`
@@ -91,7 +91,7 @@ export default function ConsumptionScreen({ route }: PropI) {
     const isSewer = item[""].toLocaleLowerCase().startsWith("sewer");
     return (
       <List.Item
-        onPress={() => {}}
+        onPress={() => navigator.navigate(Strings.ConsumptionDetails, { item })}
         title={item[""]}
         description={
           item.DESCRIPTION ||
@@ -125,7 +125,7 @@ export default function ConsumptionScreen({ route }: PropI) {
                 ) : isSewer ? (
                   <FeacalSludgeMgt width={20} height={20} fill="#a25d1a" />
                 ) : (
-                  <Consumption width={20} height={20} fill="#1081e9" />
+                  <ConsumptionSVG width={20} height={20} fill="#1081e9" />
                 )}
               </View>
             )}
@@ -200,7 +200,11 @@ export default function ConsumptionScreen({ route }: PropI) {
           }}
         />
       ) : loading ? (
-        <ActivityIndicator style={{marginTop: 20}} size="large" color={Colors.LwscOrange} />
+        <ActivityIndicator
+          style={{ marginTop: 20 }}
+          size="large"
+          color={Colors.LwscOrange}
+        />
       ) : consumptionList.length ? (
         <FlatList
           removeClippedSubviews={true}

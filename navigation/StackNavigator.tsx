@@ -70,6 +70,7 @@ import { setPushToken } from "../redux/actions/push-token";
 import { submitPushToken } from "../models/axios";
 import { PaypointI } from "../models/pay-point";
 import ConsumptionScreen from "../screens/ConsumptionScreen";
+import ConsumptionDetails from "../screens/ConsumptionDetails";
 
 const Stack = createStackNavigator();
 
@@ -155,6 +156,7 @@ const StackNavigator = ({
   };
 
   const handleNotification = React.useCallback((notification) => {
+    console.log(notification)
     Vibration.vibrate(3);
     setPushNotification(notification);
     addNotification(notification);
@@ -446,6 +448,10 @@ const StackNavigator = ({
       <Stack.Screen
         name={Strings.ConsumptionScreen}
         component={ConsumptionScreen}
+      />
+      <Stack.Screen
+        name={Strings.ConsumptionDetails}
+        component={ConsumptionDetails}
       />
     </Stack.Navigator>
   );

@@ -30,6 +30,7 @@ export default {
   PaymentHistoryListScreen: "Choose Account",
   PaymentStatementScreen: "Payment Statement",
   ConsumptionScreen: "Consumption",
+  ConsumptionDetails: "Consumption Details",
 
   /*************** Begin REDUCER TYPES *****************/
   WHITE_THEME: "WHITE_THEME",

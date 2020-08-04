@@ -42,7 +42,7 @@ const PaymentStatementScreen = ({ route }: PropI) => {
         <Subheading style={heading}>Date</Subheading>
         <Subheading
           style={value}
-        >{`${created_on.toLocaleDateString()}, ${created_on.toLocaleTimeString()} hours`}</Subheading>
+        >{`${created_on.toLocaleString()}`}</Subheading>
       </View>
       <Divider
         style={{
