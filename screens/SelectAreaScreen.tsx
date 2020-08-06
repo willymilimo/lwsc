@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
 import { bindActionCreators } from "redux";
@@ -8,26 +8,35 @@ import { BookNumberI, BookNumber } from "../models/meter-reading";
 import { BookNumberReducerI } from "../redux/reducers/book-number";
 import { fetchAllBookNumbers } from "../models/axios";
 import { useNavigation } from "@react-navigation/native";
-import { List, Searchbar } from "react-native-paper";
+import { List, Searchbar, ActivityIndicator } from "react-native-paper";
 import Strings from "../constants/Strings";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Colors from "../constants/Colors";
 import { FlatList } from "react-native-gesture-handler";
+import { ServiceApplicationI } from "../models/service-application";
+import { ServiceReportI } from "../models/service-report";
 
 interface PropI {
+  route: { params: { application: ServiceApplicationI | ServiceReportI} };
   bookNumbers: BookNumberReducerI;
-  onSelectCallback(bookNumber: BookNumberI): void;
   setBookNumbers(bookNumbers: BookNumberReducerI): void;
 }
 
-const SelectAreaScreen = ({
-  bookNumbers,
-  onSelectCallback,
-  setBookNumbers,
-}: PropI) => {
+const SelectAreaScreen = ({ route, bookNumbers, setBookNumbers }: PropI) => {
   const navigator = useNavigation();
+  const { application } = route.params;
   const [loading, setLoading] = useState(false);
-  const [displayList, setDisplayList] = useState<BookNumberI[]>([]);
+  const [displayList, setDisplayList] = useState<BookNumberI[]>(
+    (() => {
+      const result: {[key: string]: BookNumberI} = {};
+
+      Object.values(bookNumbers).forEach((bns) => {
+        bns.forEach((bn) => result[bn.CODE] = new BookNumber(bn));
+      });
+
+      return Object.values(result);
+    })()
+  );
   const [filteredDisplayList, setFilteredDisplayList] = useState<BookNumberI[]>(
     []
   );
@@ -50,7 +59,12 @@ const SelectAreaScreen = ({
 
   const renderListItem = ({ item }: { item: BookNumberI }) => (
     <List.Item
-      onPress={() => {}}
+      onPress={() =>
+        navigator.navigate(Strings.RequestServiceScreen, {
+          bookNumber: item,
+          application,
+        })
+      }
       title={item.DESCRIBE}
       description={`${item.CODE} - ${item.NO_WALKS} walks`}
       left={(props) => (
@@ -71,6 +85,7 @@ const SelectAreaScreen = ({
   useEffect(() => {
     let is_subscribed = true;
 
+    console.log(Object.keys(bookNumbers).length);
     if (is_subscribed && Object.keys(bookNumbers).length === 0) {
       fetchBookNumbers();
     }
@@ -107,27 +122,46 @@ const SelectAreaScreen = ({
         } else {
         }
       })
-      .catch((e) => {})
+      .catch((e) => {
+        console.log(e);
+      })
       .finally(() => setLoading(false));
   };
 
   return (
-    <View>
-      <>
-        <Searchbar
-          placeholder={`Search Book Number`}
-          onChangeText={onChangeSearch}
-          value={searchQuery}
+    <View style={styles.container}>
+      {loading ? (
+        <ActivityIndicator
+          size="large"
+          color={Colors.LwscOrange}
+          style={{ alignSelf: "center", marginTop: 20 }}
         />
-        <FlatList
-          removeClippedSubviews={true}
-          maxToRenderPerBatch={20}
-          initialNumToRender={20}
-          data={filteredDisplayList.length ? filteredDisplayList : displayList}
-          keyExtractor={(item: BookNumberI) => `${item.BILLGROUP}_${item.CODE}`}
-          renderItem={renderListItem}
-        />
-      </>
+      ) : displayList.length ? (
+        <>
+          <Searchbar
+            placeholder={`Search Area`}
+            onChangeText={onChangeSearch}
+            value={searchQuery}
+          />
+          <FlatList
+            removeClippedSubviews={true}
+            maxToRenderPerBatch={20}
+            initialNumToRender={20}
+            data={
+              filteredDisplayList.length ? filteredDisplayList : displayList
+            }
+            keyExtractor={(item: BookNumberI) =>
+              `${item.BILLGROUP}_${item.CODE}`
+            }
+            renderItem={renderListItem}
+          />
+        </>
+      ) : (
+        <Text style={{ margin: 15 }}>
+          Unable to fetch areas. Please ensure you are connected to the internet
+          and try again.
+        </Text>
+      )}
     </View>
   );
 };

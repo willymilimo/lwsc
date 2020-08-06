@@ -65,6 +65,7 @@ import ConsumptionScreen from "../screens/ConsumptionScreen";
 import ConsumptionDetails from "../screens/ConsumptionDetails";
 import { submitPushToken } from "../models/axios";
 import SelectAreaScreen from "../screens/SelectAreaScreen";
+import RequestServiceScreen from "../screens/RequestServiceScreen";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -131,9 +132,10 @@ const StackNavigator = ({
     let pushTokenStr;
 
     try {
+      // await AsyncStorage.clear();
+
       theme = await AsyncStorage.getItem(Strings.THEME_STORAGE);
       accounts = await AsyncStorage.getItem(Strings.ACCOUNTS_STORAGE);
-      await AsyncStorage.removeItem(Strings.PAYPOINTS_STORAGE);
       paypoints = await AsyncStorage.getItem(Strings.PAYPOINTS_STORAGE);
       paymentHistory = await AsyncStorage.getItem(
         Strings.PAYMENT_HISTORY_STORAGE
@@ -406,6 +408,10 @@ const StackNavigator = ({
       <Stack.Screen
         name={Strings.SelectAreaScreen}
         component={SelectAreaScreen}
+      />
+      <Stack.Screen
+        name={Strings.RequestServiceScreen}
+        component={RequestServiceScreen}
       />
     </Stack.Navigator>
   );

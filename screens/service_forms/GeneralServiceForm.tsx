@@ -23,24 +23,15 @@ import {
 import { ControlIT } from "../../models/control";
 import Regex from "../../constants/Regex";
 import { ServiceApplicationI } from "../../models/service-application";
-import { applyForService, fetchAllBillGroups } from "../../models/axios";
 import Strings from "../../constants/Strings";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { ServiceItemI } from "../../models/service-item";
-import { connect } from "react-redux";
-import { setBillGroups } from "../../redux/actions/bill-groups";
-import { bindActionCreators } from "redux";
-import { RootReducerI } from "../../redux/reducers";
-import { BillGroupI } from "../../models/meter-reading";
-import { BillGroupReducerI } from "../../redux/reducers/bill-groups";
 const { width, height } = Dimensions.get("window");
 
 interface GeneralServiceFormI {
   navigation: any;
-  billGroups: BillGroupReducerI;
   route: { params: { title: string; service: ServiceItemI } };
-  setBillGroups(billGroups: BillGroupReducerI): void;
 }
 
 const ASPECT_RATIO = width / height;
@@ -49,12 +40,7 @@ const LONGITUDE = 28.382121;
 const LATITUDE_DELTA = 0.00922;
 const LONGITUDE_DELTA = 0.00921; //LATITUDE_DELTA * ASPECT_RATIO;
 
-const GeneralServiceForm = ({
-  navigation,
-  route,
-  billGroups,
-  setBillGroups,
-}: GeneralServiceFormI) => {
+export default function GeneralServiceForm({ navigation, route }: GeneralServiceFormI) {
   let mapRef: MapView;
   const navigator = useNavigation();
   const { title, service } = route.params;
@@ -90,62 +76,6 @@ const GeneralServiceForm = ({
     value: "",
     error: false,
   });
-  const [billGroup, setBillGroup] = React.useState<ControlIT<string>>({
-    value: "-- Select Area --",
-    error: false,
-  });
-  const [displayList, setDisplayList] = React.useState<BillGroupI[]>(
-    Object.values(billGroups)
-  );
-
-  React.useEffect(() => {
-    let is_subscribed = true;
-
-    if (is_subscribed && !Object.keys(billGroups).length) {
-      fetchBillGroups();
-    }
-
-    return () => {
-      is_subscribed = false;
-    };
-  }, [billGroups]);
-
-  const fetchBillGroups = async () => {
-    setLoading(true);
-    fetchAllBillGroups()
-      .then(({ status, data }) => {
-        const { success, payload } = data;
-
-        // console.log(status, data);
-
-        if (status === 200 && success) {
-          const pay: BillGroupReducerI = {};
-          payload.recordset.forEach((bg) => (pay[bg.GROUP_ID] = bg));
-          setBillGroups(pay);
-          setDisplayList(Object.values(pay));
-        } else {
-          Alert.alert(
-            "Load Failure",
-            "Failed to load bill groups. Please try again later.",
-            [
-              {
-                text: "Cancel",
-                onPress: () => navigator.navigate(Strings.HomeTabNavigator),
-              },
-              { text: "RETRY", onPress: fetchBillGroups },
-            ]
-          );
-        }
-      })
-      .catch((e) =>
-        Alert.alert(
-          Strings.SELF_REPORTING_PROBLEM.title,
-          Strings.SELF_REPORTING_PROBLEM.message,
-          [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
-        )
-      )
-      .finally(() => setLoading(false));
-  };
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -181,8 +111,7 @@ const GeneralServiceForm = ({
     getLocationAsync();
   }, []);
 
-  const handleSubmit = () => {
-    setLoading(true);
+  const handleProceedButton = () => {
     const name = fullName.value.split(" ");
     const first_name = name[0];
     let last_name = first_name;
@@ -203,36 +132,9 @@ const GeneralServiceForm = ({
       meter_number: account_meter.value,
       customer_account_id: account_meter.value,
       customer_id: account_meter.value,
-      bill_group: billGroup.value,
     };
 
-    applyForService(application)
-      .then(({ status, data }) => {
-        const { success, payload } = data;
-        if (status === 200 && success) {
-          console.log(payload);
-          Alert.alert(
-            "Application Submitted",
-            "Application submitted successfully. We will respond to you on your provided contact details.",
-            [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
-          );
-        } else {
-          Alert.alert(
-            Strings.SELF_REPORTING_PROBLEM.title,
-            Strings.SELF_REPORTING_PROBLEM.message,
-            [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
-          );
-        }
-      })
-      .catch((err) => {
-        // console.log(err);
-        Alert.alert(
-          Strings.SELF_REPORTING_PROBLEM.title,
-          Strings.SELF_REPORTING_PROBLEM.message,
-          [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
-        );
-      })
-      .finally(() => setLoading(false));
+    navigator.navigate(Strings.SelectAreaScreen, { application });
   };
 
   const onPressZoomOut = () => {
@@ -429,7 +331,7 @@ const GeneralServiceForm = ({
           <TextInput
             style={{ marginTop: 10 }}
             mode="outlined"
-            label="Account/Meter Number"
+            label="Account Number"
             placeholder="e.g. 1020893"
             value={account_meter.value}
             error={account_meter.error}
@@ -461,46 +363,13 @@ const GeneralServiceForm = ({
           }
         />
 
-        <View
-          style={{
-            borderWidth: 1,
-            borderBottomColor: Colors.borderColorDark,
-            borderStyle: "solid",
-            borderRadius: 5,
-            marginTop: 10,
-          }}
-        >
-          <Picker
-            selectedValue={billGroup.value}
-            onValueChange={(itemValue, index) => {
-              setBillGroup({
-                value: itemValue,
-                error: !displayList.some(
-                  (value) => value.GROUP_ID === itemValue
-                ),
-              });
-            }}
-          >
-            <Picker.Item label="-- Select Area --" value="-- Select Area --" />
-            {displayList.map((bg) => (
-              <Picker.Item
-                key={`${bg.DESCRIPTION}_${bg.GROUP_ID}`}
-                label={bg.DESCRIPTION}
-                value={bg.GROUP_ID}
-              />
-            ))}
-          </Picker>
-        </View>
-
         {(fullName.error ||
           fullName.value.length === 0 ||
           phone.error ||
           phone.value.length === 0 ||
           address.error ||
           address.value.length === 0 ||
-          invalidPostService ||
-          billGroup.error ||
-          billGroup.value === "-- Select Area --") && (
+          invalidPostService) && (
           <Subheading
             style={{
               color: "maroon",
@@ -520,8 +389,6 @@ const GeneralServiceForm = ({
               ? "Address is required"
               : invalidPostService
               ? "Account/Meter Number is required"
-              : billGroup.error || billGroup.value === "-- Select Area --"
-              ? "Please select a valid area"
               : ""}
           </Subheading>
         )}
@@ -543,37 +410,19 @@ const GeneralServiceForm = ({
             phone.value.length === 0 ||
             address.error ||
             address.value.length === 0 ||
-            invalidPostService ||
-            billGroup.error ||
-            billGroup.value === "-- Select Area --"
+            invalidPostService
           }
           loading={loading}
           //   icon="send"
           mode="outlined"
-          onPress={handleSubmit}
+          onPress={handleProceedButton}
         >
-          Request Service
+          Proceed
         </Button>
       </View>
     </ScrollView>
   );
-};
-
-const mapPropsToState = ({ billGroups }: RootReducerI) => ({ billGroups });
-
-const matchDispatchToProps = (dispatch: any) =>
-  bindActionCreators(
-    {
-      setBillGroups,
-    },
-    dispatch
-  );
-
-export default connect(
-  mapPropsToState,
-  matchDispatchToProps
-)(GeneralServiceForm);
-// export default GeneralServiceForm;
+}
 
 const styles = StyleSheet.create({
   container: {

@@ -12,7 +12,7 @@ export interface ServiceApplicationI {
   meter_number?: string;
   customer_id: String;
   customer_account_id: String;
-  bill_group: string;
+  bill_group?: string;
 }
 
 // export class ServiceApplication implements ServiceApplicationI {

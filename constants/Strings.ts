@@ -32,6 +32,7 @@ export default {
   ConsumptionScreen: "Consumption",
   ConsumptionDetails: "Consumption Details",
   SelectAreaScreen: "Select Area",
+  RequestServiceScreen: "Submission Details",
 
   /*************** Begin REDUCER TYPES *****************/
   WHITE_THEME: "WHITE_THEME",

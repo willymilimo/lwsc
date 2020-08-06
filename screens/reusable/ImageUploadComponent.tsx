@@ -47,14 +47,6 @@ export default function ImageUploadComponent({
         { text: "Deny", onPress: () => BackHandler.exitApp() },
       ]);
 
-      // [
-      //   {
-      //     text: "Grant Permission",
-      //     onPress: async (0) =>
-      //       await ImagePicker.requestCameraPermissionsAsync(), // Permissions.askAsync(Permissions.CAMERA)
-      //   },
-      //   { text: "Deny", onPress: () => BackHandler.exitApp() },
-      // ]
     }
   };
 

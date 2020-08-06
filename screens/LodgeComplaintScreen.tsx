@@ -8,7 +8,7 @@ import MapView, { Marker } from "react-native-maps";
 import { TouchableOpacity, ScrollView } from "react-native-gesture-handler";
 import { Feather } from "@expo/vector-icons";
 import Regex from "../constants/Regex";
-import { ServiceReportI } from "../models/service-report";
+import { ServiceReportI, ServiceReport } from "../models/service-report";
 const { width, height } = Dimensions.get("window");
 import { submitComplaint } from "../models/axios";
 import Strings from "../constants/Strings";
@@ -101,7 +101,7 @@ const LodgeComplaintScreen = () => {
 
   const handleSubmitComplaint = () => {
     const space = fullName.value.indexOf(" ");
-    const report: ServiceReportI = {
+    const report: ServiceReportI = new ServiceReport({
       first_name:
         space != -1 ? fullName.value.substring(0, space) : fullName.value,
       last_name:
@@ -115,38 +115,9 @@ const LodgeComplaintScreen = () => {
       meter_number: meterAccountNumber.value,
       description: message.value,
       files: [],
-    };
-    setLoading(true);
+    });
 
-    submitComplaint(report)
-      .then(({ status, data }) => {
-        // console.log(data);
-        const { success, payload } = data;
-        if (status === 200 && success) {
-          Alert.alert(
-            Strings.REPORT_SUCCESS.title,
-            Strings.REPORT_SUCCESS.message,
-            [
-              {
-                onPress: () => navigator.navigate(Strings.HomeTabNavigator),
-              },
-            ]
-          );
-        }
-      })
-      .catch((err) => {
-        // console.log(err)
-        Alert.alert(
-          Strings.SELF_REPORTING_PROBLEM.title,
-          Strings.SELF_REPORTING_PROBLEM.message,
-          // [
-          //   {
-          //     onPress: () => navigator.navigate(Strings.HomeTabNavigator),
-          //   },
-          // ]
-        );
-      })
-      .finally(() => setLoading(false));
+    navigator.navigate(Strings.SelectAreaScreen, { application: report });
   };
 
   return (
@@ -303,7 +274,7 @@ const LodgeComplaintScreen = () => {
             });
           }}
         />
-        <TextInput
+        {/* <TextInput
           style={{ marginTop: 10 }}
           disabled={loading}
           mode="outlined"
@@ -316,7 +287,7 @@ const LodgeComplaintScreen = () => {
               error: value.length < 5,
             })
           }
-        />
+        /> */}
         <TextInput
           style={{ marginTop: 10 }}
           disabled={loading}
@@ -369,7 +340,7 @@ const LodgeComplaintScreen = () => {
           mode="outlined"
           onPress={handleSubmitComplaint}
         >
-          Submit
+          CONTINUE
         </Button>
       </View>
     </ScrollView>

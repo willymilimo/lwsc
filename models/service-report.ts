@@ -2,31 +2,33 @@ import { UploadFileI } from "./upload-file";
 import { LocationI } from "./location";
 
 export interface ServiceReportI {
-  first_name: String;
-  last_name: String;
-  phone: String;
-  email?: String;
-  area: String;
-  address: String;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  email?: string;
+  area: string;
+  address: string;
   coordinates: LocationI;
-  meter_number?: String;
-  account_number?: String;
-  description?: String;
+  meter_number?: string;
+  account_number?: string;
+  description?: string;
   files: UploadFileI[];
+  bill_group?: string;
 }
 
 export class ServiceReport implements ServiceReportI {
-  first_name: String;
-  last_name: String;
-  phone: String;
-  email?: String;
-  area: String;
-  address: String;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  email?: string;
+  area: string;
+  address: string;
   coordinates: LocationI;
-  meter_number?: String;
-  account_number?: String;
-  description?: String;
+  meter_number?: string;
+  account_number?: string;
+  description?: string;
   files: UploadFileI[];
+  bill_group?: string;
 
   constructor({
     first_name,
@@ -40,6 +42,7 @@ export class ServiceReport implements ServiceReportI {
     account_number,
     description,
     files,
+    bill_group,
   }: ServiceReportI) {
     this.first_name = first_name;
     this.last_name = last_name;
@@ -52,5 +55,6 @@ export class ServiceReport implements ServiceReportI {
     this.account_number = account_number;
     this.description = description;
     this.files = files;
+    this.bill_group = bill_group;
   }
 }

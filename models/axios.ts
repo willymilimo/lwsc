@@ -48,7 +48,7 @@ const getPayUrl = (paymentType: PaymentType): string | null => {
 
 export default axios;
 
-const api_root = "http://41.72.107.14:3000/api/v1";
+export const api_root = "http://41.72.107.14:3000/api/v1";
 
 export const getCustomerByAccountNumber = async (
   account_number: string

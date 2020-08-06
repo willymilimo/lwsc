@@ -20,7 +20,7 @@ import { useNavigation } from "@react-navigation/native";
 import Regex from "../constants/Regex";
 import ImageUploadComponent from "./reusable/ImageUploadComponent";
 import { UploadFileI } from "../models/upload-file";
-import { ServiceReportI } from "../models/service-report";
+import { ServiceReportI, ServiceReport } from "../models/service-report";
 import { reportLeakage } from "../models/axios";
 import { Feather } from "@expo/vector-icons";
 
@@ -116,51 +116,22 @@ const ReportLeakageScreen = () => {
 
   const handleReportLeakageSubmit = () => {
     const space = fullName.value.indexOf(" ");
-    const report: ServiceReportI = {
+    const report: ServiceReportI = new ServiceReport({
       first_name:
         space != -1 ? fullName.value.substring(0, space) : fullName.value,
       last_name:
         space != -1 ? fullName.value.substring(space).trim() : fullName.value,
       phone: phone.value,
       coordinates: region,
-      area: area.value,
+      area: "",
       email: email.value,
       address: address.value,
       account_number: meterAccountNumber.value,
       meter_number: meterAccountNumber.value,
       description: description.value,
       files: uploadFiles as UploadFileI[],
-    };
-    setLoading(true);
-
-    reportLeakage(report)
-      .then(({ status, data }) => {
-        // console.log(data)
-        const { success, payload } = data;
-        if (status === 200 && success) {
-          Alert.alert(
-            Strings.REPORT_SUCCESS.title,
-            Strings.REPORT_SUCCESS.message,
-            [
-              {
-                onPress: () => navigator.navigate(Strings.HomeTabNavigator),
-              },
-            ]
-          );
-        }
-      })
-      .catch((err) =>
-        Alert.alert(
-          Strings.SELF_REPORTING_PROBLEM.title,
-          Strings.SELF_REPORTING_PROBLEM.message,
-          [
-            {
-              onPress: () => navigator.navigate(Strings.HomeTabNavigator),
-            },
-          ]
-        )
-      )
-      .finally(() => setLoading(false));
+    });
+    navigator.navigate(Strings.SelectAreaScreen, { application: report });
   };
 
   return (
@@ -294,20 +265,6 @@ const ReportLeakageScreen = () => {
           style={{ marginTop: 10 }}
           disabled={loading}
           mode="outlined"
-          label={"Area"}
-          value={area.value}
-          error={area.error}
-          onChangeText={(value) =>
-            setArea({
-              value,
-              error: value.length < 5,
-            })
-          }
-        />
-        <TextInput
-          style={{ marginTop: 10 }}
-          disabled={loading}
-          mode="outlined"
           label={"Email Address (optional)"}
           value={email.value}
           error={email.error}
@@ -350,7 +307,7 @@ const ReportLeakageScreen = () => {
           style={{ marginTop: 10 }}
           disabled={loading}
           mode="outlined"
-          label={"Description"}
+          label={"Description (optional)"}
           value={description.value}
           error={description.error}
           multiline={true}
@@ -382,16 +339,12 @@ const ReportLeakageScreen = () => {
             phone.error ||
             phone.value.length === 0 ||
             fullName.error ||
-            fullName.value.length === 0 ||
-            area.error ||
-            area.value.length === 0 ||
-            description.error ||
-            description.value.length === 0
+            fullName.value.length === 0
           }
           mode="outlined"
           onPress={handleReportLeakageSubmit}
         >
-          Submit Leakage
+          Continue
         </Button>
       </View>
     </ScrollView>
