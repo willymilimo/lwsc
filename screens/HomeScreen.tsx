@@ -202,7 +202,7 @@ const btns = [
   },
   {
     icon: <Octicons name="settings" color={Colors.LwscBlack} size={25} />,
-    label: "Services",
+    label: "Service Request",
     color: "#00000023",
     component: Strings.ServicesScreen,
   },

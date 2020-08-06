@@ -235,6 +235,7 @@ const ReadMeterScreen = ({
       connection_id: property.connection_id,
       staffNumber: manNumber,
       attachements: uploadFiles as UploadFileI[],
+      lineNumber: property.lineNumber
     };
 
     setLoading(true);
@@ -396,8 +397,8 @@ const ReadMeterScreen = ({
                 color={Colors.linkBlue}
               />
             }
-            title="Meter Number"
-            value={property.MeterNumber}
+            title="Account Number"
+            value={property.AccountNumber}
           />
           <MeterItem
             icon={
@@ -481,7 +482,7 @@ const ReadMeterScreen = ({
               setAccess({
                 value: itemValue,
                 error: !displayItems.no_access.some(
-                  (value) => value.code === itemValue
+                  (value) => value.DESCRIBE === itemValue
                 ),
               });
             }}
@@ -496,7 +497,7 @@ const ReadMeterScreen = ({
                 <Picker.Item
                   key={`${noac.DESCRIBE}_${noac.code}`}
                   label={noac.DESCRIBE}
-                  value={noac.code}
+                  value={noac.DESCRIBE}
                 />
               );
             })}

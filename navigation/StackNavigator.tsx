@@ -64,6 +64,7 @@ import PaymentStatementScreen from "../screens/PaymentStatementScreen";
 import ConsumptionScreen from "../screens/ConsumptionScreen";
 import ConsumptionDetails from "../screens/ConsumptionDetails";
 import { submitPushToken } from "../models/axios";
+import SelectAreaScreen from "../screens/SelectAreaScreen";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -401,6 +402,10 @@ const StackNavigator = ({
       <Stack.Screen
         name={Strings.ConsumptionDetails}
         component={ConsumptionDetails}
+      />
+      <Stack.Screen
+        name={Strings.SelectAreaScreen}
+        component={SelectAreaScreen}
       />
     </Stack.Navigator>
   );

@@ -30,15 +30,15 @@ export default function (
         break;
     }
   
-    if (
-      [
-        Actions.SET_MR_PROPERTY,
-        Actions.ADD_MR_PROPERTY,
-        Actions.DELETE_MR_PROPERTY,
-      ].includes(type)
-    ) {
-      AsyncStorage.setItem(Strings.MR_PROPERTY_STORAGE, JSON.stringify(state));
-    }
+    // if (
+    //   [
+    //     Actions.SET_MR_PROPERTY,
+    //     Actions.ADD_MR_PROPERTY,
+    //     Actions.DELETE_MR_PROPERTY,
+    //   ].includes(type)
+    // ) {
+    //   AsyncStorage.setItem(Strings.MR_PROPERTY_STORAGE, JSON.stringify(state));
+    // }
   
     return state;
   }

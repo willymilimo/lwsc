@@ -63,6 +63,48 @@ const PaymentStatementScreen = ({ route }: PropI) => {
         }}
       />
       <Caption style={{ fontSize: 12.5, color: "#444" }}>{naration}</Caption>
+      {amount && (
+        <>
+          <Divider
+            style={{
+              marginVertical: 5,
+              backgroundColor: confirm_trans_success
+                ? "#00bb27"
+                : Colors.errorColor,
+            }}
+          />
+          <Title>Amount</Title>
+          <View style={flexRow}>
+            <Subheading style={flexWrap}>{`ZMW ${toFixed(amount)}`}</Subheading>
+          </View>
+        </>
+      )}
+      {gen_token_response && gen_token_response.success && (
+        <>
+          <Divider
+            style={{
+              marginVertical: 5,
+              backgroundColor: confirm_trans_success
+                ? "#00bb27"
+                : Colors.errorColor,
+            }}
+          />
+          <Title>Token</Title>
+          <View style={flexRow}>
+            <Subheading style={{ ...flexWrap, fontWeight: "bold" }}>
+              {gen_token_response.payload.token}
+            </Subheading>
+          </View>
+        </>
+      )}
+      <Divider
+        style={{
+          marginVertical: 5,
+          backgroundColor: confirm_trans_success
+            ? "#00bb27"
+            : Colors.errorColor,
+        }}
+      />
       <Title>Billing Information</Title>
       <View style={flexRow}>
         <Subheading style={heading}>Name</Subheading>
@@ -129,24 +171,6 @@ const PaymentStatementScreen = ({ route }: PropI) => {
         <Subheading style={pheading}>Response</Subheading>
         <Subheading style={flexWrap}>{init_trans_response.message}</Subheading>
       </View>
-      {gen_token_response && gen_token_response.success && (
-        <>
-          <Divider
-            style={{
-              marginVertical: 5,
-              backgroundColor: confirm_trans_success
-                ? "#00bb27"
-                : Colors.errorColor,
-            }}
-          />
-          <Title>Token</Title>
-          <View style={flexRow}>
-            <Subheading style={flexWrap}>
-              {gen_token_response.payload.token}
-            </Subheading>
-          </View>
-        </>
-      )}
     </ScrollView>
   );
 };
@@ -159,6 +183,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flex: 1,
     padding: 15,
+    paddingBottom: 30,
   },
   heading: {
     fontWeight: "bold",

@@ -53,7 +53,11 @@ const ServicesScreen = ({
             // console.log(status, data)
 
             if (status === 200 && success) {
-              setServiceTypes(payload.map((item) => new ServiceItem(item)));
+              setServiceTypes(
+                payload
+                  .filter((item) => item.is_active)
+                  .map((item) => new ServiceItem(item))
+              );
             } else {
               Alert.alert(
                 "Services Error",

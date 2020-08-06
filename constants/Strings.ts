@@ -31,6 +31,7 @@ export default {
   PaymentStatementScreen: "Payment Statement",
   ConsumptionScreen: "Consumption",
   ConsumptionDetails: "Consumption Details",
+  SelectAreaScreen: "Select Area",
 
   /*************** Begin REDUCER TYPES *****************/
   WHITE_THEME: "WHITE_THEME",

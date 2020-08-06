@@ -20,6 +20,7 @@ export interface MeterReadingI {
   connection_id: string | number;
   attachements: UploadFileI[];
   staffNumber?: string;
+  lineNumber: string;
 }
 
 export interface MeterReading {
