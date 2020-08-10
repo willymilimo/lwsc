@@ -144,7 +144,7 @@ export default function GeneralServiceForm({
 
     navigator.navigate(Strings.SelectAreaScreen, {
       application,
-      onSelectCallback,
+      toRoute: Strings.RequestServiceScreen,
     });
   };
 
@@ -164,16 +164,6 @@ export default function GeneralServiceForm({
       longitudeDelta: region.longitudeDelta * 10,
     });
     mapRef.animateToRegion(region, 100);
-  };
-
-  const onSelectCallback = (
-    bookNumber: BookNumberI,
-    complaint: ServiceReportI
-  ) => {
-    navigator.navigate(Strings.RequestServiceScreen, {
-      bookNumber: bookNumber,
-      item: complaint,
-    });
   };
 
   const invalidPostService =

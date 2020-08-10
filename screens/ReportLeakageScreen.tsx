@@ -115,16 +115,6 @@ const ReportLeakageScreen = () => {
     map.animateToRegion(region, 100);
   };
 
-  const onSelectCallback = (
-    bookNumber: BookNumberI,
-    complaint: ServiceReportI
-  ) => {
-    navigator.navigate(Strings.RequestServiceScreen, {
-      bookNumber: bookNumber,
-      item: complaint,
-    });
-  };
-
   const handleReportLeakageSubmit = () => {
     const space = fullName.value.indexOf(" ");
     const report: ServiceReportI = new ServiceReport({
@@ -144,7 +134,7 @@ const ReportLeakageScreen = () => {
     });
     navigator.navigate(Strings.SelectAreaScreen, {
       application: report,
-      onSelectCallback,
+      toRoute: Strings.RequestServiceScreen,
     });
   };
 

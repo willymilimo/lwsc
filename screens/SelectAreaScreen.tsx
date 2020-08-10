@@ -20,22 +20,18 @@ interface PropI {
   route: {
     params: {
       application: ServiceApplicationI | ServiceReportI | PropertyI;
-      onSelectCallback(
-        bookNumber: BookNumberI,
-        item: ServiceApplicationI | ServiceReportI | PropertyI
-      ): void;
+      toRoute: string;
     };
   };
+  application: ServiceApplicationI | ServiceReportI | PropertyI;
+  toRoute: string;
   bookNumbers: BookNumberReducerI;
   setBookNumbers(bookNumbers: BookNumberReducerI): void;
 }
 
-const SelectAreaScreen = ({
-  route,
-  bookNumbers,
-  setBookNumbers,
-}: PropI) => {
-  const { application, onSelectCallback } = route.params;
+const SelectAreaScreen = ({ route, bookNumbers, setBookNumbers }: PropI) => {
+  const navigator = useNavigation();
+  const { application, toRoute } = route.params;
   const [loading, setLoading] = useState(false);
   const [displayList, setDisplayList] = useState<BookNumberI[]>(
     (() => {
@@ -71,11 +67,10 @@ const SelectAreaScreen = ({
   const renderListItem = ({ item }: { item: BookNumberI }) => (
     <List.Item
       onPress={() => {
-        // navigator.navigate(Strings.RequestServiceScreen, {
-        //   bookNumber: item,
-        //   application,
-        // })
-        onSelectCallback(item, application);
+        navigator.navigate(toRoute, {
+          bookNumber: item,
+          item: application,
+        });
       }}
       title={item.DESCRIBE}
       description={`${item.CODE} - ${item.NO_WALKS} walks`}

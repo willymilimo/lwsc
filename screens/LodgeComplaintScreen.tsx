@@ -10,7 +10,6 @@ import { Feather } from "@expo/vector-icons";
 import Regex from "../constants/Regex";
 import { ServiceReportI, ServiceReport } from "../models/service-report";
 const { width, height } = Dimensions.get("window");
-import { submitComplaint } from "../models/axios";
 import Strings from "../constants/Strings";
 import { useNavigation } from "@react-navigation/native";
 import { BookNumberI } from "../models/meter-reading";
@@ -100,16 +99,6 @@ const LodgeComplaintScreen = () => {
     map.animateToRegion(region, 100);
   };
 
-  const onSelectCallback = (
-    bookNumber: BookNumberI,
-    complaint: ServiceReportI
-  ) => {
-    navigator.navigate(Strings.RequestServiceScreen, {
-      bookNumber: bookNumber,
-      item: complaint,
-    });
-  };
-
   const handleSubmitComplaint = () => {
     const space = fullName.value.indexOf(" ");
     const report: ServiceReportI = new ServiceReport({
@@ -130,7 +119,7 @@ const LodgeComplaintScreen = () => {
 
     navigator.navigate(Strings.SelectAreaScreen, {
       application: report,
-      onSelectCallback,
+      toRoute: Strings.RequestServiceScreen,
     });
   };
 

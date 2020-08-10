@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, Image, View, Alert, Platform } from "react-native";
+import { StyleSheet, Image, View, Alert, Platform, Text } from "react-native";
 import {
   ServiceApplicationI,
   ServiceApplication,
@@ -150,6 +150,7 @@ const RequestServiceScreen = ({ user, services, route }: PropI) => {
     }
   };
   // console.log(`${api_root}${application.files[0].remote_location}`)
+  // console.log(item)
   return (
     <View style={container}>
       {item instanceof ServiceReport || item instanceof ServiceApplication ? (
