@@ -4,10 +4,12 @@ import * as Permissions from "expo-permissions";
 import React, { useState, useEffect, useRef } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Platform, AsyncStorage } from "react-native";
-import { RootReducerI } from "../redux/reducers";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
+import { IconButton } from "react-native-paper";
+import { Ionicons } from "@expo/vector-icons";
 import { setThemeReducer } from "../redux/actions/theme";
+import { RootReducerI } from "../redux/reducers";
 import {
   setNotifications,
   addNotification,
@@ -47,13 +49,11 @@ import PaymentScreen from "../screens/PaymentScreen";
 import WebviewScreen from "../screens/WebviewScreen";
 import Boswer from "../screens/service_forms/Boswer";
 import AccountOpeningDomestic from "../screens/service_forms/AccountOpeningDomestic";
-import MeterReadingScreen from "../screens/MeterReadingScreen";
 import ReportLeakageScreen from "../screens/ReportLeakageScreen";
 import LodgeComplaintScreen from "../screens/LodgeComplaintScreen";
 import GeneralServiceForm from "../screens/service_forms/GeneralServiceForm";
 import ReConnection from "../screens/service_forms/ReConnection";
 import ApplyForPaymentScheduleScreen from "../screens/ApplyForPaymentScheduleScreen";
-import ReadMeterScreen from "../screens/ReadMeterScreen";
 import LwscStaffAuthScreen from "../screens/LwscStaffAuthScreen";
 import BillGroupScreen from "../screens/BillGroupScreen";
 import BookNumbersScreen from "../screens/BookNumbersScreen";
@@ -67,7 +67,9 @@ import { submitPushToken } from "../models/axios";
 import SelectAreaScreen from "../screens/SelectAreaScreen";
 import RequestServiceScreen from "../screens/RequestServiceScreen";
 import { setUserReducer } from "../redux/actions/user";
-import user, { UserReducerI } from "../redux/reducers/user";
+import { UserReducerI } from "../redux/reducers/user";
+import MeterReadingNavigator from "./MeterReadingNavigator";
+import { navigate } from "./RootNavigation";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -101,8 +103,6 @@ interface SNI {
 const StackNavigator = ({
   setThemeReducer,
   themeReducer,
-  // pushToken,
-  notifications,
   setNotifications,
   addNotification,
   setAccounts,
@@ -314,7 +314,6 @@ const StackNavigator = ({
       Notifications.removeNotificationSubscription(responseListener);
     };
   }, []);
-  console.log(landScreen);
 
   return (
     <Stack.Navigator
@@ -327,9 +326,20 @@ const StackNavigator = ({
         headerTitleStyle: {
           fontWeight: "bold",
         },
-        // headerRight: () => (
-        //   <HeaderRightComponent notifications={notifications.length} />
-        // ),
+        headerRight: ({ tintColor }) => (
+          <IconButton
+            icon={() => (
+              <Ionicons
+                onPress={() => navigate(Strings.HomeTabNavigator)}
+                style={{ marginRight: 10 }}
+                size={25}
+                color={tintColor}
+                name={`${Platform.OS === "ios" ? "ios" : "md"}-home`}
+              />
+            )}
+            color={tintColor}
+          />
+        ),
       }}
     >
       <Stack.Screen
@@ -368,10 +378,6 @@ const StackNavigator = ({
         component={AccountOpeningDomestic}
       />
       <Stack.Screen
-        name={Strings.MeterReadingScreen}
-        component={MeterReadingScreen}
-      />
-      <Stack.Screen
         name={Strings.ReportLeakageScreen}
         component={ReportLeakageScreen}
       />
@@ -389,8 +395,9 @@ const StackNavigator = ({
         component={ApplyForPaymentScheduleScreen}
       />
       <Stack.Screen
-        name={Strings.ReadMeterScreen}
-        component={ReadMeterScreen}
+        options={{ title: "Meter Reading", headerShown: false }}
+        name={Strings.MeterReadingNavigator}
+        component={MeterReadingNavigator}
       />
       <Stack.Screen
         name={Strings.LwscStaffAuthScreen}

@@ -4,12 +4,11 @@ import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
 import { bindActionCreators } from "redux";
 import { setBookNumbers } from "../redux/actions/book-numbers";
-import { BookNumberI, BookNumber, PropertyI } from "../models/meter-reading";
+import { BookNumberI, BookNumber } from "../models/meter-reading";
 import { BookNumberReducerI } from "../redux/reducers/book-number";
 import { fetchAllBookNumbers } from "../models/axios";
 import { useNavigation } from "@react-navigation/native";
 import { List, Searchbar, ActivityIndicator } from "react-native-paper";
-import Strings from "../constants/Strings";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Colors from "../constants/Colors";
 import { FlatList } from "react-native-gesture-handler";
@@ -19,12 +18,10 @@ import { ServiceReportI } from "../models/service-report";
 interface PropI {
   route: {
     params: {
-      application: ServiceApplicationI | ServiceReportI | PropertyI;
+      application: ServiceApplicationI | ServiceReportI;
       toRoute: string;
     };
   };
-  application: ServiceApplicationI | ServiceReportI | PropertyI;
-  toRoute: string;
   bookNumbers: BookNumberReducerI;
   setBookNumbers(bookNumbers: BookNumberReducerI): void;
 }

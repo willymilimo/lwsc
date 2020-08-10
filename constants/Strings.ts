@@ -33,6 +33,8 @@ export default {
   ConsumptionDetails: "Consumption Details",
   SelectAreaScreen: "Select Area",
   RequestServiceScreen: "Submission Details",
+  SignInScreen: "Sign in",
+  MeterReadingNavigator: "MeterReadingNavigator",
 
   /*************** Begin REDUCER TYPES *****************/
   WHITE_THEME: "WHITE_THEME",
@@ -57,7 +59,7 @@ export default {
   MR_PROPERTY_STORAGE: "MR_PROPERTY_STORAGE",
   ACCESS_NOTES_STORAGE: "ACCESS_NOTES_STORAGE",
   ACTIVE_ACCOUNT_STORAGE: "ACTIVE_ACCOUNT_STORAGE",
-  PUSH_TOKEN_STORAGE: 'PUSH_TOKEN_STORACE',
+  PUSH_TOKEN_STORAGE: "PUSH_TOKEN_STORACE",
   /*************** End Storage Constants *****************/
 
   // API
