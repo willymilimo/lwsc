@@ -59,7 +59,7 @@ const LONGITUDE = 28.382121;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = 0.0421; //LATITUDE_DELTA * ASPECT_RATIO;
 
-const MeterItem = ({
+export const MeterItem = ({
   icon,
   title,
   value,
@@ -235,7 +235,7 @@ const ReadMeterScreen = ({
       connection_id: property.connection_id,
       staffNumber: manNumber,
       attachements: uploadFiles as UploadFileI[],
-      lineNumber: property.lineNumber
+      lineNumber: property.lineNumber,
     };
 
     setLoading(true);
@@ -397,19 +397,8 @@ const ReadMeterScreen = ({
                 color={Colors.linkBlue}
               />
             }
-            title="Account Number"
-            value={property.AccountNumber}
-          />
-          <MeterItem
-            icon={
-              <Ionicons
-                name="md-speedometer"
-                size={25}
-                color={Colors.linkBlue}
-              />
-            }
-            title="Meter Number"
-            value={property.MeterNumber}
+            title="Account-Meter Number"
+            value={`${property.AccountNumber}-${property.MeterNumber}`}
           />
           <MeterItem
             icon={
@@ -691,3 +680,4 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
 });
+

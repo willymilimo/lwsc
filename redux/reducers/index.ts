@@ -4,7 +4,7 @@ import notifications from "./notifications";
 import payPoints from "./pay-points";
 import paymentHistory from "./payment-history";
 import accounts, { AccountReducerI } from "./accounts";
-import user from "./user";
+import user, { UserReducerI } from "./user";
 import services from "./services";
 import billGroups from "./bill-groups";
 import bookNumbers from "./book-number";
@@ -31,7 +31,7 @@ export interface RootReducerI {
   payPoints: PaypointI[];
   paymentHistory: StatementI[];
   services: ServiceItemI[];
-  user: string;
+  user: UserReducerI;
   billGroups: BillGroupReducerI;
   bookNumbers: BookNumberReducerI;
   properties: MeterReadingPropertiesReducerI;

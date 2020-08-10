@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
 import { bindActionCreators } from "redux";
 import { setBookNumbers } from "../redux/actions/book-numbers";
-import { BookNumberI, BookNumber } from "../models/meter-reading";
+import { BookNumberI, BookNumber, PropertyI } from "../models/meter-reading";
 import { BookNumberReducerI } from "../redux/reducers/book-number";
 import { fetchAllBookNumbers } from "../models/axios";
 import { useNavigation } from "@react-navigation/native";
@@ -17,21 +17,32 @@ import { ServiceApplicationI } from "../models/service-application";
 import { ServiceReportI } from "../models/service-report";
 
 interface PropI {
-  route: { params: { application: ServiceApplicationI | ServiceReportI} };
+  route: {
+    params: {
+      application: ServiceApplicationI | ServiceReportI | PropertyI;
+      onSelectCallback(
+        bookNumber: BookNumberI,
+        item: ServiceApplicationI | ServiceReportI | PropertyI
+      ): void;
+    };
+  };
   bookNumbers: BookNumberReducerI;
   setBookNumbers(bookNumbers: BookNumberReducerI): void;
 }
 
-const SelectAreaScreen = ({ route, bookNumbers, setBookNumbers }: PropI) => {
-  const navigator = useNavigation();
-  const { application } = route.params;
+const SelectAreaScreen = ({
+  route,
+  bookNumbers,
+  setBookNumbers,
+}: PropI) => {
+  const { application, onSelectCallback } = route.params;
   const [loading, setLoading] = useState(false);
   const [displayList, setDisplayList] = useState<BookNumberI[]>(
     (() => {
-      const result: {[key: string]: BookNumberI} = {};
+      const result: { [key: string]: BookNumberI } = {};
 
       Object.values(bookNumbers).forEach((bns) => {
-        bns.forEach((bn) => result[bn.CODE] = new BookNumber(bn));
+        bns.forEach((bn) => (result[bn.CODE] = new BookNumber(bn)));
       });
 
       return Object.values(result);
@@ -59,12 +70,13 @@ const SelectAreaScreen = ({ route, bookNumbers, setBookNumbers }: PropI) => {
 
   const renderListItem = ({ item }: { item: BookNumberI }) => (
     <List.Item
-      onPress={() =>
-        navigator.navigate(Strings.RequestServiceScreen, {
-          bookNumber: item,
-          application,
-        })
-      }
+      onPress={() => {
+        // navigator.navigate(Strings.RequestServiceScreen, {
+        //   bookNumber: item,
+        //   application,
+        // })
+        onSelectCallback(item, application);
+      }}
       title={item.DESCRIBE}
       description={`${item.CODE} - ${item.NO_WALKS} walks`}
       left={(props) => (
@@ -85,7 +97,7 @@ const SelectAreaScreen = ({ route, bookNumbers, setBookNumbers }: PropI) => {
   useEffect(() => {
     let is_subscribed = true;
 
-    console.log(Object.keys(bookNumbers).length);
+    // console.log(Object.keys(bookNumbers).length);
     if (is_subscribed && Object.keys(bookNumbers).length === 0) {
       fetchBookNumbers();
     }

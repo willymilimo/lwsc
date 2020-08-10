@@ -22,11 +22,16 @@ import {
 } from "react-native-paper";
 import { ControlIT } from "../../models/control";
 import Regex from "../../constants/Regex";
-import { ServiceApplicationI } from "../../models/service-application";
+import {
+  ServiceApplicationI,
+  ServiceApplication,
+} from "../../models/service-application";
 import Strings from "../../constants/Strings";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { ServiceItemI } from "../../models/service-item";
+import { BookNumberI } from "../../models/meter-reading";
+import { ServiceReportI } from "../../models/service-report";
 const { width, height } = Dimensions.get("window");
 
 interface GeneralServiceFormI {
@@ -40,7 +45,10 @@ const LONGITUDE = 28.382121;
 const LATITUDE_DELTA = 0.00922;
 const LONGITUDE_DELTA = 0.00921; //LATITUDE_DELTA * ASPECT_RATIO;
 
-export default function GeneralServiceForm({ navigation, route }: GeneralServiceFormI) {
+export default function GeneralServiceForm({
+  navigation,
+  route,
+}: GeneralServiceFormI) {
   let mapRef: MapView;
   const navigator = useNavigation();
   const { title, service } = route.params;
@@ -119,7 +127,7 @@ export default function GeneralServiceForm({ navigation, route }: GeneralService
       name.reverse().pop();
       last_name = name.reverse().toString();
     }
-    const application: ServiceApplicationI = {
+    const application: ServiceApplicationI = new ServiceApplication({
       service_type: service._id,
       first_name,
       last_name,
@@ -132,9 +140,12 @@ export default function GeneralServiceForm({ navigation, route }: GeneralService
       meter_number: account_meter.value,
       customer_account_id: account_meter.value,
       customer_id: account_meter.value,
-    };
+    });
 
-    navigator.navigate(Strings.SelectAreaScreen, { application });
+    navigator.navigate(Strings.SelectAreaScreen, {
+      application,
+      onSelectCallback,
+    });
   };
 
   const onPressZoomOut = () => {
@@ -153,6 +164,16 @@ export default function GeneralServiceForm({ navigation, route }: GeneralService
       longitudeDelta: region.longitudeDelta * 10,
     });
     mapRef.animateToRegion(region, 100);
+  };
+
+  const onSelectCallback = (
+    bookNumber: BookNumberI,
+    complaint: ServiceReportI
+  ) => {
+    navigator.navigate(Strings.RequestServiceScreen, {
+      bookNumber: bookNumber,
+      item: complaint,
+    });
   };
 
   const invalidPostService =

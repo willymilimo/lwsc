@@ -66,6 +66,8 @@ import ConsumptionDetails from "../screens/ConsumptionDetails";
 import { submitPushToken } from "../models/axios";
 import SelectAreaScreen from "../screens/SelectAreaScreen";
 import RequestServiceScreen from "../screens/RequestServiceScreen";
+import { setUserReducer } from "../redux/actions/user";
+import user, { UserReducerI } from "../redux/reducers/user";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -93,6 +95,7 @@ interface SNI {
   setAccessNotes(accessNotes: AccessNotesReducerI): void;
   setActiveAccount(activeAccount: ActiveAccountReducerI): void;
   setPaymentHistory(history: StatementI[]): void;
+  setUserReducer(userReducer: UserReducerI): void;
 }
 
 const StackNavigator = ({
@@ -110,6 +113,7 @@ const StackNavigator = ({
   setAccessNotes,
   setActiveAccount,
   setPaymentHistory,
+  setUserReducer,
 }: SNI) => {
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState(false);
@@ -125,11 +129,12 @@ const StackNavigator = ({
     let paymentHistory;
     let billGroups;
     let bookNumbers;
-    let properties;
+    // let properties;
     let accessNotes;
     let activeAccount;
     let notifications;
     let pushTokenStr;
+    let userStr;
 
     try {
       // await AsyncStorage.clear();
@@ -146,7 +151,7 @@ const StackNavigator = ({
       // await AsyncStorage.removeItem(Strings.MR_PROPERTY_STORAGE)
       billGroups = await AsyncStorage.getItem(Strings.BILL_GROUP_STORAGE);
       bookNumbers = await AsyncStorage.getItem(Strings.BOOK_NUMBER_STORAGE);
-      properties = await AsyncStorage.getItem(Strings.MR_PROPERTY_STORAGE);
+      // properties = await AsyncStorage.getItem(Strings.MR_PROPERTY_STORAGE);
 
       // await AsyncStorage.removeItem(Strings.ACCESS_NOTES_STORAGE)
       accessNotes = await AsyncStorage.getItem(Strings.ACCESS_NOTES_STORAGE);
@@ -157,6 +162,9 @@ const StackNavigator = ({
 
       pushTokenStr = await AsyncStorage.getItem(Strings.PUSH_TOKEN_STORAGE);
       // console.log(pushTokenStr)
+
+      // await AsyncStorage.removeItem(Strings.USER_STORAGE);
+      userStr = await AsyncStorage.getItem(Strings.USER_STORAGE);
     } catch (e) {
       // Restoring token failed
     }
@@ -208,14 +216,14 @@ const StackNavigator = ({
       setBookNumbers(data);
     }
 
-    if (properties) {
-      const data: MeterReadingPropertiesReducerI = JSON.parse(properties);
-      Object.keys(data).forEach((key) => {
-        let bns = data[key];
-        data[key] = bns.map((item) => new Property(item));
-      });
-      setMRProperties(data);
-    }
+    // if (properties) {
+    //   const data: MeterReadingPropertiesReducerI = JSON.parse(properties);
+    //   Object.keys(data).forEach((key) => {
+    //     let bns = data[key];
+    //     data[key] = bns.map((item) => new Property(item));
+    //   });
+    //   setMRProperties(data);
+    // }
 
     if (accessNotes) {
       setAccessNotes(JSON.parse(accessNotes));
@@ -231,6 +239,21 @@ const StackNavigator = ({
           (item: NotificationI) => new Notification(item)
         )
       );
+    }
+
+    if (userStr) {
+      const userReducer: UserReducerI = JSON.parse(userStr);
+      const created = userReducer.createdAt + 60 * 60 * 24 * 1000;
+      const now = Date.now();
+      if (created > now) {
+        setUserReducer(userReducer);
+      } else {
+        setUserReducer({
+          manNumber: "",
+          authToken: "",
+          createdAt: 0,
+        });
+      }
     }
 
     // console.log(`pushTokenStr: ${pushTokenStr}`);
@@ -475,6 +498,7 @@ const mapDispatchToProps = (dispatch: any) =>
       setActiveAccount,
       setPushToken,
       setPaymentHistory,
+      setUserReducer,
     },
     dispatch
   );

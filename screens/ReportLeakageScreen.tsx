@@ -23,6 +23,7 @@ import { UploadFileI } from "../models/upload-file";
 import { ServiceReportI, ServiceReport } from "../models/service-report";
 import { reportLeakage } from "../models/axios";
 import { Feather } from "@expo/vector-icons";
+import { BookNumberI } from "../models/meter-reading";
 
 const ASPECT_RATIO = width / height;
 const LATITUDE = -15.37496;
@@ -114,6 +115,16 @@ const ReportLeakageScreen = () => {
     map.animateToRegion(region, 100);
   };
 
+  const onSelectCallback = (
+    bookNumber: BookNumberI,
+    complaint: ServiceReportI
+  ) => {
+    navigator.navigate(Strings.RequestServiceScreen, {
+      bookNumber: bookNumber,
+      item: complaint,
+    });
+  };
+
   const handleReportLeakageSubmit = () => {
     const space = fullName.value.indexOf(" ");
     const report: ServiceReportI = new ServiceReport({
@@ -131,7 +142,10 @@ const ReportLeakageScreen = () => {
       description: description.value,
       files: uploadFiles as UploadFileI[],
     });
-    navigator.navigate(Strings.SelectAreaScreen, { application: report });
+    navigator.navigate(Strings.SelectAreaScreen, {
+      application: report,
+      onSelectCallback,
+    });
   };
 
   return (
