@@ -11,7 +11,6 @@ import {
   PropertyI,
   BillGroupI,
 } from "../models/meter-reading";
-import { asyncForEach } from "../helpers/functions";
 import { fetchAllCustomerDetailsByBillGroup } from "../models/axios";
 import { ActivityIndicator, Searchbar, List } from "react-native-paper";
 import Colors from "../constants/Colors";
@@ -25,7 +24,6 @@ interface PropI {
   setMRProperties(properties: MeterReadingPropertiesReducerI): void;
   route: {
     params: {
-      manNumber: string;
       bookNumber: BookNumberI;
       billGroup: BillGroupI;
     };
@@ -34,7 +32,7 @@ interface PropI {
 
 const PropertiesScreen = ({ properties, setMRProperties, route }: PropI) => {
   const navigator = useNavigation();
-  const { manNumber, bookNumber, billGroup } = route.params;
+  const { bookNumber, billGroup } = route.params;
   const props = properties[bookNumber.CODE];
   const [loading, setLoading] = useState(false);
   const [displayList, setDisplayList] = useState<PropertyI[]>(
@@ -135,7 +133,6 @@ const PropertiesScreen = ({ properties, setMRProperties, route }: PropI) => {
         onPress={() => {
           console.log(item);
           navigator.navigate(Strings.ReadMeterScreen, {
-            manNumber,
             billGroup,
             property: item,
           });

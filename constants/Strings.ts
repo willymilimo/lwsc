@@ -189,6 +189,11 @@ export default {
       "Failed to submit meter reading. Please ensure all input is valid.",
   },
 
+  INVALID_CREDENTIALS: {
+    title: "Login Failed",
+    message: "Invalid username/man number combination",
+  },
+
   IMG_UPLOAD_FAILURE: {
     title: "Upload Failed",
     message:

@@ -6,6 +6,8 @@ import store from "./redux/store";
 import StackNavigator from "./navigation/StackNavigator";
 import * as Sentry from "sentry-expo";
 import { navigationRef } from "./navigation/RootNavigation";
+import { StatusBar } from "react-native";
+import Colors from "./constants/Colors";
 
 Sentry.init({
   dsn:
@@ -19,10 +21,10 @@ export default function App() {
     <Provider store={store}>
       <PaperProvider>
         <NavigationContainer ref={navigationRef}>
-          {/* <StatusBar
+          <StatusBar
             backgroundColor={`${Colors.LwscBlue}cc`}
             barStyle="light-content"
-          /> */}
+          />
           <StackNavigator />
         </NavigationContainer>
       </PaperProvider>

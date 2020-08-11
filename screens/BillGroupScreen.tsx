@@ -17,12 +17,9 @@ import Strings from "../constants/Strings";
 interface PropsI {
   billGroups: BillGroupReducerI;
   setBillGroups(billGroups: BillGroupReducerI): void;
-  route: {
-    params: { manNumber: string };
-  };
 }
 
-const BillGroupScreen = ({ billGroups, setBillGroups, route }: PropsI) => {
+const BillGroupScreen = ({ billGroups, setBillGroups }: PropsI) => {
   const navigator = useNavigation();
   const [loading, setLoading] = useState(false);
   const [displayList, setDisplayList] = useState<BillGroupI[]>(
@@ -45,7 +42,6 @@ const BillGroupScreen = ({ billGroups, setBillGroups, route }: PropsI) => {
     <List.Item
       onPress={() =>
         navigator.navigate(Strings.BookNumbersScreen, {
-          manNumber: route.params.manNumber,
           billGroup: item,
         })
       }

@@ -266,3 +266,13 @@ export const fetchComsumption = async (
     `billing/consumption/records/fetch?account_number=${accountNumber}&lower_limit_date=${startDate}&upper_limit_date=${endDate}`
   );
 };
+
+export const login = async (
+  username: string,
+  manNumber: string
+): Promise<AxiosResponse<IResponse<string>>> => {
+  return await axios.post("billing/meter-reading/authenticate-reader", {
+    username,
+    man_number: manNumber,
+  });
+};

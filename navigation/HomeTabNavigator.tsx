@@ -1,26 +1,29 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, AntDesign } from "@expo/vector-icons";
 import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
 import { ThemeType } from "../types/theme";
 import HomeScreen from "../screens/HomeScreen";
 import NotificationsScreen from "../screens/NotificationsScreen";
 import ManageAccountsScreen from "../screens/ManageAccountsScreen";
+import { UserReducerI } from "../redux/reducers/user";
+import LogoutScreen from "../screens/LogoutScreen";
 
 interface HTNI {
   route: any;
   theme: ThemeType;
+  user: UserReducerI;
 }
 
 type HTNT = HTNI;
 
 const Tab = createBottomTabNavigator();
 
-const HomeTabNavigator = ({ route, theme }: HTNT) => {
+const HomeTabNavigator = ({ route, theme, user }: HTNT) => {
   const [activeTheme, setActiveTheme] = React.useState(theme);
   const initialRouteName = (route.params && route.params.screen) || "Home";
-  // console.log(route.params)
+  // console.log(navigation)
 
   React.useEffect(() => {
     let is_subscribed = true;
@@ -47,8 +50,8 @@ const HomeTabNavigator = ({ route, theme }: HTNT) => {
             iconName = `${focused ? "ios" : "md"}-notifications`;
           } else if (route.name === "Accounts") {
             iconName = `${focused ? "ios" : "md"}-speedometer`;
-          } else if (route.name === "History") {
-            iconName = `${focused ? "ios" : "md"}-time`;
+          } else if (route.name === "Logout") {
+            return <AntDesign name="logout" size={size} color={color} />;
           }
 
           // You can return any component that you like here!
@@ -69,7 +72,9 @@ const HomeTabNavigator = ({ route, theme }: HTNT) => {
       />
       <Tab.Screen name="Notifications" component={NotificationsScreen} />
       <Tab.Screen name="Accounts" component={ManageAccountsScreen} />
-      {/* <Tab.Screen name="History" component={PaymentHistoryScreen} /> */}
+      {!!(user.authToken && user.createdAt) && (
+        <Tab.Screen name="Logout" component={LogoutScreen} />
+      )}
     </Tab.Navigator>
   );
 };
@@ -78,6 +83,9 @@ HomeTabNavigator.navigationOptions = {
   header: null,
 };
 
-const mapStateToProps = ({ theme }: RootReducerI) => ({ theme: theme.theme });
+const mapStateToProps = ({ theme, user }: RootReducerI) => ({
+  theme: theme.theme,
+  user,
+});
 
 export default connect(mapStateToProps)(HomeTabNavigator);

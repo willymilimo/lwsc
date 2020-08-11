@@ -27,3 +27,13 @@ export const deleteAuthToken = (): ActionI<null> => ({
   type: Actions.DELETE_USER_TOKEN,
   payload: null,
 });
+
+export const setUsername = (payload: string): ActionI<string> => ({
+  type: Actions.SET_USERNAME,
+  payload,
+});
+
+export const unsetUsername = (): ActionI<null> => ({
+  type: Actions.UNSET_USERNAME,
+  payload: null,
+});

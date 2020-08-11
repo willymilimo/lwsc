@@ -4,12 +4,14 @@ import { AsyncStorage } from "react-native";
 
 export interface UserReducerI {
   manNumber: string;
+  username: string;
   authToken: string;
   createdAt: number;
 }
 
 const initState: UserReducerI = {
   manNumber: "",
+  username: "",
   authToken: "",
   createdAt: 0,
 };
@@ -24,6 +26,7 @@ export default function (
     case Actions.SET_USER_REDUCER:
       state = payload as UserReducerI;
       break;
+
     case Actions.SET_MAN_NUMBER:
       state = {
         ...state,
@@ -35,6 +38,20 @@ export default function (
       state = {
         ...state,
         manNumber: "",
+      };
+      break;
+      
+    case Actions.SET_USERNAME:
+      state = {
+        ...state,
+        username: payload as string,
+      };
+      break;
+
+    case Actions.UNSET_USERNAME:
+      state = {
+        ...state,
+        username: "",
       };
       break;
 
@@ -55,6 +72,8 @@ export default function (
 
   if (
     [
+      Actions.SET_USERNAME,
+      Actions.UNSET_USERNAME,
       Actions.SET_MAN_NUMBER,
       Actions.UNSET_MAN_NUMBER,
       Actions.SET_USER_TOKEN,
