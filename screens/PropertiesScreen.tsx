@@ -26,13 +26,21 @@ interface PropI {
     params: {
       bookNumber: BookNumberI;
       billGroup: BillGroupI;
+      cycle_id: string;
     };
   };
+  // navigation: any;
 }
 
-const PropertiesScreen = ({ properties, setMRProperties, route }: PropI) => {
+const PropertiesScreen = ({
+  properties,
+  setMRProperties,
+  route,
+  // navigation,
+}: PropI) => {
   const navigator = useNavigation();
-  const { bookNumber, billGroup } = route.params;
+  // navigator.
+  const { bookNumber, billGroup, cycle_id } = route.params;
   const props = properties[bookNumber.CODE];
   const [loading, setLoading] = useState(false);
   const [displayList, setDisplayList] = useState<PropertyI[]>(
@@ -42,6 +50,8 @@ const PropertiesScreen = ({ properties, setMRProperties, route }: PropI) => {
     []
   );
   const [searchQuery, setSearchQuery] = React.useState("");
+
+  // console.log(navigation)
 
   const onChangeSearch = (query: string) => {
     setSearchQuery(query);
@@ -135,6 +145,7 @@ const PropertiesScreen = ({ properties, setMRProperties, route }: PropI) => {
           navigator.navigate(Strings.ReadMeterScreen, {
             billGroup,
             property: item,
+            cycle_id,
           });
         }}
         title={item.MeterNumber}

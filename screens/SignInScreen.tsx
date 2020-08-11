@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Image, ImageBackground, Alert } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Modal,
+  ImageBackground,
+  Alert,
+  Text,
+} from "react-native";
 import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
 import { UserReducerI } from "../redux/reducers/user";
@@ -7,7 +14,13 @@ import { ScrollView } from "react-native-gesture-handler";
 import { LinearGradient } from "expo-linear-gradient";
 import Layouts from "../constants/Layouts";
 import { logo } from "../constants/Images";
-import { Subheading, Title, TextInput, Button } from "react-native-paper";
+import {
+  Subheading,
+  Title,
+  TextInput,
+  Button,
+  ActivityIndicator,
+} from "react-native-paper";
 import Colors from "../constants/Colors";
 import { login } from "../models/axios";
 import Strings from "../constants/Strings";
@@ -59,7 +72,7 @@ const SignInScreen = ({ user, setUserReducer }: PropI) => {
             authToken: data.payload,
             createdAt: new Date().valueOf(),
           });
-          navigator.navigate(Strings.BillGroupScreen);
+          // navigator.navigate(Strings.BillGroupScreen);
         } else {
           const { title, message } = Strings.INVALID_CREDENTIALS;
           Alert.alert(title, message);
@@ -76,6 +89,13 @@ const SignInScreen = ({ user, setUserReducer }: PropI) => {
 
   return (
     <ScrollView style={container}>
+      <Modal animationType="slide" transparent visible={loading}>
+        <View style={[styles.centeredView, { backgroundColor: "#00000077" }]}>
+          <View style={styles.modalView}>
+            <ActivityIndicator size="large" color={Colors.LwscOrange} />
+          </View>
+        </View>
+      </Modal>
       <LinearGradient
         start={[0, 0]}
         end={[1, 0]}
@@ -117,7 +137,7 @@ const SignInScreen = ({ user, setUserReducer }: PropI) => {
                 backgroundColor: "#fff",
               }}
               label="Username"
-              placeholder="e.g. 40007"
+              placeholder="e.g. zuluf"
             />
             <TextInput
               disabled={loading}
@@ -133,7 +153,7 @@ const SignInScreen = ({ user, setUserReducer }: PropI) => {
               underlineColor="#000"
               style={{ backgroundColor: "#fff" }}
               label="Man Number"
-              placeholder="e.g. zuluf"
+              placeholder="e.g. 40007"
             />
             <Button
               mode="contained"
@@ -150,7 +170,12 @@ const SignInScreen = ({ user, setUserReducer }: PropI) => {
                 disabled={loading}
                 color={Colors.linkBlue}
                 labelStyle={{ textTransform: "capitalize" }}
-                onPress={() => navigator.navigate(Strings.SelectAreaScreen)}
+                onPress={() => {
+                  // navigator.navigate(Strings.SelectAreaScreen, {
+                  //   toRoute: Strings.PropertiesScreen,
+                  // })
+                  Alert.alert("Coming soon", "Coming soon");
+                }}
               >
                 Tap Here
               </Button>
@@ -222,5 +247,26 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-end",
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });

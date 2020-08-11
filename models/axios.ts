@@ -276,3 +276,11 @@ export const login = async (
     man_number: manNumber,
   });
 };
+
+export const validateBillWindow = async (
+  billGroup: string
+): Promise<AxiosResponse<IResponse<{ CYCLE_ID: number }>>> => {
+  return await axios.get(
+    `billing/window-status/fetch?source=edams&bill_group=${billGroup}`
+  );
+};

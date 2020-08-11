@@ -178,6 +178,11 @@ export default {
     message: "Your report has been submitted successfully.",
   },
 
+  BILLING_CYCLE: {
+    title: "Cycle Inactive",
+    message: "Billing cycle inactive",
+  },
+
   METER_READING_SUBMIT_SUCCESS: {
     title: "Meter Reading Submitted",
     message: "Meter reading has been submitted successfully.",

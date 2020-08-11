@@ -16,7 +16,7 @@ const LogoutScreen = ({ navigation, setUserReducer }: PropI) => {
   useEffect(() => {
     const unsubscribe = navigation.addListener("tabPress", (e: any) => {
       // Prevent default behavior
-    //   console.log(e);
+      console.log(e);
       e.preventDefault();
 
       setUserReducer({

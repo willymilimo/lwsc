@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { RootReducerI } from "../redux/reducers";
 import { BillGroupReducerI } from "../redux/reducers/bill-groups";
-import { fetchAllBillGroups } from "../models/axios";
+import { fetchAllBillGroups, validateBillWindow } from "../models/axios";
 import { BillGroupI } from "../models/meter-reading";
 import { ActivityIndicator, List } from "react-native-paper";
 import Colors from "../constants/Colors";
@@ -36,15 +36,37 @@ const BillGroupScreen = ({ billGroups, setBillGroups }: PropsI) => {
     return () => {
       is_subscribed = false;
     };
-  }, []);
+  }, [billGroups]);
+
+  const validate = async (billGroup: string) => {
+    try {
+      setLoading(true);
+      const { status, data } = await validateBillWindow(billGroup);
+      // console.log(data);
+      if (status === 200 && data.success) {
+        return data.payload.CYCLE_ID;
+      }
+      return true;
+    } catch (err) {
+      setLoading(false);
+      return false;
+    }
+  };
 
   const renderListItem = ({ item }: { item: BillGroupI }) => (
     <List.Item
-      onPress={() =>
-        navigator.navigate(Strings.BookNumbersScreen, {
-          billGroup: item,
-        })
-      }
+      onPress={async () => {
+        const cycle_id = await validate(item.GROUP_ID);
+        if (cycle_id) {
+          navigator.navigate(Strings.BookNumbersScreen, {
+            billGroup: item,
+            cycle_id,
+          });
+        } else {
+          const { title, message } = Strings.BILLING_CYCLE;
+          Alert.alert(title, message);
+        }
+      }}
       title={item.GROUP_ID}
       description={item.DESCRIPTION}
       left={(props) => (
@@ -63,6 +85,7 @@ const BillGroupScreen = ({ billGroups, setBillGroups }: PropsI) => {
   );
 
   const fetchBillGroups = async () => {
+    console.log("windows......");
     setLoading(true);
     fetchAllBillGroups()
       .then(({ status, data }) => {
@@ -102,24 +125,22 @@ const BillGroupScreen = ({ billGroups, setBillGroups }: PropsI) => {
   return (
     <View style={styles.container}>
       {loading ? (
-        <View style={[styles.centeredView, { backgroundColor: "#00000077" }]}>
-          <View style={styles.modalView}>
-            <ActivityIndicator size="large" color={Colors.LwscOrange} />
-            <Text
-              style={{
-                marginTop: 20,
-                textAlign: "center",
-              }}
-            >
-              Loading bill groups
-            </Text>
-            <Text
-              style={{
-                marginTop: 20,
-                textAlign: "center",
-              }}
-            >{`Please wait...`}</Text>
-          </View>
+        <View style={styles.modalView}>
+          <ActivityIndicator size="large" color={Colors.LwscOrange} />
+          <Text
+            style={{
+              marginTop: 20,
+              textAlign: "center",
+            }}
+          >
+            Loading bill groups
+          </Text>
+          <Text
+            style={{
+              marginTop: 20,
+              textAlign: "center",
+            }}
+          >{`Please wait...`}</Text>
         </View>
       ) : (
         <FlatList

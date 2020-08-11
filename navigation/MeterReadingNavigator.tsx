@@ -1,16 +1,18 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
 import { UserReducerI } from "../redux/reducers/user";
 import { createStackNavigator } from "@react-navigation/stack";
-import SelectAreaScreen from "../screens/SelectAreaScreen";
-import Strings from "../constants/Strings";
-import SignInScreen from "../screens/SignInScreen";
-import Colors from "../constants/Colors";
-import { Ionicons } from "@expo/vector-icons";
-import { Platform } from "react-native";
-import { IconButton } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
+import SelectAreaScreen from "../screens/SelectAreaScreen";
+import SignInScreen from "../screens/SignInScreen";
+import BillGroupScreen from "../screens/BillGroupScreen";
+import BookNumbersScreen from "../screens/BookNumbersScreen";
+import PropertiesScreen from "../screens/PropertiesScreen";
+import Colors from "../constants/Colors";
+import Strings from "../constants/Strings";
+import ReadMeterScreen from "../screens/ReadMeterScreen";
+import HeaderRightComponent from "./HeaderRightComponent";
 
 const Stack = createStackNavigator();
 
@@ -19,6 +21,22 @@ interface PropI {
 }
 const MeterReadingNavigator = ({ user }: PropI) => {
   const navigator = useNavigation();
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    user.authToken && user.createdAt && user.manNumber
+  );
+
+  useEffect(() => {
+    let is_subscribed = true;
+
+    if (is_subscribed) {
+      setIsLoggedIn(user.authToken && user.createdAt && user.manNumber);
+    }
+
+    return () => {
+      is_subscribed = false;
+    };
+  }, [user]);
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -29,25 +47,10 @@ const MeterReadingNavigator = ({ user }: PropI) => {
         headerTitleStyle: {
           fontWeight: "bold",
         },
-        headerRight: ({ tintColor }) => (
-          <IconButton
-            icon={() => (
-              <Ionicons
-                onPress={() => navigator.navigate(Strings.HomeTabNavigator)}
-                style={{ marginRight: 10 }}
-                size={25}
-                color={tintColor}
-                name={`${Platform.OS === "ios" ? "ios" : "md"}-home`}
-              />
-            )}
-            color={tintColor}
-          />
-        ),
+        headerRight: ({tintColor}: any) => <HeaderRightComponent tintColor={tintColor} />,
       }}
     >
-      {user.authToken === "" ||
-      user.createdAt === 0 ||
-      user.manNumber === "" ? (
+      {!isLoggedIn ? (
         // No token found, user isn't signed in
         <>
           <Stack.Screen
@@ -57,12 +60,7 @@ const MeterReadingNavigator = ({ user }: PropI) => {
               title: "Sign in",
               // When logging out, a pop animation feels intuitive
               // You can remove this if you want the default 'push' animation
-              animationTypeForReplace:
-                user.authToken === "" ||
-                user.createdAt === 0 ||
-                user.manNumber === ""
-                  ? "pop"
-                  : "push",
+              animationTypeForReplace: !isLoggedIn ? "pop" : "push",
             }}
           />
           <Stack.Screen
@@ -70,14 +68,36 @@ const MeterReadingNavigator = ({ user }: PropI) => {
             component={SelectAreaScreen}
             initialParams={{ toRoute: Strings.SelectAreaScreen }}
           />
+          <Stack.Screen
+            name={Strings.PropertiesScreen}
+            component={PropertiesScreen}
+          />
         </>
       ) : (
         // User is signed in
-        <Stack.Screen
-          name={Strings.SelectAreaScreen}
-          component={SelectAreaScreen}
-          initialParams={{ toRoute: Strings.SelectAreaScreen }}
-        />
+        <>
+          <Stack.Screen
+            name={Strings.BillGroupScreen}
+            component={BillGroupScreen}
+          />
+          <Stack.Screen
+            name={Strings.BookNumbersScreen}
+            component={BookNumbersScreen}
+          />
+          <Stack.Screen
+            name={Strings.PropertiesScreen}
+            component={PropertiesScreen}
+          />
+          <Stack.Screen
+            name={Strings.SelectAreaScreen}
+            component={SelectAreaScreen}
+            initialParams={{ toRoute: Strings.SelectAreaScreen }}
+          />
+          <Stack.Screen
+            name={Strings.ReadMeterScreen}
+            component={ReadMeterScreen}
+          />
+        </>
       )}
     </Stack.Navigator>
   );

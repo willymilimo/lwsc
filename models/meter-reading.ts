@@ -9,6 +9,11 @@ interface MeterImage {
 }
 
 export interface MeterReadingI {
+  lineNumber?: string;
+  line_number?: string;
+  token: string;
+  cycle_id: string;
+  meter_id: string;
   bill_group: string;
   current_reading: number;
   current_reading_date: string;
@@ -17,10 +22,8 @@ export interface MeterReadingI {
   y_gps: number;
   access_code: string;
   description_code: string;
-  connection_id: string | number;
+  connection_id: string;
   attachements: UploadFileI[];
-  staffNumber?: string;
-  lineNumber: string;
 }
 
 export interface MeterReading {

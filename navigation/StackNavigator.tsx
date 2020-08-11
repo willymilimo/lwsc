@@ -54,10 +54,6 @@ import LodgeComplaintScreen from "../screens/LodgeComplaintScreen";
 import GeneralServiceForm from "../screens/service_forms/GeneralServiceForm";
 import ReConnection from "../screens/service_forms/ReConnection";
 import ApplyForPaymentScheduleScreen from "../screens/ApplyForPaymentScheduleScreen";
-import LwscStaffAuthScreen from "../screens/LwscStaffAuthScreen";
-import BillGroupScreen from "../screens/BillGroupScreen";
-import BookNumbersScreen from "../screens/BookNumbersScreen";
-import PropertiesScreen from "../screens/PropertiesScreen";
 import PaymentHistoryScreen from "../screens/PaymentHistoryScreen";
 import PaymentHistoryListScreen from "../screens/PaymentHistoryListScreen";
 import PaymentStatementScreen from "../screens/PaymentStatementScreen";
@@ -398,22 +394,6 @@ const StackNavigator = ({
         options={{ title: "Meter Reading", headerShown: false }}
         name={Strings.MeterReadingNavigator}
         component={MeterReadingNavigator}
-      />
-      <Stack.Screen
-        name={Strings.LwscStaffAuthScreen}
-        component={LwscStaffAuthScreen}
-      />
-      <Stack.Screen
-        name={Strings.BillGroupScreen}
-        component={BillGroupScreen}
-      />
-      <Stack.Screen
-        name={Strings.BookNumbersScreen}
-        component={BookNumbersScreen}
-      />
-      <Stack.Screen
-        name={Strings.PropertiesScreen}
-        component={PropertiesScreen}
       />
       <Stack.Screen
         name={Strings.PaymentHistoryScreen}

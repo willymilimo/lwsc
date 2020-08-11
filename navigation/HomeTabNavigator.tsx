@@ -72,9 +72,9 @@ const HomeTabNavigator = ({ route, theme, user }: HTNT) => {
       />
       <Tab.Screen name="Notifications" component={NotificationsScreen} />
       <Tab.Screen name="Accounts" component={ManageAccountsScreen} />
-      {!!(user.authToken && user.createdAt) && (
+      {/* {!!(user.authToken && user.createdAt) && (
         <Tab.Screen name="Logout" component={LogoutScreen} />
-      )}
+      )} */}
     </Tab.Navigator>
   );
 };

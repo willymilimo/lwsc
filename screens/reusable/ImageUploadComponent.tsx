@@ -82,7 +82,7 @@ export default function ImageUploadComponent({
   const captureImage = async () => {
     setLoading(true);
     let result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
       base64: true,
     });
 
@@ -90,6 +90,7 @@ export default function ImageUploadComponent({
       // console.log(result.base64);
       // setImage("data:image/jpeg;base64," + result.base64);
       // setImage(result.base64);
+      // console.log(result.uri)
       setImage(result);
 
       uploadFiles([result.uri])

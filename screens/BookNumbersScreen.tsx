@@ -18,13 +18,13 @@ interface PropI {
   bookNumbers: BookNumberReducerI;
   setBookNumbers(bookNumbers: BookNumberReducerI): void;
   route: {
-    params: { billGroup: BillGroupI };
+    params: { billGroup: BillGroupI, cycle_id: string };
   };
 }
 
 const BookNumbersScreen = ({ bookNumbers, setBookNumbers, route }: PropI) => {
   const navigator = useNavigation();
-  const { billGroup } = route.params;
+  const { billGroup, cycle_id } = route.params;
   const props = bookNumbers[billGroup.GROUP_ID];
   const [loading, setLoading] = useState(false);
   const [displayList, setDisplayList] = useState<BookNumberI[]>(
@@ -68,6 +68,7 @@ const BookNumbersScreen = ({ bookNumbers, setBookNumbers, route }: PropI) => {
         navigator.navigate(Strings.PropertiesScreen, {
           bookNumber: item,
           billGroup: billGroup,
+          cycle_id
         })
       }
       title={item.DESCRIBE}

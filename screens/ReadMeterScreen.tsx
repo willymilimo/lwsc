@@ -52,6 +52,7 @@ import {
   createMeterReading,
 } from "../models/axios";
 import { formatDate, formatDateTime } from "../helpers/functions";
+import { UserReducerI } from "../redux/reducers/user";
 
 const ASPECT_RATIO = width / height;
 const LATITUDE = -15.37496;
@@ -80,12 +81,18 @@ export const MeterItem = ({
 };
 
 interface PropI {
+  user: UserReducerI;
   accessNotes: AccessNotesReducerI;
   setAccessNotes(accessNotes: AccessNotesReducerI): void;
   setANAccess(access: NoAccessI[]): void;
   setANNotes(notes: NotesI[]): void;
   route: {
-    params: { manNumber: string; property: PropertyI; billGroup: BillGroupI };
+    params: {
+      manNumber: string;
+      property: PropertyI;
+      billGroup: BillGroupI;
+      cycle_id: string;
+    };
   };
 }
 
@@ -94,10 +101,11 @@ const ReadMeterScreen = ({
   setANAccess,
   setANNotes,
   route,
+  user,
 }: PropI) => {
   let map: MapView;
   const { container, mapContainer, mapStyle } = styles;
-  const { manNumber, billGroup, property } = route.params;
+  const { manNumber, billGroup, property, cycle_id } = route.params;
   const navigator = useNavigation();
   const [displayItems, setDisplayItems] = useState(accessNotes);
   const [region, setRegion] = React.useState({
@@ -233,10 +241,16 @@ const ReadMeterScreen = ({
       access_code: access.value,
       description_code: note.value,
       connection_id: property.connection_id,
-      staffNumber: manNumber,
+      meter_id: property.AccountNumber,
+      // staffNumber: manNumber,
       attachements: uploadFiles as UploadFileI[],
       lineNumber: property.lineNumber,
+      line_number: property.lineNumber,
+      cycle_id,
+      token: user.authToken,
     };
+
+    console.log(reading);
 
     setLoading(true);
     createMeterReading(reading)
@@ -248,17 +262,18 @@ const ReadMeterScreen = ({
             [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
           );
         } else {
-          Alert.alert(
-            Strings.METER_READING_SUBMIT_FAILURE.title,
-            Strings.METER_READING_SUBMIT_FAILURE.message
-          );
+          throw new Error(JSON.stringify(data));
+          // Alert.alert(
+          //   Strings.METER_READING_SUBMIT_FAILURE.title,
+          //   Strings.METER_READING_SUBMIT_FAILURE.message
+          // );
         }
       })
       .catch(() =>
         Alert.alert(
           Strings.SELF_REPORTING_PROBLEM.title,
-          Strings.SELF_REPORTING_PROBLEM.message,
-          [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
+          Strings.SELF_REPORTING_PROBLEM.message
+          // [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
         )
       )
       .finally(() => setLoading(false));
@@ -508,7 +523,7 @@ const ReadMeterScreen = ({
               setNote({
                 value: itemValue,
                 error: !displayItems.notes.some(
-                  (value) => value.CODE === itemValue
+                  (value) => value.DESCRIBE === itemValue
                 ),
               });
             }}
@@ -518,7 +533,7 @@ const ReadMeterScreen = ({
               <Picker.Item
                 key={`${an.DESCRIBE}_${an.CODE}`}
                 label={an.DESCRIBE}
-                value={an.CODE}
+                value={an.DESCRIBE}
               />
             ))}
           </Picker>
@@ -680,4 +695,3 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
 });
-
