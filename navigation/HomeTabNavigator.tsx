@@ -8,7 +8,6 @@ import HomeScreen from "../screens/HomeScreen";
 import NotificationsScreen from "../screens/NotificationsScreen";
 import ManageAccountsScreen from "../screens/ManageAccountsScreen";
 import { UserReducerI } from "../redux/reducers/user";
-import LogoutScreen from "../screens/LogoutScreen";
 
 interface HTNI {
   route: any;
@@ -72,9 +71,6 @@ const HomeTabNavigator = ({ route, theme, user }: HTNT) => {
       />
       <Tab.Screen name="Notifications" component={NotificationsScreen} />
       <Tab.Screen name="Accounts" component={ManageAccountsScreen} />
-      {/* {!!(user.authToken && user.createdAt) && (
-        <Tab.Screen name="Logout" component={LogoutScreen} />
-      )} */}
     </Tab.Navigator>
   );
 };

@@ -38,6 +38,7 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-38.0.2.tar.gz",
     "react-native-calendars": "^1.301.0",
     "react-native-gesture-handler": "~1.6.0",
+    "react-native-image-converter": "^0.4.2",
     "react-native-maps": "0.27.1",
     "react-native-maps-directions": "^1.8.0",
     "react-native-masked-text": "^1.13.0",

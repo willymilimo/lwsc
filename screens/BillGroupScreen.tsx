@@ -42,11 +42,11 @@ const BillGroupScreen = ({ billGroups, setBillGroups }: PropsI) => {
     try {
       setLoading(true);
       const { status, data } = await validateBillWindow(billGroup);
-      // console.log(data);
+      console.log(data);
       if (status === 200 && data.success) {
         return data.payload.CYCLE_ID;
       }
-      return true;
+      return false;
     } catch (err) {
       setLoading(false);
       return false;
@@ -64,7 +64,9 @@ const BillGroupScreen = ({ billGroups, setBillGroups }: PropsI) => {
           });
         } else {
           const { title, message } = Strings.BILLING_CYCLE;
-          Alert.alert(title, message);
+          Alert.alert(title, message, [
+            { onPress: () => navigator.navigate(Strings.HomeTabNavigator) },
+          ]);
         }
       }}
       title={item.GROUP_ID}

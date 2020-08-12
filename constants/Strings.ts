@@ -179,8 +179,8 @@ export default {
   },
 
   BILLING_CYCLE: {
-    title: "Cycle Inactive",
-    message: "Billing cycle inactive",
+    title: "Cycle Closed",
+    message: "Billing cycle closed",
   },
 
   METER_READING_SUBMIT_SUCCESS: {

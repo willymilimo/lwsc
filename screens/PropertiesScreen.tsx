@@ -148,7 +148,7 @@ const PropertiesScreen = ({
             cycle_id,
           });
         }}
-        title={item.MeterNumber}
+        title={`${item.MeterNumber} - ${item.lineNumber}`}
         description={`${item.PLOT_NO} ${item.Customer_Address} ${item.Township}`.trim()}
         left={(props) => (
           <List.Icon

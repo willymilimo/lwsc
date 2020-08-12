@@ -28,12 +28,14 @@ interface PropI {
   notifications: NotificationI[];
   addNotification(notification: NotificationI): void;
   setNotificationRead(id: string): void;
+  navigation: any;
 }
 
 const NotificationsScreen = ({
   notifications,
   addNotification,
   setNotificationRead,
+  navigation,
 }: PropI) => {
   const { container } = styles;
   const navigator = useNavigation();
@@ -52,6 +54,15 @@ const NotificationsScreen = ({
       is_subscribed = false;
     };
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("tabPress", (e: any) => {
+      // Prevent default behavior
+      getchNotifications();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   const renderListItem = ({ item }: { item: NotificationI }) => {
     const { _id, is_read, title, description, create_on } = item;

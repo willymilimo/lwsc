@@ -280,6 +280,7 @@ export const login = async (
 export const validateBillWindow = async (
   billGroup: string
 ): Promise<AxiosResponse<IResponse<{ CYCLE_ID: number }>>> => {
+  console.log(`billing/window-status/fetch?source=edams&bill_group=${billGroup}`)
   return await axios.get(
     `billing/window-status/fetch?source=edams&bill_group=${billGroup}`
   );

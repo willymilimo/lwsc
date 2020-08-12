@@ -57,8 +57,8 @@ import { UserReducerI } from "../redux/reducers/user";
 const ASPECT_RATIO = width / height;
 const LATITUDE = -15.37496;
 const LONGITUDE = 28.382121;
-const LATITUDE_DELTA = 0.0922;
-const LONGITUDE_DELTA = 0.0421; //LATITUDE_DELTA * ASPECT_RATIO;
+const LATITUDE_DELTA = 0.00922; //0.0922;
+const LONGITUDE_DELTA = 0.00421; // 0.0421; //LATITUDE_DELTA * ASPECT_RATIO;
 
 export const MeterItem = ({
   icon,
@@ -211,6 +211,7 @@ const ReadMeterScreen = ({
   };
 
   const onPressZoomOut = () => {
+    console.log(region.latitudeDelta / 10, region.longitudeDelta / 10)
     setRegion({
       ...region,
       latitudeDelta: region.latitudeDelta / 10,
@@ -300,14 +301,14 @@ const ReadMeterScreen = ({
           style={mapStyle}
         >
           <Marker
-            draggable
-            onDragEnd={(e) =>
-              setRegion({
-                ...region,
-                latitude: e.nativeEvent.coordinate.latitude,
-                longitude: e.nativeEvent.coordinate.longitude,
-              })
-            }
+            // draggable
+            // onDragEnd={(e) =>
+            //   setRegion({
+            //     ...region,
+            //     latitude: e.nativeEvent.coordinate.latitude,
+            //     longitude: e.nativeEvent.coordinate.longitude,
+            //   })
+            // }
             coordinate={{
               longitude: region.longitude,
               latitude: region.latitude,
@@ -357,7 +358,7 @@ const ReadMeterScreen = ({
             />
           )}
         />
-        <View style={styles.buttonContainer}>
+        {/* <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[
               styles.bubble,
@@ -366,7 +367,7 @@ const ReadMeterScreen = ({
           >
             <Text style={styles.bubbleText}>Drag marker to your location</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             onPress={async () => await getLocationAsync()}
@@ -486,7 +487,7 @@ const ReadMeterScreen = ({
               setAccess({
                 value: itemValue,
                 error: !displayItems.no_access.some(
-                  (value) => value.DESCRIBE === itemValue
+                  (value) => value.code === itemValue
                 ),
               });
             }}
@@ -501,7 +502,7 @@ const ReadMeterScreen = ({
                 <Picker.Item
                   key={`${noac.DESCRIBE}_${noac.code}`}
                   label={noac.DESCRIBE}
-                  value={noac.DESCRIBE}
+                  value={noac.code}
                 />
               );
             })}
@@ -523,7 +524,7 @@ const ReadMeterScreen = ({
               setNote({
                 value: itemValue,
                 error: !displayItems.notes.some(
-                  (value) => value.DESCRIBE === itemValue
+                  (value) => value.CODE === itemValue
                 ),
               });
             }}
@@ -533,7 +534,7 @@ const ReadMeterScreen = ({
               <Picker.Item
                 key={`${an.DESCRIBE}_${an.CODE}`}
                 label={an.DESCRIBE}
-                value={an.DESCRIBE}
+                value={an.CODE}
               />
             ))}
           </Picker>

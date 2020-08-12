@@ -11,6 +11,7 @@ import { FAB, Button } from "react-native-paper";
 import Colors from "../../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 import Strings from "../../constants/Strings";
 import { useNavigation } from "@react-navigation/native";
@@ -30,9 +31,47 @@ export default function ImageUploadComponent({
 }: IUC) {
   const navigator = useNavigation();
   const [loading, setLoading] = useState(false);
-  const [image, setImage] = useState<
-    (ImagePicker.ImagePickerResult & ImageInfo) | null
-  >(null);
+  const [image, setImage] = useState<ImageManipulator.ImageResult | null>(null);
+
+  const convertImage = async (
+    image: {
+      cancelled: false;
+    } & ImageInfo
+  ) => {
+    try {
+      const manipResult = await ImageManipulator.manipulateAsync(
+        image.uri,
+        [],
+        { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
+      );
+
+      // manipResult.uri
+      // console.log(manipResult.uri);
+      // const uri = manipResult.uri.replace(/.jpg$/i, ".jpg");
+      // console.log(uri);
+      const { status, data } = await uploadFiles([uri]);
+
+      console.log(data, status)
+      if (status === 200 && data.success && data.payload.length) {
+        uploadCallback(data.payload);
+        setImage(manipResult);
+      } else {
+        throw new Error(JSON.stringify(data));
+      }
+    } catch (err) {
+      console.log(err);
+      Alert.alert(
+        Strings.SELF_REPORTING_PROBLEM.title,
+        Strings.SELF_REPORTING_PROBLEM.message
+        // [
+        //   {
+        //     text: "Ok",
+        //     onPress: () => navigator.navigate(Strings.HomeTabNavigator),
+        //   },
+        // ]
+      );
+    }
+  };
 
   const requestCameraPermissionAsync = async () => {
     var { status } = await ImagePicker.requestCameraPermissionsAsync(); // Permissions.askAsync(Permissions.CAMERA);
@@ -46,7 +85,6 @@ export default function ImageUploadComponent({
         },
         { text: "Deny", onPress: () => BackHandler.exitApp() },
       ]);
-
     }
   };
 
@@ -82,52 +120,21 @@ export default function ImageUploadComponent({
   const captureImage = async () => {
     setLoading(true);
     let result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       base64: true,
     });
 
-    if (!result.cancelled && result.base64) {
+    if (!result.cancelled && result.base64 && result.uri) {
       // console.log(result.base64);
       // setImage("data:image/jpeg;base64," + result.base64);
       // setImage(result.base64);
       // console.log(result.uri)
-      setImage(result);
+      // setImage(result);
 
-      uploadFiles([result.uri])
-        .then(({ status, data }) => {
-          const { success, payload } = data;
-          if (status === 200 && success && payload.length) {
-            uploadCallback(payload);
-          } else {
-            Alert.alert(
-              Strings.IMG_UPLOAD_FAILURE.title,
-              Strings.IMG_UPLOAD_FAILURE.message,
-              [
-                {
-                  text: "Ok",
-                  onPress: () => navigator.navigate(Strings.HomeTabNavigator),
-                },
-              ]
-            );
-          }
-        })
-        .catch((err) => {
-          Alert.alert(
-            Strings.SELF_REPORTING_PROBLEM.title,
-            Strings.SELF_REPORTING_PROBLEM.message,
-            [
-              {
-                text: "Ok",
-                onPress: () => navigator.navigate(Strings.HomeTabNavigator),
-              },
-            ]
-          );
-        })
-        .finally(() => setLoading(false));
+      await convertImage(result);
       //   uploadCallback(result.base64);
-    } else {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -175,6 +182,7 @@ export default function ImageUploadComponent({
       ) : (
         <Button
           loading={loading}
+          disabled={loading}
           contentStyle={{
             borderColor: Colors.linkBlue,
             borderWidth: 0.75,
