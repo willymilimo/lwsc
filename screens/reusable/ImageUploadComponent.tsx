@@ -49,7 +49,7 @@ export default function ImageUploadComponent({
       // console.log(manipResult.uri);
       // const uri = manipResult.uri.replace(/.jpg$/i, ".jpg");
       // console.log(uri);
-      const { status, data } = await uploadFiles([uri]);
+      const { status, data } = await uploadFiles([manipResult.uri]);
 
       console.log(data, status)
       if (status === 200 && data.success && data.payload.length) {

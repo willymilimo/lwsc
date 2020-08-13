@@ -72,6 +72,7 @@ export default function (
 
   if (
     [
+      Actions.SET_USER_REDUCER,
       Actions.SET_USERNAME,
       Actions.UNSET_USERNAME,
       Actions.SET_MAN_NUMBER,

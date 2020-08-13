@@ -95,6 +95,7 @@ export interface PropertyI {
   CurrentReading: number;
   MessagesNote: string;
   MessagesAccess: string;
+  OP_STATUS: string;
   Meter_Status: string;
   key: string;
   previousReadingDate: Date;
@@ -110,6 +111,7 @@ export class Property implements PropertyI {
   Township: string;
   BOOK_NO: string;
   WALK_NO: number;
+  OP_STATUS: string;
   AccountNumber: string;
   lineNumber: string;
   _Customer_Address: string;
@@ -133,6 +135,7 @@ export class Property implements PropertyI {
     lineNumber,
     Customer_Address,
     _Customer_Address,
+    OP_STATUS,
     PLOT_NO,
     _PLOT_NO,
     MeterNumber,
@@ -149,6 +152,7 @@ export class Property implements PropertyI {
     this.Township = Township;
     this.BOOK_NO = BOOK_NO;
     this.WALK_NO = WALK_NO;
+    this.OP_STATUS = OP_STATUS;
     this.AccountNumber = AccountNumber;
     this.lineNumber = lineNumber;
     this._Customer_Address = _Customer_Address || Customer_Address;

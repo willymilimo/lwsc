@@ -36,8 +36,8 @@ const PropertiesScreen = ({
   properties,
   setMRProperties,
   route,
-  // navigation,
-}: PropI) => {
+}: // navigation,
+PropI) => {
   const navigator = useNavigation();
   // navigator.
   const { bookNumber, billGroup, cycle_id } = route.params;
@@ -138,6 +138,7 @@ const PropertiesScreen = ({
   const renderListItem = ({ item }: { item: PropertyI }) => {
     //   const desc =c
     // console.log(item);
+
     return (
       <List.Item
         onPress={() => {
@@ -148,8 +149,10 @@ const PropertiesScreen = ({
             cycle_id,
           });
         }}
-        title={`${item.MeterNumber} - ${item.lineNumber}`}
+        titleNumberOfLines={2}
+        title={`${item.AccountNumber} - ${item.MeterNumber} - ${item.lineNumber}`}
         description={`${item.PLOT_NO} ${item.Customer_Address} ${item.Township}`.trim()}
+        descriptionStyle={{fontSize: 12}}
         left={(props) => (
           <List.Icon
             {...props}

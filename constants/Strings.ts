@@ -180,7 +180,7 @@ export default {
 
   BILLING_CYCLE: {
     title: "Cycle Closed",
-    message: "Billing cycle closed",
+    message: "Not yet downloaded",
   },
 
   METER_READING_SUBMIT_SUCCESS: {

@@ -211,7 +211,7 @@ const ReadMeterScreen = ({
   };
 
   const onPressZoomOut = () => {
-    console.log(region.latitudeDelta / 10, region.longitudeDelta / 10)
+    console.log(region.latitudeDelta / 10, region.longitudeDelta / 10);
     setRegion({
       ...region,
       latitudeDelta: region.latitudeDelta / 10,
@@ -414,19 +414,26 @@ const ReadMeterScreen = ({
               />
             }
             title="Account-Meter Number"
-            value={`${property.AccountNumber}-${property.MeterNumber}`}
+            value={`${property.AccountNumber} - ${property.MeterNumber}`}
           />
           <MeterItem
-            icon={
-              <Ionicons
-                name={`${Platform.OS === "ios" ? "ios" : "md"}-home`}
-                size={25}
-                color={Colors.linkBlue}
-              />
-            }
+            icon={<Entypo name="address" color={Colors.linkBlue} size={25} />}
             title="Address"
-            value={`${property.PLOT_NO} ${property.Customer_Address}`}
+            value={`${property.Customer_Address}`}
           />
+          {property.PLOT_NO && (
+            <MeterItem
+              icon={
+                <Ionicons
+                  name={`${Platform.OS === "ios" ? "ios" : "md"}-home`}
+                  size={25}
+                  color={Colors.linkBlue}
+                />
+              }
+              title="Plot Number"
+              value={property.PLOT_NO}
+            />
+          )}
           <MeterItem
             icon={<Entypo name="location" size={20} color={Colors.linkBlue} />}
             title="Township"
@@ -453,6 +460,17 @@ const ReadMeterScreen = ({
             }
             title="Previous Reading"
             value={property.PreviousReading}
+          />
+          <MeterItem
+            icon={
+              <MaterialCommunityIcons
+                name="dots-horizontal-circle-outline"
+                size={19}
+                color={Colors.linkBlue}
+              />
+            }
+            title="Operational Status"
+            value={property.OP_STATUS}
           />
         </View>
 
