@@ -15,7 +15,6 @@ import {
   ActivityIndicator,
 } from "react-native-paper";
 import { ScrollView, TouchableHighlight } from "react-native-gesture-handler";
-import { PaymentType } from "../types/payment";
 import { NavType } from "../types/nav-type";
 import { AccountI, Account } from "../models/account";
 import Strings from "../constants/Strings";
@@ -46,6 +45,10 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
       .then(({ status, data }) => {
         if (status === 200 && data.success) {
           setPaymentChannels(data.payload);
+          if (data.payload.length) {
+            setChecked(data.payload[0].id);
+            console.log(PaymentChannel);
+          }
         } else {
           throw new Error("unexpected response from server");
         }
@@ -104,91 +107,77 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
               value={checked}
               onValueChange={(value) => setChecked(value as PaymentChannel)}
             >
-              {paymentChannels.map(
-                (
-                  {
-                    active,
-                    _id,
-                    title,
-                    id,
-                    trans_code,
-                    trans_scode,
-                    remarks,
-                    stamp_user,
-                  },
-                  index
-                ) => {
-                  return (
-                    <TouchableHighlight
-                      underlayColor={Colors.lightBorderColor}
-                      onPress={() => setChecked(id)}
+              {paymentChannels.map((channel, index) => {
+                const { _id, title, id } = channel;
+                return (
+                  <TouchableHighlight
+                    underlayColor={Colors.lightBorderColor}
+                    onPress={() => setChecked(id)}
+                    style={{
+                      marginHorizontal: 10,
+                      backgroundColor:
+                        id === checked
+                          ? Colors.LwscSelectedBlue
+                          : "transparent",
+                    }}
+                    key={_id}
+                  >
+                    <View
                       style={{
-                        marginHorizontal: 10,
-                        backgroundColor:
-                          id === checked
-                            ? Colors.LwscSelectedBlue
-                            : "transparent",
+                        borderWidth: 0.5,
+                        borderTopWidth: index !== 0 ? 0 : 0.5,
+                        borderColor: Colors.lightGray,
+                        paddingHorizontal: 10,
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
                       }}
-                      key={_id}
                     >
                       <View
                         style={{
-                          borderWidth: 0.5,
-                          borderTopWidth: index !== 0 ? 0 : 0.5,
-                          borderColor: Colors.lightGray,
-                          paddingHorizontal: 10,
                           display: "flex",
                           flexDirection: "row",
                           alignItems: "center",
-                          justifyContent: "space-between",
                         }}
                       >
-                        <View
+                        <IconButton
+                          style={{ borderRadius: 25 }}
+                          size={40}
+                          icon={({ size, color }) => (
+                            <Image
+                              style={{ height: size, width: size }}
+                              height={size}
+                              width={size}
+                              source={getImage(id)}
+                            />
+                          )}
+                        />
+                        <Text
                           style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            alignItems: "center",
+                            fontWeight: "900",
+                            fontSize: 18,
+                            color:
+                              id === checked
+                                ? Colors.whiteColor
+                                : Colors.LwscBlackLighter,
                           }}
                         >
-                          <IconButton
-                            style={{ borderRadius: 25 }}
-                            size={40}
-                            icon={({ size, color }) => (
-                              <Image
-                                style={{ height: size, width: size }}
-                                height={size}
-                                width={size}
-                                source={getImage(id)}
-                              />
-                            )}
-                          />
-                          <Text
-                            style={{
-                              fontWeight: "900",
-                              fontSize: 18,
-                              color:
-                                id === checked
-                                  ? Colors.whiteColor
-                                  : Colors.LwscBlackLighter,
-                            }}
-                          >
-                            {title}
-                          </Text>
-                        </View>
-                        <RadioButton
-                          color="white"
-                          uncheckedColor="#3366cc"
-                          value={id}
-                        />
+                          {title}
+                        </Text>
                       </View>
-                    </TouchableHighlight>
-                  );
-                }
-              )}
-              
+                      <RadioButton
+                        color="white"
+                        uncheckedColor="#3366cc"
+                        value={id}
+                      />
+                    </View>
+                  </TouchableHighlight>
+                );
+              })}
             </RadioButton.Group>
             <Button
-              disabled={!(checked in PaymentType)}
+              disabled={!(checked in PaymentChannel)}
               style={{
                 marginHorizontal: 10,
                 marginVertical: 20,
@@ -227,40 +216,24 @@ const getImage = (id: string) => {
   }
 };
 
-const paymentMethods = {
-  [PaymentChannel["Airtel Money"]]: {
-    name: PaymentChannel["airtel"],
-    image: airtel_money,
-  },
-  [PaymentChannel.Zampay]: {
-    name: PaymentChannel.zamtel,
-    image: zampay,
-  },
-  [PaymentChannel["MTN Money"]]: {
-    name: PaymentChannel.mtn,
-    image: mtn_money,
-  },
-  [PaymentChannel["VISA/MasterCard"]]: {
-    name: PaymentChannel.visa_master_card,
-    image: debit_card,
-  },
-  // [PaymentType.AIRTEL_MONEY]: {
-  //   name: PaymentType.AIRTEL_MONEY,
-  //   image: airtel_money,
-  // },
-  // [PaymentType.MTN_MONEY]: {
-  //   name: PaymentType.MTN_MONEY,
-  //   image: mtn_money,
-  // },
-  // [PaymentType.ZAMTEL_KWACHA]: {
-  //   name: PaymentType.ZAMTEL_KWACHA,
-  //   image: zampay,
-  // },
-  // [PaymentType.VISA]: {
-  //   name: PaymentType.VISA,
-  //   image: debit_card,
-  // },
-};
+// const paymentMethods = {
+//   [PaymentChannel["Airtel Money"]]: {
+//     name: PaymentChannel["airtel"],
+//     image: airtel_money,
+//   },
+//   [PaymentChannel.Zampay]: {
+//     name: PaymentChannel.zamtel,
+//     image: zampay,
+//   },
+//   [PaymentChannel["MTN Money"]]: {
+//     name: PaymentChannel.mtn,
+//     image: mtn_money,
+//   },
+//   [PaymentChannel["VISA/MasterCard"]]: {
+//     name: PaymentChannel.visa_master_card,
+//     image: debit_card,
+//   },
+// };
 
 const styles = StyleSheet.create({
   container: {
