@@ -30,7 +30,7 @@ const PaymentStatementScreen = ({ route }: PropI) => {
     fullName,
     gen_token_response,
   } = new Statement(JSON.parse(statement));
-  //   console.log(gen_token_response);
+  // console.log(gen_token_response);
   return (
     <ScrollView
       style={[
@@ -63,22 +63,6 @@ const PaymentStatementScreen = ({ route }: PropI) => {
         }}
       />
       <Caption style={{ fontSize: 12.5, color: "#444" }}>{naration}</Caption>
-      {amount && (
-        <>
-          <Divider
-            style={{
-              marginVertical: 5,
-              backgroundColor: confirm_trans_success
-                ? "#00bb27"
-                : Colors.errorColor,
-            }}
-          />
-          <Title>Amount</Title>
-          <View style={flexRow}>
-            <Subheading style={flexWrap}>{`ZMW ${toFixed(amount)}`}</Subheading>
-          </View>
-        </>
-      )}
       {gen_token_response && gen_token_response.success && (
         <>
           <Divider
@@ -91,9 +75,90 @@ const PaymentStatementScreen = ({ route }: PropI) => {
           />
           <Title>Token</Title>
           <View style={flexRow}>
-            <Subheading style={{ ...flexWrap, fontWeight: "bold" }}>
+            <Subheading style={{ ...flexWrap, fontWeight: "bold", fontSize: 14 }}>
               {gen_token_response.payload.token}
             </Subheading>
+          </View>
+          <Divider
+            style={{
+              marginVertical: 5,
+              backgroundColor: confirm_trans_success
+                ? "#00bb27"
+                : Colors.errorColor,
+            }}
+          />
+          <Title>Receipt</Title>
+          <View style={flexRow}>
+            <Subheading style={heading}>Receipt #</Subheading>
+            <Subheading style={value}>
+              {gen_token_response.payload.receipt.receiptNo}
+            </Subheading>
+          </View>
+          <View style={flexRow}>
+            <Subheading style={heading}>Vendor Name</Subheading>
+            <Subheading style={value}>
+              {gen_token_response.payload.receipt.vendorName}
+            </Subheading>
+          </View>
+          <View style={flexRow}>
+            <Subheading style={heading}>Vendor Account #</Subheading>
+            <Subheading style={value}>
+              {gen_token_response.payload.receipt.vendorAccNo}
+            </Subheading>
+          </View>
+          <View style={flexRow}>
+            <Subheading style={heading}>Tariff Name</Subheading>
+            <Subheading style={value}>
+              {gen_token_response.payload.receipt.tariffName}
+            </Subheading>
+          </View>
+          <View style={flexRow}>
+            <Subheading style={heading}>Tariff Desc.</Subheading>
+            <Subheading style={value}>
+              {gen_token_response.payload.receipt.tariffDescription}
+            </Subheading>
+          </View>
+          <View style={flexRow}>
+            <Subheading style={heading}>Arears Balance</Subheading>
+            <Subheading style={value}>
+              {gen_token_response.payload.receipt.arrearsBalance}
+            </Subheading>
+          </View>
+          <View style={flexRow}>
+            <Subheading style={heading}>Arears Paid</Subheading>
+            <Subheading style={value}>
+              {gen_token_response.payload.receipt.arrearsPaid}
+            </Subheading>
+          </View>
+          <View style={flexRow}>
+            <Subheading style={heading}>Sewer Charge</Subheading>
+            <Subheading style={value}>
+              {gen_token_response.payload.receipt.sewerChargeAmount}
+            </Subheading>
+          </View>
+          <View style={flexRow}>
+            <Subheading style={heading}>Units</Subheading>
+            <Subheading style={value}>
+              {gen_token_response.payload.receipt.units}
+            </Subheading>
+          </View>
+          <View style={flexRow}>
+            <Subheading style={heading}>Cost of Units</Subheading>
+            <Subheading style={value}>
+              {gen_token_response.payload.receipt.costOfUnits}
+            </Subheading>
+          </View>
+
+
+          <View style={flexRow}>
+            <Subheading style={heading}>VAT</Subheading>
+            <Subheading style={value}>
+              {gen_token_response.payload.receipt.vat}
+            </Subheading>
+          </View>
+          <View style={flexRow}>
+            <Subheading style={heading}>Total Amount</Subheading>
+            <Subheading style={flexWrap}>{`ZMW ${toFixed(amount)}`}</Subheading>
           </View>
         </>
       )}
@@ -167,7 +232,7 @@ const PaymentStatementScreen = ({ route }: PropI) => {
           {confirm_trans_success ? "Succeeded" : "Failed"}
         </Subheading>
       </View>
-      <View style={flexRow}>
+      <View style={[flexRow, {paddingBottom: 30}]}>
         <Subheading style={pheading}>Response</Subheading>
         <Subheading style={flexWrap}>{init_trans_response.message}</Subheading>
       </View>
@@ -183,12 +248,11 @@ const styles = StyleSheet.create({
     display: "flex",
     flex: 1,
     padding: 15,
-    paddingBottom: 30,
   },
   heading: {
     fontWeight: "bold",
     fontSize: 15,
-    width: 110,
+    width: 140,
   },
   pheading: {
     fontWeight: "bold",

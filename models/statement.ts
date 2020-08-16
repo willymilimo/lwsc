@@ -53,9 +53,29 @@ class ConfirmTransResponse implements ConfirmTransResponseI {
   }
 }
 
+interface ReceiptI {
+  clientID: string;
+  terminalID: string;
+  vendorName: string;
+  vendorAccNo: string;
+  date: string;
+  receiptNo: string;
+  tariffName: string;
+  tariffDescription: string;
+  units: string;
+  vat: string;
+  costOfUnits: string;
+  arrearsPaid: string;
+  arrearsBalance: string;
+  sewerChargeAmount: string;
+  totalAmount: string;
+  token: string;
+  meter_number: string;
+}
+
 interface GenTokenResponseI {
   success: boolean;
-  payload: { token: string };
+  payload: { token: string; receipt: ReceiptI };
 }
 
 export interface StatementI {
@@ -100,7 +120,7 @@ export class Statement implements StatementI {
   value_date: string;
   created_on: Date;
   payment_channel: PaymentChannel | PaymentChannelI;
-  init_trans_response: TransactionResponseI | object;
+  init_trans_response: TransactionResponseI | any;
   gen_token_response?: GenTokenResponseI;
   confirm_trans_response: ConfirmTransResponseI | object;
 
