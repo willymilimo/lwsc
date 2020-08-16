@@ -245,6 +245,7 @@ const StackNavigator = ({
         setUserReducer(userReducer);
       } else {
         setUserReducer({
+          username: "",
           manNumber: "",
           authToken: "",
           createdAt: 0,

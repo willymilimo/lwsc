@@ -22,6 +22,7 @@ import { NotesI, NoAccessI } from "./access-description";
 import { NotificationI } from "./notification";
 import { PaypointI } from "./pay-point";
 import { ConsumptionI } from "./consumption";
+import { PaymentChannelI } from "../types/payment-channel";
 
 // axios.defaults.auth = Strings.API_CREDS;
 axios.defaults.headers.Authorization =
@@ -277,5 +278,13 @@ export const fetchConfigStatus = async (): Promise<
 > => {
   return await axios.get(
     "http://middleware.microtech.co.zm:3000/api/v1/system/configurations/status/fetch"
+  );
+};
+
+export const fetchPaymentChannels = async (): Promise<
+  AxiosResponse<IResponse<PaymentChannelI[]>>
+> => {
+  return await axios.get(
+    "http://middleware.microtech.co.zm:3000/api/v1/system/configurations/payments/channels/fetch?active=true"
   );
 };

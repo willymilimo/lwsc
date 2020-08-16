@@ -1,18 +1,16 @@
 import React, { useEffect } from "react";
-import { StyleSheet, View, Platform, Alert, BackHandler } from "react-native";
+import { StyleSheet, View, Platform, Text, Alert } from "react-native";
 import {
   Portal,
   TextInput,
   RadioButton,
   Button,
   Dialog,
-  Text,
 } from "react-native-paper";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { ScrollView } from "react-native-gesture-handler";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
-import NetInfo from "@react-native-community/netinfo";
 
 import Colors from "../constants/Colors";
 import LwscFAB from "../components/LwscFAB";
@@ -31,7 +29,6 @@ import { AddType } from "../types/add-type";
 import Strings from "../constants/Strings";
 import { AccountReducerI } from "../redux/reducers/accounts";
 import BillComponent from "../components/BillComponent";
-import { NavType } from "../types/nav-type";
 import { Prepaid } from "../models/prepaid";
 import { setActiveAccount } from "../redux/actions/active-account";
 import { ActiveAccountReducerI } from "../redux/reducers/active-account";
@@ -39,9 +36,8 @@ import { PropertyI, Property } from "../models/meter-reading";
 import { useNavigation } from "@react-navigation/native";
 
 interface MakePaymentScreenI {
-  navigation: NavType;
   accounts: AccountReducerI;
-  activeAccount: ActiveAccountReducerI;
+  activeAccount: string;
   addAccount(account: AccountI): void;
   addAccountProperty(property: PropertyI): void;
   deleteAccount(meter_account_no: string | number): void;
@@ -49,9 +45,7 @@ interface MakePaymentScreenI {
 }
 
 const MakePaymentScreen = ({
-  navigation,
   accounts,
-  activeAccount,
   addAccount,
   addAccountProperty,
   deleteAccount,
@@ -119,7 +113,7 @@ const MakePaymentScreen = ({
     if (type === AddType.meter) {
       setShowDialog(false);
       setMeterAccountNo("");
-      navigation.navigate(
+      navigator.navigate(
         Strings.PaymentMethodScreen,
         new Prepaid({
           meterNumber: meterAccountNo,
@@ -172,6 +166,7 @@ const MakePaymentScreen = ({
             { onPress: () => navigator.navigate(Strings.HomeTabNavigator) },
           ]);
         }
+        setLoading(false);
       } else {
         Alert.alert(
           `${type} Already Added`,
@@ -192,7 +187,7 @@ const MakePaymentScreen = ({
               key={`${acc.CUSTKEY} - ${acc.ID_NO} - ${acc.CUSTOMER_ID}`}
               account={acc}
               onPress={() =>
-                navigation.navigate(Strings.PaymentMethodScreen, acc)
+                navigator.navigate(Strings.PaymentMethodScreen, acc)
               }
             />
           ))
@@ -252,6 +247,7 @@ const MakePaymentScreen = ({
           <Dialog.Actions>
             <Button
               loading={loading}
+              disabled={loading}
               onPress={() => handleAccountMeterSubmit()}
             >
               Submit
