@@ -58,7 +58,7 @@ export const getCustomerByAccountNumber = async (
 
 export const getCustomerByMeterNumber = async (
   meterNumber: string
-): Promise<AxiosResponse<IResponse<PropertyI>>> => {
+): Promise<AxiosResponse<IResponse<PropertyI | any>>> => {
   return new Promise((resolve, reject) => {
     resolve({
       statusText: "Ok",
@@ -69,27 +69,7 @@ export const getCustomerByMeterNumber = async (
         error: "",
         message: "",
         success: true,
-        payload: new Property({
-          BILLGROUP: "KBL",
-          Township: "Woodlands",
-          BOOK_NO: "B-01",
-          WALK_NO: 1,
-          AccountNumber: "05045573",
-          lineNumber: "010411/000",
-          Customer_Address: "STATE HOUSE INDEPENDENCE AVE",
-          PLOT_NO: "",
-          MeterNumber: "Nr. 41057944",
-          connection_id: "94165",
-          PreviousReading: 60238,
-          PreviousReadingDate: "2020-03-18T00:00:00.000Z",
-          CurrentReadingDate: "2020-07-28T00:00:00.000Z",
-          CurrentReading: 60390,
-          MessagesNote: "Meter underground",
-          MessagesAccess: " ",
-          Meter_Status: "Operational",
-          key: "",
-          previousReadingDate: new Date(),
-        }),
+        payload: {},
       },
     });
   });
@@ -145,11 +125,15 @@ export const uploadFiles = async (
     } as any);
   });
 
-  return await axios.post("uploads/files/disk/create", fd, {
-    headers: {
-      "content-type": "multipart/form-data",
-    },
-  });
+  return await axios.post(
+    "https://lwsc.microtech.co.zm/api/v1/uploads/files/disk/create",
+    fd,
+    {
+      headers: {
+        "content-type": "multipart/form-data",
+      },
+    }
+  );
 };
 
 export const submitMeterReading = async (reading: MeterReading) => {
@@ -280,8 +264,18 @@ export const login = async (
 export const validateBillWindow = async (
   billGroup: string
 ): Promise<AxiosResponse<IResponse<{ CYCLE_ID: number }>>> => {
-  console.log(`billing/window-status/fetch?source=edams&bill_group=${billGroup}`)
+  console.log(
+    `billing/window-status/fetch?source=edams&bill_group=${billGroup}`
+  );
   return await axios.get(
     `billing/window-status/fetch?source=edams&bill_group=${billGroup}`
+  );
+};
+
+export const fetchConfigStatus = async (): Promise<
+  AxiosResponse<IResponse<{ status: string; update_link: string }>>
+> => {
+  return await axios.get(
+    "http://middleware.microtech.co.zm:3000/api/v1/system/configurations/status/fetch"
   );
 };

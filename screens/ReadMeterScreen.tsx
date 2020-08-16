@@ -387,12 +387,23 @@ const ReadMeterScreen = ({
           deleteCallback={() => setUploadFiles(undefined)}
         />
         <View>
-          <MeterItem
+          {/* <MeterItem
             icon={
               <Ionicons name="ios-person" size={25} color={Colors.linkBlue} />
             }
-            title="Man Number"
+            title="Operational Status"
             value={manNumber}
+          /> */}
+          <MeterItem
+            icon={
+              <MaterialCommunityIcons
+                name="dots-horizontal-circle-outline"
+                size={19}
+                color={Colors.linkBlue}
+              />
+            }
+            title="Operational Status"
+            value={property.Meter_Status}
           />
           <MeterItem
             icon={
@@ -460,17 +471,6 @@ const ReadMeterScreen = ({
             }
             title="Previous Reading"
             value={property.PreviousReading}
-          />
-          <MeterItem
-            icon={
-              <MaterialCommunityIcons
-                name="dots-horizontal-circle-outline"
-                size={19}
-                color={Colors.linkBlue}
-              />
-            }
-            title="Operational Status"
-            value={property.OP_STATUS}
           />
         </View>
 
