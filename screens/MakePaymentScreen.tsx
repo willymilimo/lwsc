@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
   box: {
     display: "flex",
     flex: 1,
-    padding: 15,
+    padding: 10,
   },
   formBox: {
     backgroundColor: "red",

@@ -4,7 +4,12 @@ import {
   ServiceApplicationI,
   ServiceApplication,
 } from "../models/service-application";
-import { applyForService, reportLeakage, api_root } from "../models/axios";
+import {
+  applyForService,
+  reportLeakage,
+  api_root,
+  fetchServiceInvoice,
+} from "../models/axios";
 import Strings from "../constants/Strings";
 import { useNavigation } from "@react-navigation/native";
 import {
@@ -131,6 +136,34 @@ const RequestServiceScreen = ({ user, services, route }: PropI) => {
       .finally(() => setLoading(false));
   };
 
+  const requestInvoice = () => {
+    setLoading(true);
+    const data = item as ServiceApplication;
+    fetchServiceInvoice(
+      data.service_type,
+      (data.account_number || data.meter_number) as string
+    )
+      .then(({ status, data }) => {
+        if (status == 200 && data.success) {
+          setLoading(false);
+          navigator.navigate(Strings.ServiceInvoiceScreen, {
+            service: item,
+            invoice: data.payload,
+            bookNumber
+          });
+        } else {
+          throw new Error(JSON.stringify(data));
+        }
+      })
+      .catch((err) => {
+        const { title, message } = Strings.SELF_REPORTING_PROBLEM;
+        Alert.alert(title, message, [
+          { onPress: () => navigator.navigate(Strings.HomeTabNavigator) },
+        ]);
+      })
+      .finally(() => setLoading(false));
+  };
+
   const requestService = () => {
     setLoading(true);
 
@@ -149,8 +182,16 @@ const RequestServiceScreen = ({ user, services, route }: PropI) => {
       ServiceApplicationRequest(service);
     }
   };
+
+  const handleButtonTap = () => {
+    if (item instanceof ServiceApplication && item.post_service) {
+      requestInvoice();
+    } else {
+      requestService();
+    }
+  };
   // console.log(`${api_root}${application.files[0].remote_location}`)
-  // console.log(item)
+  // console.log(item);
   return (
     <View style={container}>
       {item instanceof ServiceReport || item instanceof ServiceApplication ? (
@@ -258,9 +299,11 @@ const RequestServiceScreen = ({ user, services, route }: PropI) => {
         loading={loading}
         //   icon="send"
         mode="outlined"
-        onPress={requestService}
+        onPress={handleButtonTap}
       >
-        SUMBIT
+        {item instanceof ServiceApplication && item.post_service
+          ? "REQUEST INVOICE"
+          : "SUMBIT"}
       </Button>
     </View>
   );

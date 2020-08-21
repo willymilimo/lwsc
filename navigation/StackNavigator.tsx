@@ -66,6 +66,7 @@ import { setUserReducer } from "../redux/actions/user";
 import { UserReducerI } from "../redux/reducers/user";
 import MeterReadingNavigator from "./MeterReadingNavigator";
 import { navigate } from "./RootNavigation";
+import ServiceInvoiceScreen from "../screens/ServiceInvoiceScreen";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -423,6 +424,10 @@ const StackNavigator = ({
       <Stack.Screen
         name={Strings.RequestServiceScreen}
         component={RequestServiceScreen}
+      />
+      <Stack.Screen
+        name={Strings.ServiceInvoiceScreen}
+        component={ServiceInvoiceScreen}
       />
     </Stack.Navigator>
   );

@@ -10,9 +10,11 @@ export interface ServiceApplicationI {
   area?: string;
   description?: string;
   meter_number?: string;
+  account_number?: string;
   customer_id: String;
   customer_account_id: String;
   bill_group?: string;
+  post_service: boolean;
 }
 
 export class ServiceApplication implements ServiceApplicationI {
@@ -27,9 +29,11 @@ export class ServiceApplication implements ServiceApplicationI {
   area?: string;
   description?: string;
   meter_number?: string;
+  account_number?: string;
   customer_id: String;
   customer_account_id: String;
   bill_group?: string;
+  post_service: boolean;
 
   constructor({
     service_type,
@@ -43,9 +47,11 @@ export class ServiceApplication implements ServiceApplicationI {
     area,
     description,
     meter_number,
+    account_number,
     customer_id,
     customer_account_id,
     bill_group,
+    post_service
   }: ServiceApplicationI) {
     this.service_type = service_type;
     this.first_name = first_name;
@@ -58,8 +64,10 @@ export class ServiceApplication implements ServiceApplicationI {
     this.area = area;
     this.description = description;
     this.meter_number = meter_number;
+    this.account_number = account_number;
     this.customer_id = customer_id;
     this.customer_account_id = customer_account_id;
     this.bill_group = bill_group;
+    this.post_service = post_service;
   }
 }

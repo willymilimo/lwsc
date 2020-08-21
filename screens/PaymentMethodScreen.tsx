@@ -20,13 +20,20 @@ import { AccountI, Account } from "../models/account";
 import Strings from "../constants/Strings";
 import { PaymentChannel, PaymentChannelI } from "../types/payment-channel";
 import PrepaidComponent from "./reusable/PrepaidComponent";
-import { PrepaidI } from "../models/prepaid";
+import { PrepaidI, Prepaid } from "../models/prepaid";
 import { fetchPaymentChannels } from "../models/axios";
+import { ServiceInvoiceI } from "../models/service-invoice";
+import { ServiceApplicationI } from "../models/service-application";
+import ServiceComponent from "../components/ServiceComponent";
 
 interface PaymentMethodScreenI {
   navigation: NavType;
   route: {
-    params: AccountI | PrepaidI | string;
+    params:
+      | AccountI
+      | PrepaidI
+      | string
+      | { invoice: ServiceInvoiceI; service: ServiceApplicationI };
   };
 }
 
@@ -47,7 +54,7 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
           setPaymentChannels(data.payload);
           if (data.payload.length) {
             setChecked(data.payload[0].id);
-            console.log(PaymentChannel);
+            // console.log(PaymentChannel);
           }
         } else {
           throw new Error("unexpected response from server");
@@ -84,12 +91,17 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
         <>
           {params instanceof Account ? (
             <BillComponent account={params} />
-          ) : (
+          ) : params instanceof Prepaid ? (
             <PrepaidComponent>
               {typeof params === "string"
                 ? params
                 : (params as PrepaidI).meterNumber}
             </PrepaidComponent>
+          ) : (
+            <ServiceComponent
+              invoice={(params as any).invoice}
+              service={(params as any).service}
+            />
           )}
           <View style={{ padding: 10 }}>
             <Text
@@ -239,6 +251,6 @@ const styles = StyleSheet.create({
   container: {
     display: "flex",
     flex: 1,
-    backgroundColor: "white",
+    // backgroundColor: "white",
   },
 });

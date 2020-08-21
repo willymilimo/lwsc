@@ -53,8 +53,8 @@ export default function BillComponent({
     itemTitle,
   } = styles;
   style = style
-    ? { padding: 1, margin: 5, borderRadius: 5, ...style }
-    : { padding: 1, margin: 5, borderRadius: 5 };
+    ? { padding: 5, margin: 5, borderRadius: 5, ...style }
+    : { padding: 5, margin: 5, borderRadius: 5 };
   return (
     <TouchableHighlight
       onPress={onPress}
@@ -156,12 +156,12 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     flex: 1,
-    backgroundColor: `${Colors.linkBlue}11`,
-    paddingHorizontal: 20,
-    paddingVertical: 15,
+    padding: 10,
+    margin: 5,
+    backgroundColor: "#fff",
     shadowColor: `${Colors.linkBlue}22`,
 
-    elevation: 1,
+    elevation: 5,
 
     shadowOffset: {
       width: 1,

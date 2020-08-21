@@ -138,8 +138,10 @@ export default function GeneralServiceForm({
       address: address.value,
       description: description.value,
       meter_number: account_meter.value,
+      account_number: account_meter.value,
       customer_account_id: account_meter.value,
       customer_id: account_meter.value,
+      post_service: service.post_service
     });
 
     navigator.navigate(Strings.SelectAreaScreen, {

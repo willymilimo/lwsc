@@ -22,6 +22,7 @@ import { PaypointI } from "./pay-point";
 import { ConsumptionI } from "./consumption";
 import { PaymentChannelI } from "../types/payment-channel";
 import Strings from "../constants/Strings";
+import { ServiceInvoiceI } from "./service-invoice";
 
 // axios.defaults.auth = Strings.API_CREDS;
 axios.defaults.headers.Authorization =
@@ -285,5 +286,14 @@ export const fetchPaymentChannels = async (): Promise<
 > => {
   return await axios.get(
     "system/configurations/payments/channels/fetch?active=true"
+  );
+};
+
+export const fetchServiceInvoice = async (
+  service_type: string,
+  account_number: string
+): Promise<AxiosResponse<IResponse<ServiceInvoiceI>>> => {
+  return await axios.get(
+    `services/invoices/fetch?service_type=${service_type}&account_number=${account_number}`
   );
 };

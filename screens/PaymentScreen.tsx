@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  StyleSheet,
-  View,
-  Image,
-  Text,
-  Alert,
-  Modal
-} from "react-native";
+import { StyleSheet, View, Image, Text, Alert, Modal } from "react-native";
 
 import { ScrollView } from "react-native-gesture-handler";
 import { NavType } from "../types/nav-type";
@@ -37,12 +30,20 @@ import { Bowser } from "../models/bowser";
 import { CustomerType } from "../types/customer-type";
 import { PaymentChannel } from "../types/payment-channel";
 import { PrepaidI, Prepaid } from "../models/prepaid";
+import { ServiceInvoiceI } from "../models/service-invoice";
+import { ServiceApplicationI } from "../models/service-application";
+import PrepaidComponent from "./reusable/PrepaidComponent";
+import ServiceComponent from "../components/ServiceComponent";
 
 interface PaymentScreenI {
   navigation: NavType;
   route: {
     params: {
-      params: AccountI | PrepaidI;
+      params:
+        | AccountI
+        | PrepaidI
+        | string
+        | { invoice: ServiceInvoiceI; service: ServiceApplicationI };
       method: PaymentChannel;
     };
   };
@@ -134,18 +135,18 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
           if (success) {
             if (method === PaymentChannel.visa_master_card) {
               navigation.navigate(Strings.WebviewScreen, payload);
-            // } else if (method === PaymentChannel.zamtel) {
-            //   Alert.alert(
-            //     Strings.PAYMENT_SUCCESS.title,
-            //     Strings.PAYMENT_SUCCESS.message,
-            //     [
-            //       {
-            //         text: "OK",
-            //         onPress: () =>
-            //           navigation.navigate(Strings.HomeTabNavigator),
-            //       },
-            //     ]
-            //   );
+              // } else if (method === PaymentChannel.zamtel) {
+              //   Alert.alert(
+              //     Strings.PAYMENT_SUCCESS.title,
+              //     Strings.PAYMENT_SUCCESS.message,
+              //     [
+              //       {
+              //         text: "OK",
+              //         onPress: () =>
+              //           navigation.navigate(Strings.HomeTabNavigator),
+              //       },
+              //     ]
+              //   );
             } else {
               Alert.alert(
                 Strings.PIN_INPUT.title,
@@ -232,9 +233,17 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
 
       {params instanceof Account ? (
         <BillComponent account={params} />
+      ) : params instanceof Prepaid ? (
+        <PrepaidComponent>
+          {typeof params === "string"
+            ? params
+            : (params as PrepaidI).meterNumber}
+        </PrepaidComponent>
       ) : (
-        // <PrepaidComponent>{(params as PrepaidI).meterNumber}</PrepaidComponent>
-        <></>
+        <ServiceComponent
+          invoice={(params as any).invoice}
+          service={(params as any).service}
+        />
       )}
       <View style={contentBox}>
         <View style={methodStyle}>

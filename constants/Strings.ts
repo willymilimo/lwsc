@@ -38,6 +38,7 @@ export default {
   RequestServiceScreen: "Submission Details",
   SignInScreen: "Sign in",
   MeterReadingNavigator: "MeterReadingNavigator",
+  ServiceInvoiceScreen: "Service Invoice",
 
   /*************** Begin REDUCER TYPES *****************/
   WHITE_THEME: "WHITE_THEME",

@@ -47,7 +47,7 @@ export class ServiceItem implements ServiceItemI {
     this.thumbnail_img = thumbnail_img;
     this.title = title === "Recconnection" ? "Reconnection" : title;
     this.app_icon = app_icon;
-    this.post_service = post_service;
+    this.post_service = post_service || false;
 
     if (app_icon.type === "svg") {
       const size = app_icon.size.toString();
