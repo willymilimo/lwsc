@@ -1,7 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import { IResponse } from "./iresponse";
 import { AccountI } from "./account";
-import { AddType } from "../types/add-type";
 import { IdentityType } from "../types/identity-type";
 import { PaymentType } from "../types/payment";
 import { PaymentI } from "./payment";
@@ -11,7 +10,6 @@ import {
   BookNumberI,
   PropertyI,
   MeterReadingI,
-  Property,
 } from "./meter-reading";
 import { ServiceItemI } from "./service-item";
 import { ServiceApplicationI } from "./service-application";
@@ -23,14 +21,17 @@ import { NotificationI } from "./notification";
 import { PaypointI } from "./pay-point";
 import { ConsumptionI } from "./consumption";
 import { PaymentChannelI } from "../types/payment-channel";
+import Strings from "../constants/Strings";
 
 // axios.defaults.auth = Strings.API_CREDS;
 axios.defaults.headers.Authorization =
   "Basic bHdzY19tb2JpbGVfYXBwX2Rldjojd3d3QDEyMzRfbHdzY19hcHA=";
-axios.defaults.baseURL = "http://41.72.107.14:3000/api/v1/";
+// axios.defaults.baseURL = "http://41.72.107.14:3000/api/v1/";
+axios.defaults.baseURL = Strings.API_BASE_URL;
+//http://41.72.107.14:3020/
 // axios.defaults.timeout = 60000;
 
-// console.log(axios.defaults.headers);
+// console.log(axios.defaults.baseURL);
 
 const getPayUrl = (paymentType: PaymentType): string | null => {
   switch (paymentType) {
@@ -276,15 +277,13 @@ export const validateBillWindow = async (
 export const fetchConfigStatus = async (): Promise<
   AxiosResponse<IResponse<{ status: string; update_link: string }>>
 > => {
-  return await axios.get(
-    "http://middleware.microtech.co.zm:3000/api/v1/system/configurations/status/fetch"
-  );
+  return await axios.get("system/configurations/status/fetch");
 };
 
 export const fetchPaymentChannels = async (): Promise<
   AxiosResponse<IResponse<PaymentChannelI[]>>
 > => {
   return await axios.get(
-    "http://middleware.microtech.co.zm:3000/api/v1/system/configurations/payments/channels/fetch?active=true"
+    "system/configurations/payments/channels/fetch?active=true"
   );
 };

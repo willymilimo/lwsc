@@ -1,3 +1,6 @@
+import { ENV } from 'react-native-dotenv'
+// console.log(ENV)
+
 export default {
   // screens
   HomeScreen: "Home",
@@ -102,6 +105,11 @@ export default {
     username: "lwsc_mobile_app_dev",
     password: "#www@1234_lwsc_app",
   },
+
+  API_BASE_URL:
+  (ENV === 'DEV' || ENV === 'TEST')
+    ? 'http://41.72.107.14:3020/api/v1/'
+    : 'https://middleware.microtech.co.zm:3000/api/v1',
 
   INTERNET_FAILURE: {
     title: "NO INTERNET",

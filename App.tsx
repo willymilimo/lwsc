@@ -15,12 +15,12 @@ import Strings from "./constants/Strings";
 import DeprecationScreen from "./screens/DeprecationScreen";
 import Toast from "./components/Toast";
 
-// Sentry.init({
-//   dsn:
-//     "https://420c505c0fcd4c99b674c76a37a05174@o429442.ingest.sentry.io/5376037",
-//   enableInExpoDevelopment: true,
-//   debug: true,
-// });
+Sentry.init({
+  dsn:
+    "https://420c505c0fcd4c99b674c76a37a05174@o429442.ingest.sentry.io/5376037",
+  enableInExpoDevelopment: true,
+  debug: true,
+});
 
 export default function App() {
   const [loading, setLoading] = useState(true);
