@@ -6,6 +6,7 @@ export interface ServiceInvoiceI {
   penalty_charge: number;
   fee_charge: number;
   total_charge: number;
+  totalcharge: number;
 }
 
 export class ServiceInvoice implements ServiceInvoiceI {
@@ -33,5 +34,11 @@ export class ServiceInvoice implements ServiceInvoiceI {
     this.penalty_charge = penalty_charge;
     this.fee_charge = fee_charge;
     this.total_charge = total_charge;
+  }
+
+  get totalcharge(): number {
+    return this.total_charge > 0
+      ? this.total_charge
+      : this.penalty_charge + this.fee_charge;
   }
 }

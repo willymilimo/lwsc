@@ -33,6 +33,7 @@ import {
   SimpleLineIcons,
 } from "@expo/vector-icons";
 import { UserReducerI } from "../redux/reducers/user";
+import { ServiceInvoice } from "../models/service-invoice";
 
 const myHeaders = new Headers();
 myHeaders.append(
@@ -59,11 +60,11 @@ interface PropI {
 }
 
 const RequestServiceScreen = ({ user, services, route }: PropI) => {
-  const { billGroup, bookNumber, item } = route.params;
+  const { bookNumber, item } = route.params;
   const { container, flexRow, heading, value } = styles;
   const navigator = useNavigation();
   const [loading, setLoading] = useState(false);
-
+  // console.log(billGroup, bookNumber);
   const flexRowItem = (header: string, content: string | number) => {
     return (
       <View style={flexRow}>
@@ -146,10 +147,11 @@ const RequestServiceScreen = ({ user, services, route }: PropI) => {
       .then(({ status, data }) => {
         if (status == 200 && data.success) {
           setLoading(false);
+          // console.log(new ServiceInvoice(data.payload).totalcharge)
           navigator.navigate(Strings.ServiceInvoiceScreen, {
             service: item,
-            invoice: data.payload,
-            bookNumber
+            invoice: new ServiceInvoice(data.payload),
+            bookNumber,
           });
         } else {
           throw new Error(JSON.stringify(data));

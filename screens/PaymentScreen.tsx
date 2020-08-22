@@ -28,12 +28,13 @@ import Strings from "../constants/Strings";
 import { ControlIT } from "../models/control";
 import { Bowser } from "../models/bowser";
 import { CustomerType } from "../types/customer-type";
-import { PaymentChannel } from "../types/payment-channel";
+import { PaymentChannel, PaymentChannelI } from "../types/payment-channel";
 import { PrepaidI, Prepaid } from "../models/prepaid";
 import { ServiceInvoiceI } from "../models/service-invoice";
 import { ServiceApplicationI } from "../models/service-application";
 import PrepaidComponent from "./reusable/PrepaidComponent";
 import ServiceComponent from "../components/ServiceComponent";
+import { BookNumberI } from "../models/meter-reading";
 
 interface PaymentScreenI {
   navigation: NavType;
@@ -43,8 +44,12 @@ interface PaymentScreenI {
         | AccountI
         | PrepaidI
         | string
-        | { invoice: ServiceInvoiceI; service: ServiceApplicationI };
-      method: PaymentChannel;
+        | {
+            invoice: ServiceInvoiceI;
+            service: ServiceApplicationI;
+            bookNumber: BookNumberI;
+          };
+      method: PaymentChannelI;
     };
   };
 }
@@ -53,7 +58,7 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
   const { container, methodStyle, formContainer, contentBox } = styles;
   const { params, method } = route.params;
   // console.log(route.params);
-  const { image, placeholder } = Items[method];
+  const { image, placeholder, regex } = getItem(method.id);
   // console.log(params, method, image, placeholder);
   const isPrepaid = params instanceof Prepaid;
   const [meterNumber, setMeterNumber] = useState<ControlIT<string>>({
@@ -69,8 +74,11 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
     error: false,
   });
   const [amount, setAmount] = useState(
-    params instanceof Bowser ? params.totalPrice.toString() : ""
+    !!(params as any).invoice
+      ? (params as any).invoice.totalcharge.toString()
+      : ""
   );
+  // console.log((params as any).invoice.totalcharge)
   const [firstName, setFirstName] = useState<ControlIT<string>>({
     value: "",
     error: false,
@@ -89,6 +97,11 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
         }
       : params instanceof Account
       ? { name: params.FULL_NAME, address: params.ADDRESS }
+      : (params as any).invoice && (params as any).service
+      ? {
+          name: (params as any).service.fullname,
+          address: (params as any).service.address,
+        }
       : { name: "", address: "" };
 
   const confirmPayment = () => {
@@ -101,9 +114,9 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
     } else if (!(phone.error || !/^\d+$/.test(amount) || email.error)) {
       //   setLoading(true);
       const methodDetails =
-        method === PaymentChannel["VISA/MasterCard"]
-          ? `${method} reference contacts ${email.value} and ${phone.value}`
-          : `${method} - ${phone.value}`;
+        method.id === "visa_master_card"
+          ? `${method.title} reference contacts ${email.value} and ${phone.value}`
+          : `${method.title} - ${phone.value}`;
       Alert.alert(
         "Make Payment?",
         `You are paying the amount of ZMW ${toFixed(amount)} for ${
@@ -125,7 +138,7 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
   };
 
   async function processPayment(payment: PaymentI) {
-    // console.log(payment);
+    console.log(payment);
     setLoading(true);
     makePayment(payment)
       .then(({ data, status }) => {
@@ -133,7 +146,7 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
 
         if (status === 200) {
           if (success) {
-            if (method === PaymentChannel.visa_master_card) {
+            if (method.id === "visa_master_card") {
               navigation.navigate(Strings.WebviewScreen, payload);
               // } else if (method === PaymentChannel.zamtel) {
               //   Alert.alert(
@@ -150,7 +163,7 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
             } else {
               Alert.alert(
                 Strings.PIN_INPUT.title,
-                Strings.PIN_INPUT.message.replace("{pin}", method),
+                Strings.PIN_INPUT.message.replace("{pin}", method.title),
                 [
                   {
                     text: "OK",
@@ -164,7 +177,7 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
             let msg =
               message ||
               error ||
-              Strings.PIN_INPUT.message.replace("{pin}", method);
+              Strings.PIN_INPUT.message.replace("{pin}", method.title);
 
             // if (msg.toLowerCase() === "transaction initiation failed")
             if (isPrepaid) {
@@ -199,12 +212,12 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
         last_name: lastName.value,
         customer_type: CustomerType.prepaid,
         amount,
-        payment_channel: PaymentChannel[method],
+        payment_channel: method.id,
         phone_number: phone.value,
         email: email.value,
       });
-    } else {
-      const accnt = params as AccountI;
+    } else if (params instanceof Account) {
+      const accnt = params;
       payment = new Payment({
         account_number: accnt.CUSTKEY,
         meter_number: accnt.CUSTKEY,
@@ -212,9 +225,27 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
         last_name: accnt.SURNAME,
         customer_type: CustomerType.postpaid,
         amount,
-        payment_channel: PaymentChannel[method],
+        payment_channel: method.id,
         phone_number: phone.value,
         email: email.value || accnt.STATEMENT_DELIVERY_BY_EMAIL,
+      });
+    } else {
+      const invoice = (params as any).invoice as ServiceInvoiceI;
+      const service = (params as any).service as ServiceApplicationI;
+      payment = new Payment({
+        account_number: service.account_number || service.meter_number,
+        meter_number: service.meter_number,
+        first_name: service.first_name,
+        last_name: service.last_name,
+        customer_type: CustomerType.postpaid,
+        amount: invoice.totalcharge.toString(),
+        payment_channel: method.id,
+        phone_number: phone.value,
+        email: email.value,
+        invoice_id: (params as any).invoice ? (params as any).invoice._id : "",
+        bill_group: (params as any).bookNumber
+          ? (params as any).bookNumber.BILLGROUP
+          : "",
       });
     }
 
@@ -273,7 +304,7 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
                 color: Colors.whiteColor,
               }}
             >
-              {method}
+              {method.title}
             </Text>
           </View>
           <Checkbox status="checked" color="white" />
@@ -306,7 +337,7 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
             money={true}
             validator={/^\d+$/}
             loading={loading}
-            disabled={params instanceof Bowser}
+            disabled={!!(params as any).invoice}
           />
 
           {isPrepaid && (
@@ -362,12 +393,12 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
             onChangeText={(text) =>
               setPhone({
                 value: text,
-                error: !Regex.ZAMBIAN_MOBILE_NUMBER.test(text),
+                error: !regex.test(text),
               })
             }
           />
 
-          {(method === PaymentChannel.visa_master_card || isPrepaid) && (
+          {(method.id === "visa_master_card" || isPrepaid) && (
             <TextInput
               style={{ marginTop: 10 }}
               mode="outlined"
@@ -390,8 +421,9 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
             disabled={
               loading ||
               !Regex.ZAMBIAN_MOBILE_NUMBER.test(phone.value) ||
+              !regex.test(phone.value) ||
               !/^\d+$/.test(amount) ||
-              (method === PaymentChannel.visa_master_card &&
+              (method.id === "visa_master_card" &&
                 !Regex.EMAIL.test(email.value))
             }
             style={{ marginVertical: 20, paddingVertical: 5 }}
@@ -408,6 +440,35 @@ const PaymentScreen = ({ navigation, route }: PaymentScreenI) => {
 };
 
 export default PaymentScreen;
+
+const getItem = (id: string) => {
+  switch (id) {
+    case "airtel":
+      return {
+        image: airtel_money,
+        placeholder: "0978271892 or 0778271892",
+        regex: Regex.AIRTEL_NUMBER,
+      };
+    case "zamtel":
+      return {
+        image: zampay,
+        placeholder: "0955549887",
+        regex: Regex.ZAMTEL_NUMBER,
+      };
+    case "mtn":
+      return {
+        image: mtn_money,
+        placeholder: "0968271892 or 0768271892",
+        regex: Regex.MTN_NUMBER,
+      };
+    default:
+      return {
+        image: debit_card,
+        placeholder: "0955271892",
+        regex: Regex.ZAMTEL_NUMBER,
+      };
+  }
+};
 
 const Items: { [key: string]: any } = {
   [PaymentChannel.airtel]: {

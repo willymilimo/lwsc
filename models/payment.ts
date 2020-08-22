@@ -12,6 +12,8 @@ export interface PaymentI {
   payment_channel: PaymentChannel;
   phone_number: string;
   email?: string;
+  invoice_id?: string;
+  bill_group?: string;
 }
 
 export type PaymentT = PaymentI;
@@ -26,6 +28,8 @@ export class Payment implements PaymentI {
   payment_channel: PaymentChannel;
   phone_number: string;
   email?: string | undefined;
+  invoice_id?: string;
+  bill_group?: string;
 
   constructor({
     account_number,
@@ -37,6 +41,8 @@ export class Payment implements PaymentI {
     payment_channel,
     phone_number,
     email,
+    invoice_id,
+    bill_group
   }: PaymentI) {
     this.account_number = account_number;
     this.meter_number = meter_number;
@@ -47,5 +53,7 @@ export class Payment implements PaymentI {
     this.payment_channel = payment_channel;
     this.phone_number = phone_number;
     this.email = email;
+    this.invoice_id = invoice_id;
+    this.bill_group = bill_group;
   }
 }

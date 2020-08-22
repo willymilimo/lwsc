@@ -50,7 +50,7 @@ const ServicesScreen = ({
         .then(({ status, data }) => {
           if (is_subscribed) {
             const { success, payload, error, message } = data;
-            console.log(status, data)
+            // console.log(status, data)
 
             if (status === 200 && success) {
               setServiceTypes(

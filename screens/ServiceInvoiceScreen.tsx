@@ -40,6 +40,7 @@ const ServiceInvoiceScreen = ({ services, route }: PropsI) => {
     first_name,
     last_name,
   } = service;
+  // console.log(bookNumber);
   const { customer_type, penalty_charge, fee_charge, total_charge } = invoice;
 
   const flexRowItem = (
@@ -95,7 +96,11 @@ const ServiceInvoiceScreen = ({ services, route }: PropsI) => {
         //   icon="send"
         mode="outlined"
         onPress={() =>
-          navigator.navigate(Strings.PaymentMethodScreen, { invoice, service })
+          navigator.navigate(Strings.PaymentMethodScreen, {
+            invoice,
+            service,
+            bookNumber,
+          })
         }
       >
         Make Payment

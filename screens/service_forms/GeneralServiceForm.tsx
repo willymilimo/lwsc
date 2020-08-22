@@ -123,7 +123,7 @@ export default function GeneralServiceForm({
     const name = fullName.value.split(" ");
     const first_name = name[0];
     let last_name = first_name;
-    if (name.length > 2) {
+    if (name.length > 1) {
       name.reverse().pop();
       last_name = name.reverse().toString();
     }
@@ -141,7 +141,8 @@ export default function GeneralServiceForm({
       account_number: account_meter.value,
       customer_account_id: account_meter.value,
       customer_id: account_meter.value,
-      post_service: service.post_service
+      post_service: service.post_service,
+      fullname: ''
     });
 
     navigator.navigate(Strings.SelectAreaScreen, {
@@ -401,7 +402,7 @@ export default function GeneralServiceForm({
               : address.error || address.value.length === 0
               ? "Address is required"
               : invalidPostService
-              ? "Account/Meter Number is required"
+              ? "Account Number is required"
               : ""}
           </Subheading>
         )}

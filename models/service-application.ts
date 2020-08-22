@@ -15,6 +15,7 @@ export interface ServiceApplicationI {
   customer_account_id: String;
   bill_group?: string;
   post_service: boolean;
+  fullname: string;
 }
 
 export class ServiceApplication implements ServiceApplicationI {
@@ -51,7 +52,7 @@ export class ServiceApplication implements ServiceApplicationI {
     customer_id,
     customer_account_id,
     bill_group,
-    post_service
+    post_service,
   }: ServiceApplicationI) {
     this.service_type = service_type;
     this.first_name = first_name;
@@ -69,5 +70,9 @@ export class ServiceApplication implements ServiceApplicationI {
     this.customer_account_id = customer_account_id;
     this.bill_group = bill_group;
     this.post_service = post_service;
+  }
+
+  get fullname(): string {
+    return `${this.first_name} ${this.last_name}`;
   }
 }

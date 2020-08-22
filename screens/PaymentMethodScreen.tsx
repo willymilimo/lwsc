@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Image, Alert } from "react-native";
 import BillComponent from "../components/BillComponent";
 import Colors from "../constants/Colors";
@@ -25,6 +25,7 @@ import { fetchPaymentChannels } from "../models/axios";
 import { ServiceInvoiceI } from "../models/service-invoice";
 import { ServiceApplicationI } from "../models/service-application";
 import ServiceComponent from "../components/ServiceComponent";
+import { BookNumberI } from "../models/meter-reading";
 
 interface PaymentMethodScreenI {
   navigation: NavType;
@@ -33,18 +34,24 @@ interface PaymentMethodScreenI {
       | AccountI
       | PrepaidI
       | string
-      | { invoice: ServiceInvoiceI; service: ServiceApplicationI };
+      | {
+          invoice: ServiceInvoiceI;
+          service: ServiceApplicationI;
+          bookNumber: BookNumberI;
+        };
   };
 }
 
 const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
   const { params } = route;
   const { container } = styles;
-  const [checked, setChecked] = React.useState(PaymentChannel.airtel);
-  const [loading, setLoading] = React.useState(false);
-  const [paymentChannels, setPaymentChannels] = React.useState<
-    PaymentChannelI[]
-  >([]);
+  const [checked, setChecked] = useState(PaymentChannel.airtel);
+  const [
+    selectedChannel,
+    setSelectedChannel,
+  ] = useState<PaymentChannelI | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [paymentChannels, setPaymentChannels] = useState<PaymentChannelI[]>([]);
 
   const getPaymentChannels = () => {
     setLoading(true);
@@ -54,6 +61,7 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
           setPaymentChannels(data.payload);
           if (data.payload.length) {
             setChecked(data.payload[0].id);
+            setSelectedChannel(data.payload[0]);
             // console.log(PaymentChannel);
           }
         } else {
@@ -124,7 +132,10 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
                 return (
                   <TouchableHighlight
                     underlayColor={Colors.lightBorderColor}
-                    onPress={() => setChecked(id)}
+                    onPress={() => {
+                      setChecked(id);
+                      setSelectedChannel(channel);
+                    }}
                     style={{
                       marginHorizontal: 10,
                       backgroundColor:
@@ -189,7 +200,7 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
               })}
             </RadioButton.Group>
             <Button
-              disabled={!(checked in PaymentChannel)}
+              disabled={selectedChannel == null}
               style={{
                 marginHorizontal: 10,
                 marginVertical: 20,
@@ -199,7 +210,7 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
               mode="contained"
               onPress={() =>
                 navigation.navigate(Strings.PaymentScreen, {
-                  method: checked,
+                  method: selectedChannel,
                   params,
                 })
               }
@@ -217,7 +228,7 @@ export default PaymentMethodScreen;
 
 const getImage = (id: string) => {
   switch (id) {
-    case "airte":
+    case "airtel":
       return airtel_money;
     case "zamtel":
       return zampay;
