@@ -14,6 +14,7 @@ import Colors from "../constants/Colors";
 import { FlatList } from "react-native-gesture-handler";
 import { ServiceApplicationI } from "../models/service-application";
 import { ServiceReportI } from "../models/service-report";
+import { BillGroupReducerI } from "../redux/reducers/bill-groups";
 
 interface PropI {
   route: {
@@ -23,10 +24,16 @@ interface PropI {
     };
   };
   bookNumbers: BookNumberReducerI;
+  billGroups: BillGroupReducerI;
   setBookNumbers(bookNumbers: BookNumberReducerI): void;
 }
 
-const SelectAreaScreen = ({ route, bookNumbers, setBookNumbers }: PropI) => {
+const SelectAreaScreen = ({
+  route,
+  bookNumbers,
+  billGroups,
+  setBookNumbers,
+}: PropI) => {
   const navigator = useNavigation();
   const { application, toRoute } = route.params;
   const [loading, setLoading] = useState(false);
@@ -170,7 +177,10 @@ const SelectAreaScreen = ({ route, bookNumbers, setBookNumbers }: PropI) => {
   );
 };
 
-const mapStateToProps = ({ bookNumbers }: RootReducerI) => ({ bookNumbers });
+const mapStateToProps = ({ bookNumbers, billGroups }: RootReducerI) => ({
+  bookNumbers,
+  billGroups,
+});
 
 const mapDispatchToProps = (dispatch: any) =>
   bindActionCreators({ setBookNumbers }, dispatch);

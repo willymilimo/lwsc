@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, Modal, Alert } from "react-native";
+import { StyleSheet, Text, View, Alert } from "react-native";
 import { BillGroupI, BookNumberI, BookNumber } from "../models/meter-reading";
 import { RootReducerI } from "../redux/reducers";
 import { bindActionCreators } from "redux";
@@ -8,7 +8,14 @@ import { connect } from "react-redux";
 import { BookNumberReducerI } from "../redux/reducers/book-number";
 import { useNavigation } from "@react-navigation/native";
 import { fetchAllBookNumbers } from "../models/axios";
-import { List, ActivityIndicator, Searchbar } from "react-native-paper";
+import {
+  List,
+  ActivityIndicator,
+  Searchbar,
+  Provider,
+  Modal,
+  Portal,
+} from "react-native-paper";
 import Strings from "../constants/Strings";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Colors from "../constants/Colors";
@@ -18,7 +25,7 @@ interface PropI {
   bookNumbers: BookNumberReducerI;
   setBookNumbers(bookNumbers: BookNumberReducerI): void;
   route: {
-    params: { billGroup: BillGroupI, cycle_id: string };
+    params: { billGroup: BillGroupI; cycle_id: string };
   };
 }
 
@@ -53,6 +60,7 @@ const BookNumbersScreen = ({ bookNumbers, setBookNumbers, route }: PropI) => {
   useEffect(() => {
     let is_subscribed = true;
 
+    console.log(Object.keys(bookNumbers).length);
     if (is_subscribed && !Object.keys(bookNumbers).length) {
       fetchBookNumbers();
     }
@@ -68,7 +76,7 @@ const BookNumbersScreen = ({ bookNumbers, setBookNumbers, route }: PropI) => {
         navigator.navigate(Strings.PropertiesScreen, {
           bookNumber: item,
           billGroup: billGroup,
-          cycle_id
+          cycle_id,
         })
       }
       title={item.DESCRIBE}
@@ -135,42 +143,61 @@ const BookNumbersScreen = ({ bookNumbers, setBookNumbers, route }: PropI) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Modal animationType="slide" transparent visible={loading}>
-        <View style={[styles.centeredView, { backgroundColor: "#00000077" }]}>
-          <View style={styles.modalView}>
-            <ActivityIndicator size="large" color={Colors.LwscOrange} />
-            <Text
-              style={{
-                marginTop: 20,
-                textAlign: "center",
-              }}
-            >
-              Loading book numbers
-            </Text>
-            <Text
-              style={{
-                marginTop: 20,
-                textAlign: "center",
-              }}
-            >{`Please wait...`}</Text>
-          </View>
-        </View>
-      </Modal>
-      <Searchbar
-        placeholder={`Search Book Number`}
-        onChangeText={onChangeSearch}
-        value={searchQuery}
-      />
-      <FlatList
-        removeClippedSubviews={true}
-        maxToRenderPerBatch={20}
-        initialNumToRender={20}
-        data={filteredDisplayList.length ? filteredDisplayList : displayList}
-        keyExtractor={(item: BookNumberI) => `${item.BILLGROUP}_${item.CODE}`}
-        renderItem={renderListItem}
-      />
-    </View>
+    <>
+      <View style={styles.container}>
+        {!loading && !Object.keys(displayList).length ? (
+          <Text>
+            Unable to fetch book numbers. Please ensure you are connected to the
+            internet.
+          </Text>
+        ) : (
+          <>
+            <Searchbar
+              placeholder={`Search Book Number`}
+              onChangeText={onChangeSearch}
+              value={searchQuery}
+            />
+            <FlatList
+              removeClippedSubviews={true}
+              maxToRenderPerBatch={20}
+              initialNumToRender={20}
+              data={
+                filteredDisplayList.length ? filteredDisplayList : displayList
+              }
+              keyExtractor={(item: BookNumberI) =>
+                `${item.BILLGROUP}_${item.CODE}`
+              }
+              renderItem={renderListItem}
+            />
+          </>
+        )}
+      </View>
+      <Provider>
+        <Portal>
+          <Modal visible={loading}>
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <ActivityIndicator size="large" color={Colors.LwscOrange} />
+                <Text
+                  style={{
+                    marginTop: 20,
+                    textAlign: "center",
+                  }}
+                >
+                  Loading book numbers
+                </Text>
+                <Text
+                  style={{
+                    marginTop: 20,
+                    textAlign: "center",
+                  }}
+                >{`Please wait...`}</Text>
+              </View>
+            </View>
+          </Modal>
+        </Portal>
+      </Provider>
+    </>
   );
 };
 
@@ -197,7 +224,7 @@ const styles = StyleSheet.create({
     // paddingHorizontal: 15,
   },
   centeredView: {
-    flex: 1,
+    // flex: 1,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 22,

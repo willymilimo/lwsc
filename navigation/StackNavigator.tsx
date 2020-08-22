@@ -3,7 +3,7 @@ import * as Notifications from "expo-notifications";
 import * as Permissions from "expo-permissions";
 import React, { useState, useEffect, useRef } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import { Platform, AsyncStorage } from "react-native";
+import { Platform } from "react-native";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { IconButton } from "react-native-paper";
@@ -23,20 +23,9 @@ import { setAccessNotes } from "../redux/actions/access-notes";
 import { setActiveAccount } from "../redux/actions/active-account";
 import { setPushToken } from "../redux/actions/push-token";
 import { ThemeReducer } from "../types/theme";
-import { NotificationI, Notification } from "../models/notification";
-import { AccountReducerI } from "../redux/reducers/accounts";
-import { PaypointI } from "../models/pay-point";
-import { BillGroupReducerI } from "../redux/reducers/bill-groups";
-import { BookNumberReducerI } from "../redux/reducers/book-number";
-import { MeterReadingPropertiesReducerI } from "../redux/reducers/meter-reading-proerties";
-import { AccessNotesReducerI } from "../redux/reducers/access-notes";
-import { ActiveAccountReducerI } from "../redux/reducers/active-account";
-import { BookNumber, Property } from "../models/meter-reading";
+import { NotificationI } from "../models/notification";
 import Strings from "../constants/Strings";
-import { Account } from "../models/account";
-import { PaymentHistory } from "../models/payment-history";
 import { setPaymentHistory } from "../redux/actions/payment-history";
-import { StatementI } from "../models/statement";
 import HomeTabNavigator from "./HomeTabNavigator";
 import NotificationsScreen from "../screens/NotificationsScreen";
 import LocatePaypointScreen from "../screens/LocatePaypointScreen";
@@ -63,7 +52,6 @@ import { submitPushToken } from "../models/axios";
 import SelectAreaScreen from "../screens/SelectAreaScreen";
 import RequestServiceScreen from "../screens/RequestServiceScreen";
 import { setUserReducer } from "../redux/actions/user";
-import { UserReducerI } from "../redux/reducers/user";
 import MeterReadingNavigator from "./MeterReadingNavigator";
 import { navigate } from "./RootNavigation";
 import ServiceInvoiceScreen from "../screens/ServiceInvoiceScreen";
@@ -82,35 +70,14 @@ interface SNI {
   themeReducer: ThemeReducer;
   pushToken: string;
   notifications: NotificationI[];
-  setThemeReducer(themeReducer: ThemeReducer): void;
   setPushToken(token: string): void;
-  setNotifications(notifications: NotificationI[]): void;
   addNotification(notifications: NotificationI): void;
-  setAccounts(accounts: AccountReducerI): void;
-  setPayPoints(paypoints: PaypointI[]): void;
-  setBillGroups(billGroups: BillGroupReducerI): void;
-  setBookNumbers(bookNumbers: BookNumberReducerI): void;
-  setMRProperties(properties: MeterReadingPropertiesReducerI): void;
-  setAccessNotes(accessNotes: AccessNotesReducerI): void;
-  setActiveAccount(activeAccount: ActiveAccountReducerI): void;
-  setPaymentHistory(history: StatementI[]): void;
-  setUserReducer(userReducer: UserReducerI): void;
+
 }
 
 const StackNavigator = ({
-  setThemeReducer,
   themeReducer,
-  setNotifications,
   addNotification,
-  setAccounts,
-  setPayPoints,
-  setBillGroups,
-  setBookNumbers,
-  setMRProperties,
-  setAccessNotes,
-  setActiveAccount,
-  setPaymentHistory,
-  setUserReducer,
 }: SNI) => {
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState(false);
@@ -118,150 +85,6 @@ const StackNavigator = ({
   const notificationListener = useRef();
   const responseListener = useRef();
   const [activeTheme, setActiveTheme] = React.useState(themeReducer.theme);
-
-  const bootstrapAsync = async () => {
-    let theme;
-    let accounts;
-    let paypoints;
-    let paymentHistory;
-    let billGroups;
-    let bookNumbers;
-    // let properties;
-    let accessNotes;
-    let activeAccount;
-    let notifications;
-    let pushTokenStr;
-    let userStr;
-
-    try {
-      // await AsyncStorage.clear();
-
-      theme = await AsyncStorage.getItem(Strings.THEME_STORAGE);
-      accounts = await AsyncStorage.getItem(Strings.ACCOUNTS_STORAGE);
-      paypoints = await AsyncStorage.getItem(Strings.PAYPOINTS_STORAGE);
-      paymentHistory = await AsyncStorage.getItem(
-        Strings.PAYMENT_HISTORY_STORAGE
-      );
-
-      notifications = await AsyncStorage.getItem(Strings.NOTIFICATIONS_STORAGE);
-      // await AsyncStorage.removeItem(Strings.NOTIFICATIONS_STORAGE)
-      // await AsyncStorage.removeItem(Strings.MR_PROPERTY_STORAGE)
-      billGroups = await AsyncStorage.getItem(Strings.BILL_GROUP_STORAGE);
-      bookNumbers = await AsyncStorage.getItem(Strings.BOOK_NUMBER_STORAGE);
-      // properties = await AsyncStorage.getItem(Strings.MR_PROPERTY_STORAGE);
-
-      // await AsyncStorage.removeItem(Strings.ACCESS_NOTES_STORAGE)
-      accessNotes = await AsyncStorage.getItem(Strings.ACCESS_NOTES_STORAGE);
-
-      activeAccount = await AsyncStorage.getItem(
-        Strings.ACTIVE_ACCOUNT_STORAGE
-      );
-
-      pushTokenStr = await AsyncStorage.getItem(Strings.PUSH_TOKEN_STORAGE);
-      // console.log(pushTokenStr)
-
-      // await AsyncStorage.removeItem(Strings.USER_STORAGE);
-      userStr = await AsyncStorage.getItem(Strings.USER_STORAGE);
-    } catch (e) {
-      // Restoring token failed
-    }
-
-    if (theme) {
-      setThemeReducer(JSON.parse(theme));
-      setActiveTheme(JSON.parse(theme).theme);
-    }
-
-    if (accounts) {
-      accounts = JSON.parse(accounts);
-      for (const key in accounts) {
-        if (accounts.hasOwnProperty(key)) {
-          const element = accounts[key];
-          accounts[key] = element.CUSTKEY
-            ? new Account(element)
-            : element.MeterNumber
-            ? new Property(element)
-            : element;
-        }
-      }
-      setAccounts(accounts);
-    }
-
-    if (paypoints) {
-      // console.log(paypoints);
-      paypoints = paypoints == "undefined" ? [] : JSON.parse(paypoints);
-
-      setPayPoints(JSON.parse(paypoints));
-    }
-
-    if (paymentHistory) {
-      setPaymentHistory(
-        JSON.parse(paymentHistory).map((ph: any) => new PaymentHistory(ph))
-      );
-    }
-
-    if (billGroups) {
-      setBillGroups(JSON.parse(billGroups));
-    }
-
-    if (bookNumbers) {
-      const data: BookNumberReducerI = JSON.parse(bookNumbers);
-      Object.keys(data).forEach((key) => {
-        let bns = data[key];
-
-        bns.map((k) => new BookNumber(k)); // forEach((k) => (bns.CODE = new BookNumber(bns[k])));
-      });
-      setBookNumbers(data);
-    }
-
-    // if (properties) {
-    //   const data: MeterReadingPropertiesReducerI = JSON.parse(properties);
-    //   Object.keys(data).forEach((key) => {
-    //     let bns = data[key];
-    //     data[key] = bns.map((item) => new Property(item));
-    //   });
-    //   setMRProperties(data);
-    // }
-
-    if (accessNotes) {
-      setAccessNotes(JSON.parse(accessNotes));
-    }
-
-    if (activeAccount) {
-      setActiveAccount(JSON.parse(activeAccount));
-    }
-
-    if (notifications) {
-      setNotifications(
-        JSON.parse(notifications).map(
-          (item: NotificationI) => new Notification(item)
-        )
-      );
-    }
-
-    if (userStr) {
-      const userReducer: UserReducerI = JSON.parse(userStr);
-      const created = userReducer.createdAt + 60 * 60 * 24 * 1000;
-      const now = Date.now();
-      if (created > now) {
-        setUserReducer(userReducer);
-      } else {
-        setUserReducer({
-          username: "",
-          manNumber: "",
-          authToken: "",
-          createdAt: 0,
-        });
-      }
-    }
-
-    // console.log(`pushTokenStr: ${pushTokenStr}`);
-    // if (pushTokenStr) {
-    //   setPushToken(pushTokenStr);
-    //   setToken(pushTokenStr);
-    // }
-
-    // setBootstrapping(false);
-  };
 
   const submitToken = async (token: string) => {
     try {
@@ -305,7 +128,7 @@ const StackNavigator = ({
       }
     );
 
-    bootstrapAsync();
+    // bootstrapAsync();
 
     return () => {
       Notifications.removeNotificationSubscription(notificationListener);

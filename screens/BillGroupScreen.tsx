@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Modal, Alert } from "react-native";
+import { StyleSheet, Text, View, Alert } from "react-native";
 import { setBillGroups } from "../redux/actions/bill-groups";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -7,7 +7,14 @@ import { RootReducerI } from "../redux/reducers";
 import { BillGroupReducerI } from "../redux/reducers/bill-groups";
 import { fetchAllBillGroups, validateBillWindow } from "../models/axios";
 import { BillGroupI } from "../models/meter-reading";
-import { ActivityIndicator, List } from "react-native-paper";
+import {
+  ActivityIndicator,
+  List,
+  Portal,
+  Provider,
+  Modal,
+  Button,
+} from "react-native-paper";
 import Colors from "../constants/Colors";
 import { FlatList } from "react-native-gesture-handler";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -22,6 +29,7 @@ interface PropsI {
 const BillGroupScreen = ({ billGroups, setBillGroups }: PropsI) => {
   const navigator = useNavigation();
   const [loading, setLoading] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
   const [displayList, setDisplayList] = useState<BillGroupI[]>(
     Object.values(billGroups)
   );
@@ -36,19 +44,17 @@ const BillGroupScreen = ({ billGroups, setBillGroups }: PropsI) => {
     return () => {
       is_subscribed = false;
     };
-  }, [billGroups]);
+  }, []);
 
   const validate = async (billGroup: string) => {
     try {
-      setLoading(true);
       const { status, data } = await validateBillWindow(billGroup);
-      console.log(data);
+      // console.log(data);
       if (status === 200 && data.success) {
         return data.payload.CYCLE_ID;
       }
       return false;
     } catch (err) {
-      setLoading(false);
       return false;
     }
   };
@@ -56,7 +62,11 @@ const BillGroupScreen = ({ billGroups, setBillGroups }: PropsI) => {
   const renderListItem = ({ item }: { item: BillGroupI }) => (
     <List.Item
       onPress={async () => {
+        setModalMessage("Validating billing window");
+        setLoading(true);
         const cycle_id = await validate(item.GROUP_ID);
+        setLoading(false);
+        setModalMessage("");
         if (cycle_id) {
           navigator.navigate(Strings.BookNumbersScreen, {
             billGroup: item,
@@ -64,9 +74,7 @@ const BillGroupScreen = ({ billGroups, setBillGroups }: PropsI) => {
           });
         } else {
           const { title, message } = Strings.BILLING_CYCLE;
-          Alert.alert(title, message, [
-            { onPress: () => navigator.navigate(Strings.HomeTabNavigator) },
-          ]);
+          Alert.alert(title, message);
         }
       }}
       title={item.GROUP_ID}
@@ -87,7 +95,8 @@ const BillGroupScreen = ({ billGroups, setBillGroups }: PropsI) => {
   );
 
   const fetchBillGroups = async () => {
-    console.log("windows......");
+    // console.log("windows......");
+    setModalMessage("Loading bill groups");
     setLoading(true);
     fetchAllBillGroups()
       .then(({ status, data }) => {
@@ -121,40 +130,61 @@ const BillGroupScreen = ({ billGroups, setBillGroups }: PropsI) => {
           [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
         )
       )
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
+  // console.log(Object.keys(billGroups).length)
   return (
-    <View style={styles.container}>
-      {loading ? (
-        <View style={styles.modalView}>
-          <ActivityIndicator size="large" color={Colors.LwscOrange} />
-          <Text
-            style={{
-              marginTop: 20,
-              textAlign: "center",
-            }}
-          >
-            Loading bill groups
+    <>
+      <View style={styles.container}>
+        {!Object.keys(billGroups).length &&
+        modalMessage == "Loading bill groups" ? (
+          <Text>
+            Unable to fetch bill groups. Please ensure you are connected to the
+            internet.
           </Text>
-          <Text
-            style={{
-              marginTop: 20,
-              textAlign: "center",
-            }}
-          >{`Please wait...`}</Text>
-        </View>
-      ) : (
-        <FlatList
-          removeClippedSubviews={true}
-          maxToRenderPerBatch={20}
-          initialNumToRender={20}
-          data={displayList}
-          keyExtractor={(item: BillGroupI) => item.GROUP_ID}
-          renderItem={renderListItem}
-        />
-      )}
-    </View>
+        ) : (
+          <FlatList
+            removeClippedSubviews={true}
+            maxToRenderPerBatch={20}
+            initialNumToRender={20}
+            data={displayList}
+            keyExtractor={(item: BillGroupI) => item.GROUP_ID}
+            renderItem={renderListItem}
+          />
+        )}
+      </View>
+      <Provider>
+        <Portal>
+          <Modal visible={loading}>
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <ActivityIndicator size="large" color={Colors.LwscOrange} />
+                <Text
+                  style={{
+                    marginTop: 20,
+                    textAlign: "center",
+                  }}
+                >
+                  {modalMessage}
+                </Text>
+                <Text
+                  style={{
+                    marginTop: 20,
+                    textAlign: "center",
+                  }}
+                >{`Please wait...`}</Text>
+              </View>
+            </View>
+          </Modal>
+          {/* <Button style={{ marginTop: 30 }} onPress={() => setLoading(true)}>
+            Show
+          </Button> */}
+        </Portal>
+      </Provider>
+    </>
   );
 };
 
