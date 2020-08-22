@@ -14,17 +14,17 @@ import { fetchConfigStatus } from "./models/axios";
 import Strings from "./constants/Strings";
 import DeprecationScreen from "./screens/DeprecationScreen";
 import Toast from "./components/Toast";
+import Bootstrap from "./screens/Bootstrap";
+import MeterReadingNavigator from "./navigation/MeterReadingNavigator";
 
-Sentry.init({
-  dsn:
-    "https://420c505c0fcd4c99b674c76a37a05174@o429442.ingest.sentry.io/5376037",
-  enableInExpoDevelopment: true,
-  debug: true,
-});
+// Sentry.init({
+//   dsn:
+//     "https://420c505c0fcd4c99b674c76a37a05174@o429442.ingest.sentry.io/5376037",
+//   enableInExpoDevelopment: true,
+//   debug: true,
+// });
 
 export default function App() {
-  const [loading, setLoading] = useState(true);
-  const [deprecated, setDeprecated] = useState(false);
   const [internetRecheable, setInternetRecheable] = useState(false);
 
   useEffect(() => {
@@ -33,47 +33,11 @@ export default function App() {
       // console.log("Is connected?", state.isConnected);
       setInternetRecheable(!!state.isInternetReachable);
     });
-
-    getConfigStatus();
     // To unsubscribe to these update, just use:
     unsubscribe();
   }, []);
 
-  const getConfigStatus = () => {
-    fetchConfigStatus()
-      .then(({ status, data }) => {
-        if (status !== 200) throw new Error("we have a problem");
-
-        const { success, payload } = data;
-
-        if (!success || /deprecated/i.test(payload.status)) {
-          setDeprecated(true);
-        }
-      })
-      .catch((err) => {
-        const { title, message } = Strings.SELF_REPORTING_PROBLEM;
-        Alert.alert(title, message, [{ onPress: () => BackHandler.exitApp() }]);
-      })
-      .finally(() => setLoading(false));
-  };
-
-  return loading ? (
-    <>
-      <StatusBar
-        backgroundColor={`${Colors.LwscBlue}cc`}
-        barStyle="light-content"
-      />
-      <VersionCheckScreen />
-    </>
-  ) : deprecated ? (
-    <>
-      <StatusBar
-        backgroundColor={`${Colors.LwscBlue}cc`}
-        barStyle="light-content"
-      />
-      <DeprecationScreen />
-    </>
-  ) : (
+  return (
     <Provider store={store}>
       <PaperProvider>
         <>
@@ -87,7 +51,8 @@ export default function App() {
               backgroundColor={`${Colors.LwscBlue}cc`}
               barStyle="light-content"
             />
-            <StackNavigator />
+            {/* <StackNavigator /> */}
+            <Bootstrap />
           </NavigationContainer>
         </>
       </PaperProvider>

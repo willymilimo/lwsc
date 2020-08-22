@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, AsyncStorage, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  AsyncStorage,
+  StyleSheet,
+  Alert,
+  BackHandler,
+} from "react-native";
+import { createStackNavigator } from "@react-navigation/stack";
 import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
 import { bindActionCreators } from "redux";
@@ -33,7 +41,13 @@ import { UserReducerI } from "../redux/reducers/user";
 import { Account } from "../models/account";
 import { Property, BookNumber } from "../models/meter-reading";
 import { PaymentHistory } from "../models/payment-history";
-import { fetchAllBillGroups } from "../models/axios";
+import { fetchAllBillGroups, fetchConfigStatus } from "../models/axios";
+import { Surface, ActivityIndicator } from "react-native-paper";
+import Colors from "../constants/Colors";
+import DeprecationScreen from "./DeprecationScreen";
+import StackNavigator from "../navigation/StackNavigator";
+
+const Stack = createStackNavigator();
 
 interface PropI {
   themeReducer: ThemeReducer;
@@ -52,6 +66,33 @@ interface PropI {
   setUserReducer(userReducer: UserReducerI): void;
 }
 
+const Loader = () => {
+  return (
+    <View style={styles.container}>
+      <Surface style={styles.surface}>
+        <ActivityIndicator size="large" color={Colors.LwscOrange} />
+        <Text
+          style={{
+            marginTop: 20,
+            textAlign: "center",
+          }}
+        >
+          Loading necessary resources
+        </Text>
+        <Text
+          style={{
+            marginTop: 20,
+            textAlign: "center",
+          }}
+        >{`Please wait...`}</Text>
+      </Surface>
+      <View style={styles.footer}>
+        <Text>Powered by Microtech</Text>
+      </View>
+    </View>
+  );
+};
+
 const Bootstrap = ({
   themeReducer,
   setThemeReducer,
@@ -66,168 +107,206 @@ const Bootstrap = ({
   setUserReducer,
 }: PropI) => {
   const [activeTheme, setActiveTheme] = React.useState(themeReducer.theme);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [deprecated, setDeprecated] = useState(false);
 
   const bootstrapAsync = async () => {
     setLoading(true);
-    let theme;
-    let accounts;
-    let paypoints;
-    let paymentHistory;
-    let billGroups;
-    let bookNumbers;
-    // let properties;
-    let accessNotes;
-    let activeAccount;
-    let notifications;
-    let pushTokenStr;
-    let userStr;
+    const isDeprecated = await getConfigStatus();
+    setDeprecated(isDeprecated);
 
-    try {
-      // await AsyncStorage.clear();
+    if (!isDeprecated) {
+      let theme;
+      let accounts;
+      let paypoints;
+      let paymentHistory;
+      let billGroups;
+      let bookNumbers;
+      // let properties;
+      let accessNotes;
+      let activeAccount;
+      let notifications;
+      let pushTokenStr;
+      let userStr;
 
-      theme = await AsyncStorage.getItem(Strings.THEME_STORAGE);
-      accounts = await AsyncStorage.getItem(Strings.ACCOUNTS_STORAGE);
-      paypoints = await AsyncStorage.getItem(Strings.PAYPOINTS_STORAGE);
-      paymentHistory = await AsyncStorage.getItem(
-        Strings.PAYMENT_HISTORY_STORAGE
-      );
+      try {
+        // await AsyncStorage.clear();
 
-      notifications = await AsyncStorage.getItem(Strings.NOTIFICATIONS_STORAGE);
-      // await AsyncStorage.removeItem(Strings.NOTIFICATIONS_STORAGE)
-      // await AsyncStorage.removeItem(Strings.MR_PROPERTY_STORAGE)
-      billGroups = await AsyncStorage.getItem(Strings.BILL_GROUP_STORAGE);
-      bookNumbers = await AsyncStorage.getItem(Strings.BOOK_NUMBER_STORAGE);
-      // properties = await AsyncStorage.getItem(Strings.MR_PROPERTY_STORAGE);
+        theme = await AsyncStorage.getItem(Strings.THEME_STORAGE);
+        accounts = await AsyncStorage.getItem(Strings.ACCOUNTS_STORAGE);
+        paypoints = await AsyncStorage.getItem(Strings.PAYPOINTS_STORAGE);
+        paymentHistory = await AsyncStorage.getItem(
+          Strings.PAYMENT_HISTORY_STORAGE
+        );
 
-      // await AsyncStorage.removeItem(Strings.ACCESS_NOTES_STORAGE)
-      accessNotes = await AsyncStorage.getItem(Strings.ACCESS_NOTES_STORAGE);
+        notifications = await AsyncStorage.getItem(
+          Strings.NOTIFICATIONS_STORAGE
+        );
+        // await AsyncStorage.removeItem(Strings.NOTIFICATIONS_STORAGE)
+        // await AsyncStorage.removeItem(Strings.MR_PROPERTY_STORAGE)
+        billGroups = await AsyncStorage.getItem(Strings.BILL_GROUP_STORAGE);
+        bookNumbers = await AsyncStorage.getItem(Strings.BOOK_NUMBER_STORAGE);
+        // properties = await AsyncStorage.getItem(Strings.MR_PROPERTY_STORAGE);
 
-      activeAccount = await AsyncStorage.getItem(
-        Strings.ACTIVE_ACCOUNT_STORAGE
-      );
+        // await AsyncStorage.removeItem(Strings.ACCESS_NOTES_STORAGE)
+        accessNotes = await AsyncStorage.getItem(Strings.ACCESS_NOTES_STORAGE);
 
-      pushTokenStr = await AsyncStorage.getItem(Strings.PUSH_TOKEN_STORAGE);
-      // console.log(pushTokenStr)
+        activeAccount = await AsyncStorage.getItem(
+          Strings.ACTIVE_ACCOUNT_STORAGE
+        );
 
-      // await AsyncStorage.removeItem(Strings.USER_STORAGE);
-      userStr = await AsyncStorage.getItem(Strings.USER_STORAGE);
-    } catch (e) {
-      // Restoring token failed
-    }
+        pushTokenStr = await AsyncStorage.getItem(Strings.PUSH_TOKEN_STORAGE);
+        // console.log(pushTokenStr)
 
-    if (theme) {
-      setThemeReducer(JSON.parse(theme));
-      setActiveTheme(JSON.parse(theme).theme);
-    }
+        // await AsyncStorage.removeItem(Strings.USER_STORAGE);
+        userStr = await AsyncStorage.getItem(Strings.USER_STORAGE);
+      } catch (e) {
+        // Restoring token failed
+      }
 
-    if (accounts) {
-      accounts = JSON.parse(accounts);
-      for (const key in accounts) {
-        if (accounts.hasOwnProperty(key)) {
-          const element = accounts[key];
-          accounts[key] = element.CUSTKEY
-            ? new Account(element)
-            : element.MeterNumber
-            ? new Property(element)
-            : element;
+      if (theme) {
+        setThemeReducer(JSON.parse(theme));
+        setActiveTheme(JSON.parse(theme).theme);
+      }
+
+      if (accounts) {
+        accounts = JSON.parse(accounts);
+        for (const key in accounts) {
+          if (accounts.hasOwnProperty(key)) {
+            const element = accounts[key];
+            accounts[key] = element.CUSTKEY
+              ? new Account(element)
+              : element.MeterNumber
+              ? new Property(element)
+              : element;
+          }
+        }
+        setAccounts(accounts);
+      }
+
+      if (paypoints) {
+        // console.log(paypoints);
+        paypoints = paypoints == "undefined" ? [] : JSON.parse(paypoints);
+
+        setPayPoints(JSON.parse(paypoints));
+      }
+
+      if (paymentHistory) {
+        setPaymentHistory(
+          JSON.parse(paymentHistory).map((ph: any) => new PaymentHistory(ph))
+        );
+      }
+
+      // console.log(billGroups)
+      if (billGroups) {
+        setBillGroups(JSON.parse(billGroups));
+      } else {
+        const { status, data } = await fetchAllBillGroups();
+        if (status === 200 && data.success) {
+          const pay: BillGroupReducerI = {};
+          data.payload.recordset.forEach((bg) => (pay[bg.GROUP_ID] = bg));
+          setBillGroups(pay);
         }
       }
-      setAccounts(accounts);
-    }
 
-    if (paypoints) {
-      // console.log(paypoints);
-      paypoints = paypoints == "undefined" ? [] : JSON.parse(paypoints);
+      if (bookNumbers) {
+        const data: BookNumberReducerI = JSON.parse(bookNumbers);
+        Object.keys(data).forEach((key) => {
+          let bns = data[key];
 
-      setPayPoints(JSON.parse(paypoints));
-    }
-
-    if (paymentHistory) {
-      setPaymentHistory(
-        JSON.parse(paymentHistory).map((ph: any) => new PaymentHistory(ph))
-      );
-    }
-
-    // console.log(billGroups)
-    if (billGroups) {
-      setBillGroups(JSON.parse(billGroups));
-    } else {
-      const { status, data } = await fetchAllBillGroups();
-      if (status === 200 && data.success) {
-        const pay: BillGroupReducerI = {};
-        data.payload.recordset.forEach((bg) => (pay[bg.GROUP_ID] = bg));
-        setBillGroups(pay);
-      }
-    }
-
-    if (bookNumbers) {
-      const data: BookNumberReducerI = JSON.parse(bookNumbers);
-      Object.keys(data).forEach((key) => {
-        let bns = data[key];
-
-        bns.map((k) => new BookNumber(k)); // forEach((k) => (bns.CODE = new BookNumber(bns[k])));
-      });
-      setBookNumbers(data);
-    }
-
-    if (accessNotes) {
-      setAccessNotes(JSON.parse(accessNotes));
-    }
-
-    if (activeAccount) {
-      setActiveAccount(JSON.parse(activeAccount));
-    }
-
-    if (notifications) {
-      setNotifications(
-        JSON.parse(notifications).map(
-          (item: NotificationI) => new Notification(item)
-        )
-      );
-    }
-
-    if (userStr) {
-      const userReducer: UserReducerI = JSON.parse(userStr);
-      const created = userReducer.createdAt + 60 * 60 * 24 * 1000;
-      const now = Date.now();
-      if (created > now) {
-        setUserReducer(userReducer);
-      } else {
-        setUserReducer({
-          username: "",
-          manNumber: "",
-          authToken: "",
-          createdAt: 0,
+          bns.map((k) => new BookNumber(k)); // forEach((k) => (bns.CODE = new BookNumber(bns[k])));
         });
+        setBookNumbers(data);
       }
+
+      if (accessNotes) {
+        setAccessNotes(JSON.parse(accessNotes));
+      }
+
+      if (activeAccount) {
+        setActiveAccount(JSON.parse(activeAccount));
+      }
+
+      if (notifications) {
+        setNotifications(
+          JSON.parse(notifications).map(
+            (item: NotificationI) => new Notification(item)
+          )
+        );
+      }
+
+      if (userStr) {
+        const userReducer: UserReducerI = JSON.parse(userStr);
+        const created = userReducer.createdAt + 60 * 60 * 24 * 1000;
+        const now = Date.now();
+        if (created > now) {
+          setUserReducer(userReducer);
+        } else {
+          setUserReducer({
+            username: "",
+            manNumber: "",
+            authToken: "",
+            createdAt: 0,
+          });
+        }
+      }
+
+      // console.log(`pushTokenStr: ${pushTokenStr}`);
+      // if (pushTokenStr) {
+      //   setPushToken(pushTokenStr);
+      //   setToken(pushTokenStr);
+      // }
+
+      // setBootstrapping(false);
     }
 
-    // console.log(`pushTokenStr: ${pushTokenStr}`);
-    // if (pushTokenStr) {
-    //   setPushToken(pushTokenStr);
-    //   setToken(pushTokenStr);
-    // }
-
-    // setBootstrapping(false);
     setLoading(false);
+  };
+
+  const getConfigStatus = async () => {
+    const { status, data } = await fetchConfigStatus();
+
+    return !(
+      status == 200 &&
+      data.success &&
+      !/deprecated/i.test(data.payload.status)
+    );
   };
 
   useEffect(() => {
     let is_subscribed = true;
 
     if (is_subscribed) {
-      bootstrapAsync();
+      try {
+        bootstrapAsync();
+      } catch (err) {
+        const { title, message } = Strings.SELF_REPORTING_PROBLEM;
+        Alert.alert(title, message, [{ onPress: () => BackHandler.exitApp() }]);
+      }
     }
     return () => {
       is_subscribed = false;
     };
   }, []);
 
+  
   return (
-    <View style={styles.container}>
-      <Text></Text>
-    </View>
+    <Stack.Navigator headerMode="none" initialRouteName="Loader">
+      {loading ? (
+        <Stack.Screen name="Loader" component={Loader} />
+      ) : deprecated ? (
+        <Stack.Screen
+          name={Strings.DeprecationScreen}
+          component={DeprecationScreen}
+        />
+      ) : (
+        <Stack.Screen
+          options={{ headerShown: false }}
+          name={Strings.MeterReadingNavigator}
+          component={StackNavigator}
+        />
+      )}
+    </Stack.Navigator>
   );
 };
 
@@ -235,8 +314,22 @@ const styles = StyleSheet.create({
   container: {
     display: "flex",
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "white",
-    // paddingHorizontal: 15,
+    justifyContent: "center",
+  },
+  surface: {
+    padding: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 4,
+    alignSelf: "center",
+    borderRadius: 10,
+  },
+  footer: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    paddingRight: 10,
+    paddingBottom: 10,
   },
 });
 

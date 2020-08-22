@@ -171,10 +171,9 @@ const SignInScreen = ({ user, setUserReducer }: PropI) => {
                 color={Colors.linkBlue}
                 labelStyle={{ textTransform: "capitalize" }}
                 onPress={() => {
-                  // navigator.navigate(Strings.SelectAreaScreen, {
-                  //   toRoute: Strings.PropertiesScreen,
-                  // })
-                  Alert.alert("Coming soon", "Coming soon");
+                  navigator.navigate(Strings.SelectAreaScreen, {
+                    toRoute: Strings.PropertiesScreen,
+                  });
                 }}
               >
                 Tap Here

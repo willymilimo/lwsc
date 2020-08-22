@@ -73,6 +73,7 @@ const SelectAreaScreen = ({
       onPress={() => {
         navigator.navigate(toRoute, {
           bookNumber: item,
+          billGroup: billGroups[item.BILLGROUP],
           item: application,
         });
       }}

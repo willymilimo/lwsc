@@ -58,7 +58,7 @@ PropI) => {
   );
   const [searchQuery, setSearchQuery] = React.useState("");
 
-  // console.log(navigation)
+  console.log(bookNumber, billGroup);
 
   const onChangeSearch = (query: string) => {
     setSearchQuery(query);
@@ -139,7 +139,7 @@ PropI) => {
         [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
       );
     }
-    console.log('here now.......')
+    console.log("here now.......");
     setLoading(false);
   };
 
