@@ -44,8 +44,8 @@ import { PaymentHistory } from "../models/payment-history";
 import { fetchAllBillGroups, fetchConfigStatus } from "../models/axios";
 import { Surface, ActivityIndicator } from "react-native-paper";
 import Colors from "../constants/Colors";
-import DeprecationScreen from "./DeprecationScreen";
-import StackNavigator from "../navigation/StackNavigator";
+import DeprecationScreen from "../screens/DeprecationScreen";
+import StackNavigator from "./StackNavigator";
 
 const Stack = createStackNavigator();
 
@@ -302,7 +302,7 @@ const Bootstrap = ({
       ) : (
         <Stack.Screen
           options={{ headerShown: false }}
-          name={Strings.MeterReadingNavigator}
+          name="Stack Navigator"
           component={StackNavigator}
         />
       )}

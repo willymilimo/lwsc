@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, Alert } from "react-native";
 import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
 import { bindActionCreators } from "redux";
 import { setBookNumbers } from "../redux/actions/book-numbers";
 import { BookNumberI, BookNumber } from "../models/meter-reading";
 import { BookNumberReducerI } from "../redux/reducers/book-number";
-import { fetchAllBookNumbers } from "../models/axios";
+import { fetchAllBookNumbers, validateBillWindow } from "../models/axios";
 import { useNavigation } from "@react-navigation/native";
 import { List, Searchbar, ActivityIndicator } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -15,6 +15,7 @@ import { FlatList } from "react-native-gesture-handler";
 import { ServiceApplicationI } from "../models/service-application";
 import { ServiceReportI } from "../models/service-report";
 import { BillGroupReducerI } from "../redux/reducers/bill-groups";
+import Strings from "../constants/Strings";
 
 interface PropI {
   route: {
@@ -35,6 +36,7 @@ const SelectAreaScreen = ({
   setBookNumbers,
 }: PropI) => {
   const navigator = useNavigation();
+  const [modalMessage, setModalMessage] = useState("Loading b");
   const { application, toRoute } = route.params;
   const [loading, setLoading] = useState(false);
   const [displayList, setDisplayList] = useState<BookNumberI[]>(
@@ -68,14 +70,37 @@ const SelectAreaScreen = ({
     }
   };
 
+  const validate = async (billGroup: string) => {
+    try {
+      const { status, data } = await validateBillWindow(billGroup);
+      // console.log(data);
+      if (status === 200 && data.success) {
+        return data.payload.CYCLE_ID;
+      }
+      return false;
+    } catch (err) {
+      return false;
+    }
+  };
+
   const renderListItem = ({ item }: { item: BookNumberI }) => (
     <List.Item
-      onPress={() => {
-        navigator.navigate(toRoute, {
-          bookNumber: item,
-          billGroup: billGroups[item.BILLGROUP],
-          item: application,
-        });
+      onPress={async () => {
+        setLoading(true);
+        const cycle_id = await validate(item.BILLGROUP);
+        setLoading(false);
+
+        if (cycle_id) {
+          navigator.navigate(toRoute, {
+            bookNumber: item,
+            billGroup: billGroups[item.BILLGROUP],
+            cycle_id,
+            item: application,
+          });
+        } else {
+          const { title, message } = Strings.BILLING_CYCLE;
+          Alert.alert(title, message);
+        }
       }}
       title={item.DESCRIBE}
       description={`${item.CODE} - ${item.NO_WALKS} walks`}

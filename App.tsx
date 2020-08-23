@@ -3,19 +3,14 @@ import { Provider as PaperProvider } from "react-native-paper";
 import { NavigationContainer } from "@react-navigation/native";
 import { Provider } from "react-redux";
 import store from "./redux/store";
-import StackNavigator from "./navigation/StackNavigator";
 import * as Sentry from "sentry-expo";
 import { navigationRef } from "./navigation/RootNavigation";
-import { StatusBar, Alert, BackHandler } from "react-native";
+import { StatusBar } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
 import Colors from "./constants/Colors";
-import VersionCheckScreen from "./screens/VersionCheckScreen";
-import { fetchConfigStatus } from "./models/axios";
 import Strings from "./constants/Strings";
-import DeprecationScreen from "./screens/DeprecationScreen";
 import Toast from "./components/Toast";
-import Bootstrap from "./screens/Bootstrap";
-import MeterReadingNavigator from "./navigation/MeterReadingNavigator";
+import Bootstrap from "./navigation/Bootstrap";
 
 // Sentry.init({
 //   dsn:

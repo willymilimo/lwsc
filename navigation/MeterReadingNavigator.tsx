@@ -72,6 +72,10 @@ const MeterReadingNavigator = ({ user }: PropI) => {
             name={Strings.PropertiesScreen}
             component={PropertiesScreen}
           />
+          <Stack.Screen
+            name={Strings.ReadMeterScreen}
+            component={ReadMeterScreen}
+          />
         </>
       ) : (
         // User is signed in

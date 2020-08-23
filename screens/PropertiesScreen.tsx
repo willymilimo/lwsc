@@ -58,8 +58,6 @@ PropI) => {
   );
   const [searchQuery, setSearchQuery] = React.useState("");
 
-  console.log(bookNumber, billGroup);
-
   const onChangeSearch = (query: string) => {
     setSearchQuery(query);
     if (query.length > 1) {

@@ -105,7 +105,7 @@ const ReadMeterScreen = ({
 }: PropI) => {
   let map: MapView;
   const { container, mapContainer, mapStyle } = styles;
-  const { manNumber, billGroup, property, cycle_id } = route.params;
+  const { billGroup, property, cycle_id } = route.params;
   const navigator = useNavigation();
   const [displayItems, setDisplayItems] = useState(accessNotes);
   const [region, setRegion] = React.useState({
@@ -129,11 +129,34 @@ const ReadMeterScreen = ({
   const [loading, setLoading] = useState(false);
   const [uploadFiles, setUploadFiles] = useState<UploadFileI[]>();
 
+  const initializeAccess = (access: NoAccessI[]) => {
+    access.forEach(({ code, DESCRIBE }) => {
+      if (DESCRIBE.toLocaleLowerCase().includes("no message")) {
+        setAccess({
+          value: code.toString(),
+          error: false,
+        });
+      }
+    });
+  };
+
+  const initializeNotes = (notes: NotesI[]) => {
+    notes.forEach(({ CODE, DESCRIBE }) => {
+      if (DESCRIBE.toLocaleLowerCase().includes("no note")) {
+        setNote({
+          value: CODE.toString(),
+          error: false,
+        });
+      }
+    });
+  };
+
   useEffect(() => {
     let is_subscribed = true;
 
     const bootstrap = async () => {
       setLoading(true);
+      const self_reading = user.authToken == "";
 
       try {
         await getLocationAsync();
@@ -144,21 +167,26 @@ const ReadMeterScreen = ({
             setANAccess(data.payload.recordset);
             displayItems.no_access = data.payload.recordset;
             setDisplayItems(displayItems);
+            if (self_reading) initializeAccess(data.payload.recordset);
           } else {
             throw new Error("failed to retrieve records");
           }
+        } else if (self_reading) {
+          initializeAccess(accessNotes.no_access);
         }
 
         if (!accessNotes.notes.length) {
           const { status, data } = await fetchAccessNotes();
           if (status === 200 && data.success) {
             setANNotes(data.payload.recordset);
-            // console.log(data.payload.recordset);
             displayItems.notes = data.payload.recordset;
             setDisplayItems(displayItems);
+            if (self_reading) initializeNotes(data.payload.recordset);
           } else {
             throw new Error("failed to retrieve records");
           }
+        } else if (self_reading) {
+          initializeNotes(accessNotes.notes);
         }
       } catch (err) {
         Alert.alert(
@@ -264,10 +292,6 @@ const ReadMeterScreen = ({
           );
         } else {
           throw new Error(JSON.stringify(data));
-          // Alert.alert(
-          //   Strings.METER_READING_SUBMIT_FAILURE.title,
-          //   Strings.METER_READING_SUBMIT_FAILURE.message
-          // );
         }
       })
       .catch(() =>
@@ -301,14 +325,6 @@ const ReadMeterScreen = ({
           style={mapStyle}
         >
           <Marker
-            // draggable
-            // onDragEnd={(e) =>
-            //   setRegion({
-            //     ...region,
-            //     latitude: e.nativeEvent.coordinate.latitude,
-            //     longitude: e.nativeEvent.coordinate.longitude,
-            //   })
-            // }
             coordinate={{
               longitude: region.longitude,
               latitude: region.latitude,
@@ -358,16 +374,6 @@ const ReadMeterScreen = ({
             />
           )}
         />
-        {/* <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[
-              styles.bubble,
-              { backgroundColor: `${Colors.LwscBlack}33`, borderRadius: 10 },
-            ]}
-          >
-            <Text style={styles.bubbleText}>Drag marker to your location</Text>
-          </TouchableOpacity>
-        </View> */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             onPress={async () => await getLocationAsync()}
@@ -387,13 +393,6 @@ const ReadMeterScreen = ({
           deleteCallback={() => setUploadFiles(undefined)}
         />
         <View>
-          {/* <MeterItem
-            icon={
-              <Ionicons name="ios-person" size={25} color={Colors.linkBlue} />
-            }
-            title="Operational Status"
-            value={manNumber}
-          /> */}
           <MeterItem
             icon={
               <MaterialCommunityIcons
@@ -432,7 +431,7 @@ const ReadMeterScreen = ({
             title="Address"
             value={`${property.Customer_Address}`}
           />
-          {property.PLOT_NO && (
+          {!!property.PLOT_NO && (
             <MeterItem
               icon={
                 <Ionicons
@@ -490,73 +489,80 @@ const ReadMeterScreen = ({
           }}
         />
 
-        <View
-          style={{
-            borderWidth: 1,
-            borderBottomColor: Colors.borderColorDark,
-            borderStyle: "solid",
-            borderRadius: 5,
-            marginTop: 10,
-          }}
-        >
-          <Picker
-            selectedValue={access.value}
-            onValueChange={(itemValue, index) => {
-              setAccess({
-                value: itemValue,
-                error: !displayItems.no_access.some(
-                  (value) => value.code === itemValue
-                ),
-              });
-            }}
-          >
-            <Picker.Item
-              label="-- Select Access Description --"
-              value="-- Select Access Description --"
-            />
-            {displayItems.no_access.map((noac) => {
-              // console.log(noac);
-              return (
+        {user.authToken !== "" && (
+          <>
+            <View
+              style={{
+                borderWidth: 1,
+                borderBottomColor: Colors.borderColorDark,
+                borderStyle: "solid",
+                borderRadius: 5,
+                marginTop: 10,
+              }}
+            >
+              <Picker
+                selectedValue={access.value}
+                onValueChange={(itemValue, index) => {
+                  setAccess({
+                    value: itemValue,
+                    error: !displayItems.no_access.some(
+                      (value) => value.code === itemValue
+                    ),
+                  });
+                }}
+              >
                 <Picker.Item
-                  key={`${noac.DESCRIBE}_${noac.code}`}
-                  label={noac.DESCRIBE}
-                  value={noac.code}
+                  label="-- Select Access Description --"
+                  value="-- Select Access Description --"
                 />
-              );
-            })}
-          </Picker>
-        </View>
+                {displayItems.no_access.map((noac) => {
+                  // console.log(noac);
+                  return (
+                    <Picker.Item
+                      key={`${noac.DESCRIBE}_${noac.code}`}
+                      label={noac.DESCRIBE}
+                      value={noac.code}
+                    />
+                  );
+                })}
+              </Picker>
+            </View>
 
-        <View
-          style={{
-            borderWidth: 1,
-            borderBottomColor: Colors.borderColorDark,
-            borderStyle: "solid",
-            borderRadius: 5,
-            marginTop: 10,
-          }}
-        >
-          <Picker
-            selectedValue={note.value}
-            onValueChange={(itemValue, index) => {
-              setNote({
-                value: itemValue,
-                error: !displayItems.notes.some(
-                  (value) => value.CODE === itemValue
-                ),
-              });
-            }}
-          >
-            <Picker.Item label="-- Select Note --" value="-- Select Note --" />
-            {displayItems.notes.map((an) => (
-              <Picker.Item
-                key={`${an.DESCRIBE}_${an.CODE}`}
-                label={an.DESCRIBE}
-                value={an.CODE}
-              />
-            ))}
-          </Picker>
-        </View>
+            <View
+              style={{
+                borderWidth: 1,
+                borderBottomColor: Colors.borderColorDark,
+                borderStyle: "solid",
+                borderRadius: 5,
+                marginTop: 10,
+              }}
+            >
+              <Picker
+                selectedValue={note.value}
+                onValueChange={(itemValue, index) => {
+                  setNote({
+                    value: itemValue,
+                    error: !displayItems.notes.some(
+                      (value) => value.CODE === itemValue
+                    ),
+                  });
+                }}
+              >
+                <Picker.Item
+                  label="-- Select Note --"
+                  value="-- Select Note --"
+                />
+                {displayItems.notes.map((an) => (
+                  <Picker.Item
+                    key={`${an.DESCRIBE}_${an.CODE}`}
+                    label={an.DESCRIBE}
+                    value={an.CODE}
+                  />
+                ))}
+              </Picker>
+            </View>
+          </>
+        )}
 
         {(meterReading.error ||
           meterReading.value === 0 ||
