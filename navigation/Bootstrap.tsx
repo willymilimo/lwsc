@@ -133,29 +133,66 @@ const Bootstrap = ({
         // await AsyncStorage.clear();
 
         theme = await AsyncStorage.getItem(Strings.THEME_STORAGE);
+      } catch (e) {
+        // Restoring token failed
+      }
+      try {
         accounts = await AsyncStorage.getItem(Strings.ACCOUNTS_STORAGE);
+      } catch (e) {
+        // Restoring token failed
+      }
+      try {
         paypoints = await AsyncStorage.getItem(Strings.PAYPOINTS_STORAGE);
+      } catch (e) {
+        // Restoring token failed
+      }
+      try {
         paymentHistory = await AsyncStorage.getItem(
           Strings.PAYMENT_HISTORY_STORAGE
         );
-
+      } catch (e) {
+        // Restoring token failed
+      }
+      try {
         notifications = await AsyncStorage.getItem(
           Strings.NOTIFICATIONS_STORAGE
         );
+      } catch (e) {
+        // Restoring token failed
+      }
+      try {
         // await AsyncStorage.removeItem(Strings.NOTIFICATIONS_STORAGE)
         // await AsyncStorage.removeItem(Strings.MR_PROPERTY_STORAGE)
         billGroups = await AsyncStorage.getItem(Strings.BILL_GROUP_STORAGE);
+      } catch (e) {
+        // Restoring token failed
+      }
+      try {
         bookNumbers = await AsyncStorage.getItem(Strings.BOOK_NUMBER_STORAGE);
+      } catch (e) {
+        // Restoring token failed
+      }
+      try {
         // properties = await AsyncStorage.getItem(Strings.MR_PROPERTY_STORAGE);
 
         // await AsyncStorage.removeItem(Strings.ACCESS_NOTES_STORAGE)
         accessNotes = await AsyncStorage.getItem(Strings.ACCESS_NOTES_STORAGE);
-
+      } catch (e) {
+        // Restoring token failed
+      }
+      try {
         activeAccount = await AsyncStorage.getItem(
           Strings.ACTIVE_ACCOUNT_STORAGE
         );
-
+      } catch (e) {
+        // Restoring token failed
+      }
+      try {
         pushTokenStr = await AsyncStorage.getItem(Strings.PUSH_TOKEN_STORAGE);
+      } catch (e) {
+        // Restoring token failed
+      }
+      try {
         // console.log(pushTokenStr)
 
         // await AsyncStorage.removeItem(Strings.USER_STORAGE);
@@ -164,100 +201,130 @@ const Bootstrap = ({
         // Restoring token failed
       }
 
-      if (theme) {
-        setThemeReducer(JSON.parse(theme));
-        setActiveTheme(JSON.parse(theme).theme);
+      try {
+        if (theme) {
+          setThemeReducer(JSON.parse(theme));
+          setActiveTheme(JSON.parse(theme).theme);
+        }
+      } catch (err) {
+        console.log(`theme: ${theme}`);
       }
 
-      if (accounts) {
-        accounts = JSON.parse(accounts);
-        for (const key in accounts) {
-          if (accounts.hasOwnProperty(key)) {
-            const element = accounts[key];
-            accounts[key] = element.CUSTKEY
-              ? new Account(element)
-              : element.MeterNumber
-              ? new Property(element)
-              : element;
+      try {
+        if (accounts) {
+          accounts = JSON.parse(accounts);
+          for (const key in accounts) {
+            if (accounts.hasOwnProperty(key)) {
+              const element = accounts[key];
+              accounts[key] = element.CUSTKEY
+                ? new Account(element)
+                : element.MeterNumber
+                ? new Property(element)
+                : element;
+            }
+          }
+          setAccounts(accounts);
+        }
+      } catch (err) {
+        console.log(`accounts: ${accounts}`);
+      }
+
+      try {
+        if (paypoints) {
+          // console.log(paypoints);
+          paypoints = paypoints == "undefined" ? [] : JSON.parse(paypoints);
+
+          setPayPoints(JSON.parse(paypoints));
+        }
+      } catch (er) {}
+
+      try {
+        if (paymentHistory) {
+          setPaymentHistory(
+            JSON.parse(paymentHistory).map((ph: any) => new PaymentHistory(ph))
+          );
+        }
+      } catch (err) {
+        console.log(`paymentHistory: ${paymentHistory}`);
+      }
+
+      try {
+        // console.log(billGroups)
+        if (billGroups) {
+          setBillGroups(JSON.parse(billGroups));
+        } else {
+          const { status, data } = await fetchAllBillGroups();
+          if (status === 200 && data.success) {
+            const pay: BillGroupReducerI = {};
+            data.payload.recordset.forEach((bg) => (pay[bg.GROUP_ID] = bg));
+            setBillGroups(pay);
           }
         }
-        setAccounts(accounts);
+      } catch (er) {
+        console.log(`notifications: ${notifications}`);
       }
 
-      if (paypoints) {
-        // console.log(paypoints);
-        paypoints = paypoints == "undefined" ? [] : JSON.parse(paypoints);
+      try {
+        if (bookNumbers) {
+          const data: BookNumberReducerI = JSON.parse(bookNumbers);
+          Object.keys(data).forEach((key) => {
+            let bns = data[key];
 
-        setPayPoints(JSON.parse(paypoints));
-      }
-
-      if (paymentHistory) {
-        setPaymentHistory(
-          JSON.parse(paymentHistory).map((ph: any) => new PaymentHistory(ph))
-        );
-      }
-
-      // console.log(billGroups)
-      if (billGroups) {
-        setBillGroups(JSON.parse(billGroups));
-      } else {
-        const { status, data } = await fetchAllBillGroups();
-        if (status === 200 && data.success) {
-          const pay: BillGroupReducerI = {};
-          data.payload.recordset.forEach((bg) => (pay[bg.GROUP_ID] = bg));
-          setBillGroups(pay);
-        }
-      }
-
-      if (bookNumbers) {
-        const data: BookNumberReducerI = JSON.parse(bookNumbers);
-        Object.keys(data).forEach((key) => {
-          let bns = data[key];
-
-          bns.map((k) => new BookNumber(k)); // forEach((k) => (bns.CODE = new BookNumber(bns[k])));
-        });
-        setBookNumbers(data);
-      }
-
-      if (accessNotes) {
-        setAccessNotes(JSON.parse(accessNotes));
-      }
-
-      if (activeAccount) {
-        setActiveAccount(JSON.parse(activeAccount));
-      }
-
-      if (notifications) {
-        setNotifications(
-          JSON.parse(notifications).map(
-            (item: NotificationI) => new Notification(item)
-          )
-        );
-      }
-
-      if (userStr) {
-        const userReducer: UserReducerI = JSON.parse(userStr);
-        const created = userReducer.createdAt + 60 * 60 * 24 * 1000;
-        const now = Date.now();
-        if (created > now) {
-          setUserReducer(userReducer);
-        } else {
-          setUserReducer({
-            username: "",
-            manNumber: "",
-            authToken: "",
-            createdAt: 0,
+            bns.map((k) => new BookNumber(k)); // forEach((k) => (bns.CODE = new BookNumber(bns[k])));
           });
+          setBookNumbers(data);
         }
+      } catch (err) {
+        console.log(`bookNumbers: ${bookNumbers}`);
       }
 
-      // console.log(`pushTokenStr: ${pushTokenStr}`);
-      // if (pushTokenStr) {
-      //   setPushToken(pushTokenStr);
-      //   setToken(pushTokenStr);
-      // }
+      try {
+        if (accessNotes) {
+          setAccessNotes(JSON.parse(accessNotes));
+        }
+      } catch (err) {
+        console.log(`accessNotes: ${accessNotes}`);
+      }
 
-      // setBootstrapping(false);
+      try {
+        if (activeAccount) {
+          setActiveAccount(JSON.parse(activeAccount));
+        }
+      } catch (err) {
+        console.log(`activeAccount: ${activeAccount}`);
+      }
+
+      try {
+        if (notifications) {
+          setNotifications(
+            JSON.parse(notifications).map(
+              (item: NotificationI) => new Notification(item)
+            )
+          );
+        }
+      } catch (err) {
+        console.log(`userStr: ${notifications}`);
+      }
+
+      try {
+        if (userStr) {
+          const userReducer: UserReducerI = JSON.parse(userStr);
+          const created = userReducer.createdAt + 60 * 60 * 24 * 1000;
+          const now = Date.now();
+          if (created > now) {
+            setUserReducer(userReducer);
+          } else {
+            setUserReducer({
+              username: "",
+              manNumber: "",
+              authToken: "",
+              createdAt: 0,
+            });
+          }
+        }
+      } catch (err) {
+        console.log(`userStr: ${userStr}`);
+      }
     }
 
     setLoading(false);
@@ -289,7 +356,6 @@ const Bootstrap = ({
     };
   }, []);
 
-  
   return (
     <Stack.Navigator headerMode="none" initialRouteName="Loader">
       {loading ? (

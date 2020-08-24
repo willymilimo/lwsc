@@ -30,7 +30,7 @@ axios.defaults.headers.Authorization =
 // axios.defaults.baseURL = "http://41.72.107.14:3000/api/v1/";
 axios.defaults.baseURL = Strings.API_BASE_URL;
 //http://41.72.107.14:3020/
-// axios.defaults.timeout = 60000;
+axios.defaults.timeout = 60000;
 
 // console.log(axios.defaults.baseURL);
 
