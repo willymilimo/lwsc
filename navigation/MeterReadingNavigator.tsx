@@ -47,7 +47,10 @@ const MeterReadingNavigator = ({ user }: PropI) => {
         headerTitleStyle: {
           fontWeight: "bold",
         },
-        headerRight: ({tintColor}: any) => <HeaderRightComponent tintColor={tintColor} />,
+        headerRight: ({ tintColor }: any) =>
+          user.authToken ? (
+            <HeaderRightComponent tintColor={tintColor} />
+          ) : null,
       }}
     >
       {!isLoggedIn ? (

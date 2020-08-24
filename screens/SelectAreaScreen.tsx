@@ -86,21 +86,21 @@ const SelectAreaScreen = ({
   const renderListItem = ({ item }: { item: BookNumberI }) => (
     <List.Item
       onPress={async () => {
-        setLoading(true);
-        const cycle_id = await validate(item.BILLGROUP);
-        setLoading(false);
+        // setLoading(true);
+        // const cycle_id = await validate(item.BILLGROUP);
+        // setLoading(false);
 
-        if (cycle_id) {
-          navigator.navigate(toRoute, {
-            bookNumber: item,
-            billGroup: billGroups[item.BILLGROUP],
-            cycle_id,
-            item: application,
-          });
-        } else {
-          const { title, message } = Strings.BILLING_CYCLE;
-          Alert.alert(title, message);
-        }
+        // if (cycle_id) {
+        navigator.navigate(toRoute, {
+          bookNumber: item,
+          billGroup: billGroups[item.BILLGROUP],
+          // cycle_id,
+          item: application,
+        });
+        // } else {
+        //   const { title, message } = Strings.BILLING_CYCLE;
+        //   Alert.alert(title, message);
+        // }
       }}
       title={item.DESCRIBE}
       description={`${item.CODE} - ${item.NO_WALKS} walks`}

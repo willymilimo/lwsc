@@ -194,12 +194,12 @@ const btns = [
     color: `#efefef`,
     component: Strings.MakePaymentScreen,
   },
-  {
-    icon: <FontAwesome5 name="tachometer-alt" color="#1081e9" size={25} />,
-    label: "Meter Reading",
-    color: "#1081e923",
-    component: Strings.MeterReadingNavigator,
-  },
+  // {
+  //   icon: <FontAwesome5 name="tachometer-alt" color="#1081e9" size={25} />,
+  //   label: "Meter Reading",
+  //   color: "#1081e923",
+  //   component: Strings.MeterReadingNavigator,
+  // },
   {
     icon: <Octicons name="settings" color={Colors.LwscBlack} size={25} />,
     label: "Service Request",
