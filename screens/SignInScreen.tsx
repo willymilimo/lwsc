@@ -5,7 +5,6 @@ import {
   Modal,
   ImageBackground,
   Alert,
-  Text,
 } from "react-native";
 import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";

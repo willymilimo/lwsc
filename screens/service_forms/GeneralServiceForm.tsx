@@ -142,7 +142,8 @@ export default function GeneralServiceForm({
       customer_account_id: account_meter.value,
       customer_id: account_meter.value,
       post_service: service.post_service,
-      fullname: ''
+      fullname: "",
+      post_to_customer_balance: false,
     });
 
     navigator.navigate(Strings.SelectAreaScreen, {
@@ -341,23 +342,21 @@ export default function GeneralServiceForm({
           }
         />
 
-        {service.post_service && (
-          <TextInput
-            style={{ marginTop: 10 }}
-            mode="outlined"
-            label="Account Number"
-            placeholder="e.g. 1020893"
-            value={account_meter.value}
-            error={account_meter.error}
-            disabled={loading}
-            onChangeText={(text) =>
-              setAccountMeter({
-                value: text,
-                error: text.length > 0 && !/^\d{5,}$/g.test(text),
-              })
-            }
-          />
-        )}
+        <TextInput
+          style={{ marginTop: 10 }}
+          mode="outlined"
+          label="Account Number"
+          placeholder="e.g. 1020893"
+          value={account_meter.value}
+          error={account_meter.error}
+          disabled={loading}
+          onChangeText={(text) =>
+            setAccountMeter({
+              value: text,
+              error: text.length > 0 && !/^\d{5,}$/g.test(text),
+            })
+          }
+        />
 
         <TextInput
           style={{ marginTop: 10 }}
@@ -366,7 +365,7 @@ export default function GeneralServiceForm({
           mode="outlined"
           label="Description (optional)"
           placeholder="e.g. Requesting service xxxx and xxxx due to such and such"
-          value={description.value}
+          value={description.value} //5f44c0a202f336bb804956d1
           error={description.error}
           disabled={loading}
           onChangeText={(text) =>

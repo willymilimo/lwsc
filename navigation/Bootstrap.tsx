@@ -46,6 +46,8 @@ import { Surface, ActivityIndicator } from "react-native-paper";
 import Colors from "../constants/Colors";
 import DeprecationScreen from "../screens/DeprecationScreen";
 import StackNavigator from "./StackNavigator";
+import { LinearGradient } from "expo-linear-gradient";
+import Layouts from "../constants/Layouts";
 
 const Stack = createStackNavigator();
 
@@ -69,26 +71,33 @@ interface PropI {
 const Loader = () => {
   return (
     <View style={styles.container}>
-      <Surface style={styles.surface}>
-        <ActivityIndicator size="large" color={Colors.LwscOrange} />
-        <Text
-          style={{
-            marginTop: 20,
-            textAlign: "center",
-          }}
-        >
-          Loading necessary resources
-        </Text>
-        <Text
-          style={{
-            marginTop: 20,
-            textAlign: "center",
-          }}
-        >{`Please wait...`}</Text>
-      </Surface>
-      <View style={styles.footer}>
-        <Text>Powered by Microtech</Text>
-      </View>
+      <LinearGradient
+        start={[0, 0]}
+        end={[1, 0]}
+        colors={["#56cbf1", "#5a86e4"]}
+        style={styles.gradientStyle}
+      >
+        <Surface style={styles.surface}>
+          <ActivityIndicator size="large" color={Colors.LwscOrange} />
+          <Text
+            style={{
+              marginTop: 20,
+              textAlign: "center",
+            }}
+          >
+            Loading necessary resources
+          </Text>
+          <Text
+            style={{
+              marginTop: 20,
+              textAlign: "center",
+            }}
+          >{`Please wait...`}</Text>
+        </Surface>
+        <View style={styles.footer}>
+          <Text>Powered by Microtech</Text>
+        </View>
+      </LinearGradient>
     </View>
   );
 };
@@ -396,6 +405,10 @@ const styles = StyleSheet.create({
     right: 0,
     paddingRight: 10,
     paddingBottom: 10,
+    color: '#fff'
+  },
+  gradientStyle: {
+    height: Layouts.window.height,
   },
 });
 

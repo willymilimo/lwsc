@@ -12,7 +12,7 @@ import { List, Searchbar, ActivityIndicator } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Colors from "../constants/Colors";
 import { FlatList } from "react-native-gesture-handler";
-import { ServiceApplicationI } from "../models/service-application";
+import { ServiceApplicationI, ServiceApplication } from "../models/service-application";
 import { ServiceReportI } from "../models/service-report";
 import { BillGroupReducerI } from "../redux/reducers/bill-groups";
 import Strings from "../constants/Strings";
@@ -86,6 +86,9 @@ const SelectAreaScreen = ({
   const renderListItem = ({ item }: { item: BookNumberI }) => (
     <List.Item
       onPress={async () => {
+        if (application instanceof ServiceApplication) {
+          application.area = item.CODE;
+        }
         // setLoading(true);
         // const cycle_id = await validate(item.BILLGROUP);
         // setLoading(false);

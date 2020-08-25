@@ -1,3 +1,19 @@
+interface ServiceApp {
+  service_type: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  email: string;
+  area: string;
+  address: string;
+  description: string;
+  post_to_customer_balance: boolean;
+  bill_group: string;
+  amount: number;
+  phone_number: string;
+  payment_channel: string;
+}
+
 export interface ServiceApplicationI {
   service_type: string;
   first_name: string;
@@ -16,6 +32,10 @@ export interface ServiceApplicationI {
   bill_group?: string;
   post_service: boolean;
   fullname: string;
+  post_to_customer_balance: boolean;
+  amount?: number;
+  phone_number?: string;
+  payment_channel: string;
 }
 
 export class ServiceApplication implements ServiceApplicationI {
@@ -35,6 +55,10 @@ export class ServiceApplication implements ServiceApplicationI {
   customer_account_id: String;
   bill_group?: string;
   post_service: boolean;
+  post_to_customer_balance: boolean;
+  amount?: number;
+  phone_number?: string;
+  payment_channel: string;
 
   constructor({
     service_type,
@@ -53,6 +77,10 @@ export class ServiceApplication implements ServiceApplicationI {
     customer_account_id,
     bill_group,
     post_service,
+    post_to_customer_balance,
+    amount,
+    phone_number,
+    payment_channel
   }: ServiceApplicationI) {
     this.service_type = service_type;
     this.first_name = first_name;
@@ -70,6 +98,10 @@ export class ServiceApplication implements ServiceApplicationI {
     this.customer_account_id = customer_account_id;
     this.bill_group = bill_group;
     this.post_service = post_service;
+    this.post_to_customer_balance = post_to_customer_balance;
+    this.amount = amount;
+    this.phone_number = phone_number;
+    this.payment_channel = payment_channel;
   }
 
   get fullname(): string {

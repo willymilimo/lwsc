@@ -107,7 +107,8 @@ const RequestServiceScreen = ({ user, services, route }: PropI) => {
       .finally(() => setLoading(false));
   };
 
-  const ServiceApplicationRequest = (service: ServiceApplicationI) => {
+  const serviceApplicationRequest = (service: ServiceApplicationI) => {
+    console.log(service)
     applyForService(service)
       .then(({ status, data }) => {
         const { success, payload } = data;
@@ -148,6 +149,9 @@ const RequestServiceScreen = ({ user, services, route }: PropI) => {
         if (status == 200 && data.success) {
           setLoading(false);
           // console.log(new ServiceInvoice(data.payload).totalcharge)
+          if (item instanceof ServiceApplication)
+            item.post_to_customer_balance =
+              data.payload.post_to_customer_balance;
           navigator.navigate(Strings.ServiceInvoiceScreen, {
             service: item,
             invoice: new ServiceInvoice(data.payload),
@@ -181,7 +185,7 @@ const RequestServiceScreen = ({ user, services, route }: PropI) => {
         ...(item as ServiceApplicationI),
         bill_group: bookNumber.BILLGROUP,
       };
-      ServiceApplicationRequest(service);
+      serviceApplicationRequest(service);
     }
   };
 
