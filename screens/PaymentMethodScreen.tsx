@@ -13,6 +13,7 @@ import {
   IconButton,
   RadioButton,
   ActivityIndicator,
+  Divider,
 } from "react-native-paper";
 import { ScrollView, TouchableHighlight } from "react-native-gesture-handler";
 import { NavType } from "../types/nav-type";
@@ -26,6 +27,7 @@ import { ServiceInvoiceI } from "../models/service-invoice";
 import { ServiceApplicationI } from "../models/service-application";
 import ServiceComponent from "../components/ServiceComponent";
 import { BookNumberI } from "../models/meter-reading";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface PaymentMethodScreenI {
   navigation: NavType;
@@ -88,139 +90,150 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
   }, [route]);
 
   return (
-    <ScrollView style={container}>
-      {loading ? (
-        <ActivityIndicator
-          style={{ alignSelf: "center", marginTop: 20 }}
-          size="large"
-          color={Colors.LwscOrange}
-        />
-      ) : (
-        <>
-          {params instanceof Account ? (
-            <BillComponent account={params} />
-          ) : params instanceof Prepaid ? (
-            <PrepaidComponent>
-              {typeof params === "string"
-                ? params
-                : (params as PrepaidI).meterNumber}
-            </PrepaidComponent>
-          ) : (
-            <ServiceComponent
-              invoice={(params as any).invoice}
-              service={(params as any).service}
-            />
-          )}
-          <View style={{ padding: 10 }}>
-            <Text
-              style={{
-                marginHorizontal: 10,
-                marginVertical: 10,
-                fontSize: 18,
-                color: `${Colors.LwscBlack}ab`,
-                fontWeight: "bold",
-              }}
-            >
-              Payment Method
-            </Text>
-            <RadioButton.Group
-              value={checked}
-              onValueChange={(value) => setChecked(value as PaymentChannel)}
-            >
-              {paymentChannels.map((channel, index) => {
-                const { _id, title, id } = channel;
-                return (
-                  <TouchableHighlight
-                    underlayColor={Colors.lightBorderColor}
-                    onPress={() => {
-                      setChecked(id);
-                      setSelectedChannel(channel);
-                    }}
-                    style={{
-                      marginHorizontal: 10,
-                      backgroundColor:
-                        id === checked
-                          ? Colors.LwscSelectedBlue
-                          : "transparent",
-                    }}
-                    key={_id}
-                  >
-                    <View
-                      style={{
-                        borderWidth: 0.5,
-                        borderTopWidth: index !== 0 ? 0 : 0.5,
-                        borderColor: Colors.lightGray,
-                        paddingHorizontal: 10,
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <View
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          alignItems: "center",
-                        }}
-                      >
-                        <IconButton
-                          style={{ borderRadius: 25 }}
-                          size={40}
-                          icon={({ size, color }) => (
-                            <Image
-                              style={{ height: size, width: size }}
-                              height={size}
-                              width={size}
-                              source={getImage(id)}
-                            />
-                          )}
-                        />
-                        <Text
+    <LinearGradient
+      start={[0, 0]}
+      end={[1, 0]}
+      colors={["#56cbf1", "#5a86e4"]}
+      style={{ display: "flex", flex: 1 }}
+    >
+      <ScrollView style={container}>
+        {loading ? (
+          <ActivityIndicator
+            style={{ alignSelf: "center", marginTop: 20 }}
+            size="large"
+            color={Colors.LwscOrange}
+          />
+        ) : (
+          <>
+            {params instanceof Account ? (
+              <BillComponent account={params} />
+            ) : params instanceof Prepaid ? (
+              <PrepaidComponent>
+                {typeof params === "string"
+                  ? params
+                  : (params as PrepaidI).meterNumber}
+              </PrepaidComponent>
+            ) : (
+              <ServiceComponent
+                invoice={(params as any).invoice}
+                service={(params as any).service}
+              />
+            )}
+            <View style={{ padding: 10 }}>
+              <Text
+                style={{
+                  marginHorizontal: 10,
+                  marginVertical: 10,
+                  fontSize: 18,
+                  color: `${Colors.LwscBlack}ab`,
+                  fontWeight: "bold",
+                }}
+              >
+                Payment Method
+              </Text>
+              <View style={{ backgroundColor: "#fff", marginHorizontal: 5 }}>
+                <RadioButton.Group
+                  value={checked}
+                  onValueChange={(value) => setChecked(value as PaymentChannel)}
+                >
+                  {paymentChannels.map((channel, index) => {
+                    const { _id, title, id } = channel;
+                    return (
+                      <View key={_id}>
+                        <TouchableHighlight
+                          underlayColor={Colors.lightBorderColor}
+                          onPress={() => {
+                            setChecked(id);
+                            setSelectedChannel(channel);
+                          }}
                           style={{
-                            fontWeight: "900",
-                            fontSize: 18,
-                            color:
+                            backgroundColor:
                               id === checked
-                                ? Colors.whiteColor
-                                : Colors.LwscBlackLighter,
+                                ? Colors.LwscSelectedBlue
+                                : "transparent",
                           }}
                         >
-                          {title}
-                        </Text>
+                          <View
+                            style={{
+                              borderWidth: 0.5,
+                              borderTopWidth: index !== 0 ? 0 : 0.5,
+                              borderColor: Colors.lightGray,
+                              paddingHorizontal: 10,
+                              display: "flex",
+                              flexDirection: "row",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <View
+                              style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                alignItems: "center",
+                              }}
+                            >
+                              <IconButton
+                                style={{ borderRadius: 25 }}
+                                size={40}
+                                icon={({ size, color }) => (
+                                  <Image
+                                    style={{ height: size, width: size }}
+                                    height={size}
+                                    width={size}
+                                    source={getImage(id)}
+                                  />
+                                )}
+                              />
+                              <Text
+                                style={{
+                                  fontWeight: "900",
+                                  fontSize: 18,
+                                  color:
+                                    id === checked
+                                      ? Colors.whiteColor
+                                      : Colors.LwscBlackLighter,
+                                }}
+                              >
+                                {title}
+                              </Text>
+                            </View>
+                            <RadioButton
+                              color="white"
+                              uncheckedColor="#3366cc"
+                              value={id}
+                            />
+                          </View>
+                        </TouchableHighlight>
+                        <Divider style={{backgroundColor: "#5a86e4"}} />
                       </View>
-                      <RadioButton
-                        color="white"
-                        uncheckedColor="#3366cc"
-                        value={id}
-                      />
-                    </View>
-                  </TouchableHighlight>
-                );
-              })}
-            </RadioButton.Group>
-            <Button
-              disabled={selectedChannel == null}
-              style={{
-                marginHorizontal: 10,
-                marginVertical: 20,
-                paddingVertical: 5,
-              }}
-              labelStyle={{ fontSize: 17 }}
-              mode="contained"
-              onPress={() =>
-                navigation.navigate(Strings.PaymentScreen, {
-                  method: selectedChannel,
-                  params,
-                })
-              }
-            >
-              Proceed
-            </Button>
-          </View>
-        </>
-      )}
-    </ScrollView>
+                    );
+                  })}
+                </RadioButton.Group>
+              </View>
+              <Button
+                color={Colors.LwscSelectedBlue}
+                disabled={selectedChannel == null}
+                style={{
+                  marginHorizontal: 5,
+                  marginVertical: 20,
+                  paddingVertical: 5,
+                }}
+                labelStyle={{ fontSize: 17 }}
+                mode="contained"
+                onPress={() =>
+                  navigation.navigate(Strings.PaymentScreen, {
+                    method: selectedChannel,
+                    params,
+                  })
+                }
+              >
+                Proceed
+              </Button>
+            </View>
+          </>
+        )}
+      </ScrollView>
+    </LinearGradient>
   );
 };
 

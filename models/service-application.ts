@@ -34,6 +34,7 @@ export interface ServiceApplicationI {
   fullname: string;
   post_to_customer_balance: boolean;
   amount?: number;
+  billable: boolean;
   phone_number?: string;
   payment_channel: string;
 }
@@ -59,6 +60,7 @@ export class ServiceApplication implements ServiceApplicationI {
   amount?: number;
   phone_number?: string;
   payment_channel: string;
+  billable: boolean;
 
   constructor({
     service_type,
@@ -80,7 +82,8 @@ export class ServiceApplication implements ServiceApplicationI {
     post_to_customer_balance,
     amount,
     phone_number,
-    payment_channel
+    payment_channel,
+    billable,
   }: ServiceApplicationI) {
     this.service_type = service_type;
     this.first_name = first_name;
@@ -102,6 +105,7 @@ export class ServiceApplication implements ServiceApplicationI {
     this.amount = amount;
     this.phone_number = phone_number;
     this.payment_channel = payment_channel;
+    this.billable = billable;
   }
 
   get fullname(): string {

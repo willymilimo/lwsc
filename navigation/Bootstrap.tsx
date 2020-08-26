@@ -95,7 +95,7 @@ const Loader = () => {
           >{`Please wait...`}</Text>
         </Surface>
         <View style={styles.footer}>
-          <Text>Powered by Microtech</Text>
+          <Text style={{color: '#fff', padding: 10}}>Powered by Microtech</Text>
         </View>
       </LinearGradient>
     </View>
@@ -120,6 +120,7 @@ const Bootstrap = ({
   const [deprecated, setDeprecated] = useState(false);
 
   const bootstrapAsync = async () => {
+    console.log('started')
     setLoading(true);
     const isDeprecated = await getConfigStatus();
     setDeprecated(isDeprecated);
@@ -209,6 +210,7 @@ const Bootstrap = ({
       } catch (e) {
         // Restoring token failed
       }
+      console.log('1')
 
       try {
         if (theme) {
@@ -218,6 +220,7 @@ const Bootstrap = ({
       } catch (err) {
         console.log(`theme: ${theme}`);
       }
+      console.log('2')
 
       try {
         if (accounts) {
@@ -237,6 +240,7 @@ const Bootstrap = ({
       } catch (err) {
         console.log(`accounts: ${accounts}`);
       }
+      console.log('3')
 
       try {
         if (paypoints) {
@@ -246,6 +250,7 @@ const Bootstrap = ({
           setPayPoints(JSON.parse(paypoints));
         }
       } catch (er) {}
+      console.log('4')
 
       try {
         if (paymentHistory) {
@@ -256,6 +261,7 @@ const Bootstrap = ({
       } catch (err) {
         console.log(`paymentHistory: ${paymentHistory}`);
       }
+      console.log('5')
 
       try {
         // console.log(billGroups)
@@ -272,6 +278,7 @@ const Bootstrap = ({
       } catch (er) {
         console.log(`notifications: ${notifications}`);
       }
+      console.log('6')
 
       try {
         if (bookNumbers) {
@@ -286,6 +293,7 @@ const Bootstrap = ({
       } catch (err) {
         console.log(`bookNumbers: ${bookNumbers}`);
       }
+      console.log('7')
 
       try {
         if (accessNotes) {
@@ -294,6 +302,7 @@ const Bootstrap = ({
       } catch (err) {
         console.log(`accessNotes: ${accessNotes}`);
       }
+      console.log('8')
 
       try {
         if (activeAccount) {
@@ -302,6 +311,7 @@ const Bootstrap = ({
       } catch (err) {
         console.log(`activeAccount: ${activeAccount}`);
       }
+      console.log('9')
 
       try {
         if (notifications) {
@@ -314,6 +324,7 @@ const Bootstrap = ({
       } catch (err) {
         console.log(`userStr: ${notifications}`);
       }
+      console.log('last')
 
       try {
         if (userStr) {
@@ -337,7 +348,9 @@ const Bootstrap = ({
     }
 
     setLoading(false);
+    console.log('finished..')
   };
+
 
   const getConfigStatus = async () => {
     const { status, data } = await fetchConfigStatus();
@@ -352,6 +365,8 @@ const Bootstrap = ({
   useEffect(() => {
     let is_subscribed = true;
 
+    console.log('boostrapping.....')
+
     if (is_subscribed) {
       try {
         bootstrapAsync();
@@ -361,6 +376,7 @@ const Bootstrap = ({
       }
     }
     return () => {
+      console.log('stopped effecting.....')
       is_subscribed = false;
     };
   }, []);
@@ -409,6 +425,7 @@ const styles = StyleSheet.create({
   },
   gradientStyle: {
     height: Layouts.window.height,
+    justifyContent: "center",
   },
 });
 

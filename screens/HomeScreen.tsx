@@ -20,6 +20,7 @@ import Consumption from "../assets/consumption.svg";
 import Strings from "../constants/Strings";
 import { useNavigation, Route } from "@react-navigation/native";
 import { ThemeReducer } from "../types/theme";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface HomeI {
   theme: ThemeReducer;
@@ -33,11 +34,18 @@ const HomeScreen = ({ theme, route }: HomeI) => {
     btnsBox,
     btnStyle,
     iconContainer,
+    gradientStyle
   } = styles;
   const navigation = useNavigation();
 
   return (
     <SafeAreaView style={container}>
+      <LinearGradient
+        start={[0, 0]}
+        end={[1, 0]}
+        colors={["#56cbf1", "#5a86e4"]}
+        style={gradientStyle}
+      >
       <ScrollView style={scrollViewStyle}>
         <Carousel
           style="stats"
@@ -76,7 +84,7 @@ const HomeScreen = ({ theme, route }: HomeI) => {
                   width: "82%",
                   height: "82%",
                   borderRadius: 10,
-                  backgroundColor: "#fff",
+                  backgroundColor: "#ffffffee",
                   shadowColor: `${Colors.linkBlue}22`,
 
                   elevation: 5,
@@ -181,6 +189,7 @@ const HomeScreen = ({ theme, route }: HomeI) => {
           <AntDesign size={30} name="message1" color={theme.theme.textColor} />
         </TouchableHighlight>
       </View>
+      </LinearGradient>
     </SafeAreaView>
   );
 };
@@ -194,12 +203,12 @@ const btns = [
     color: `#efefef`,
     component: Strings.MakePaymentScreen,
   },
-  // {
-  //   icon: <FontAwesome5 name="tachometer-alt" color="#1081e9" size={25} />,
-  //   label: "Meter Reading",
-  //   color: "#1081e923",
-  //   component: Strings.MeterReadingNavigator,
-  // },
+  {
+    icon: <FontAwesome5 name="tachometer-alt" color="#1081e9" size={25} />,
+    label: "Meter Reading",
+    color: "#1081e923",
+    component: Strings.MeterReadingNavigator,
+  },
   {
     icon: <Octicons name="settings" color={Colors.LwscBlack} size={25} />,
     label: "Service Request",
@@ -278,6 +287,10 @@ const styles = StyleSheet.create({
     borderRadius: 35,
     alignItems: "center",
     justifyContent: "center",
+  },
+  gradientStyle: {
+    display: 'flex',
+    flex: 1
   },
 });
 

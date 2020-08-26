@@ -32,6 +32,7 @@ import { useNavigation } from "@react-navigation/native";
 import { ServiceItemI } from "../../models/service-item";
 import { BookNumberI } from "../../models/meter-reading";
 import { ServiceReportI } from "../../models/service-report";
+import { LinearGradient } from "expo-linear-gradient";
 const { width, height } = Dimensions.get("window");
 
 interface GeneralServiceFormI {
@@ -84,6 +85,8 @@ export default function GeneralServiceForm({
     value: "",
     error: false,
   });
+
+  console.log(service);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -141,9 +144,11 @@ export default function GeneralServiceForm({
       account_number: account_meter.value,
       customer_account_id: account_meter.value,
       customer_id: account_meter.value,
-      post_service: service.post_service,
+      post_service: service.billable,
       fullname: "",
       post_to_customer_balance: false,
+      payment_channel: "",
+      billable: service.billable,
     });
 
     navigator.navigate(Strings.SelectAreaScreen, {
@@ -175,265 +180,275 @@ export default function GeneralServiceForm({
     (account_meter.error || account_meter.value.length === 0);
 
   return (
-    <ScrollView style={container}>
-      <Modal animationType="slide" transparent visible={loading}>
-        <View style={[styles.centeredView, { backgroundColor: "#00000077" }]}>
-          <View style={styles.modalView}>
-            <ActivityIndicator size="large" color={Colors.LwscOrange} />
+    <LinearGradient
+      start={[0, 0]}
+      end={[1, 0]}
+      colors={["#56cbf1", "#5a86e4"]}
+      style={{ display: "flex", flex: 1 }}
+    >
+      <ScrollView style={container}>
+        <Modal animationType="slide" transparent visible={loading}>
+          <View style={[styles.centeredView, { backgroundColor: "#00000077" }]}>
+            <View style={styles.modalView}>
+              <ActivityIndicator size="large" color={Colors.LwscOrange} />
+            </View>
+          </View>
+        </Modal>
+
+        <View style={mapContainer}>
+          <MapView
+            ref={(ref) => (mapRef = ref as MapView)}
+            zoomEnabled={true}
+            showsUserLocation={true}
+            region={region}
+            onRegionChangeComplete={() => setRegion(region)}
+            initialRegion={region}
+            style={styles.map}
+          >
+            <Marker
+              draggable
+              onDragEnd={(e) =>
+                setRegion({
+                  ...region,
+                  latitude: e.nativeEvent.coordinate.latitude,
+                  longitude: e.nativeEvent.coordinate.longitude,
+                })
+              }
+              coordinate={{
+                longitude: region.longitude,
+                latitude: region.latitude,
+              }}
+              pinColor={`${Colors.LwscRed}`}
+            />
+          </MapView>
+          <FAB
+            onPress={onPressZoomOut}
+            style={{
+              position: "absolute",
+              margin: 16,
+              right: 0,
+              bottom: 50,
+              backgroundColor: "#ffffff77",
+              borderWidth: 0.75,
+              borderColor: `${Colors.LwscBlack}01`,
+            }}
+            small
+            icon={({ color }) => (
+              <Feather
+                name="zoom-in"
+                size={25}
+                color={color}
+                style={{ backgroundColor: "transparent" }}
+              />
+            )}
+          />
+          <FAB
+            onPress={onPressZoomIn}
+            style={{
+              position: "absolute",
+              margin: 16,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "#ffffff77",
+              borderWidth: 0.75,
+              borderColor: `${Colors.LwscBlack}01`,
+            }}
+            small
+            icon={({ color }) => (
+              <Feather
+                name="zoom-out"
+                size={25}
+                color={color}
+                style={{ backgroundColor: "transparent" }}
+              />
+            )}
+          />
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={[
+                styles.bubble,
+                { backgroundColor: `${Colors.LwscBlack}33`, borderRadius: 10 },
+              ]}
+            >
+              <Text style={styles.bubbleText}>
+                Drag marker to location requiring the service
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              onPress={async () => await getLocationAsync()}
+              style={styles.bubble}
+            >
+              <Text style={styles.bubbleText}>
+                Tap to center to your location
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
-      </Modal>
 
-      <View style={mapContainer}>
-        <MapView
-          ref={(ref) => (mapRef = ref as MapView)}
-          zoomEnabled={true}
-          showsUserLocation={true}
-          region={region}
-          onRegionChangeComplete={() => setRegion(region)}
-          initialRegion={region}
-          style={styles.map}
-        >
-          <Marker
-            draggable
-            onDragEnd={(e) =>
-              setRegion({
-                ...region,
-                latitude: e.nativeEvent.coordinate.latitude,
-                longitude: e.nativeEvent.coordinate.longitude,
+        <View style={{ paddingVertical: 10, paddingHorizontal: 15 }}>
+          <TextInput
+            mode="outlined"
+            label="Full Name"
+            placeholder="e.g. Moses Chinthalima"
+            value={fullName.value}
+            error={fullName.error}
+            disabled={loading}
+            onChangeText={(text) =>
+              setFullName({
+                value: text,
+                error: !Regex.NAME.test(text),
               })
             }
-            coordinate={{
-              longitude: region.longitude,
-              latitude: region.latitude,
-            }}
-            pinColor={`${Colors.LwscRed}`}
           />
-        </MapView>
-        <FAB
-          onPress={onPressZoomOut}
-          style={{
-            position: "absolute",
-            margin: 16,
-            right: 0,
-            bottom: 50,
-            backgroundColor: "#ffffff77",
-            borderWidth: 0.75,
-            borderColor: `${Colors.LwscBlack}01`,
-          }}
-          small
-          icon={({ color }) => (
-            <Feather
-              name="zoom-in"
-              size={25}
-              color={color}
-              style={{ backgroundColor: "transparent" }}
-            />
-          )}
-        />
-        <FAB
-          onPress={onPressZoomIn}
-          style={{
-            position: "absolute",
-            margin: 16,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "#ffffff77",
-            borderWidth: 0.75,
-            borderColor: `${Colors.LwscBlack}01`,
-          }}
-          small
-          icon={({ color }) => (
-            <Feather
-              name="zoom-out"
-              size={25}
-              color={color}
-              style={{ backgroundColor: "transparent" }}
-            />
-          )}
-        />
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[
-              styles.bubble,
-              { backgroundColor: `${Colors.LwscBlack}33`, borderRadius: 10 },
-            ]}
-          >
-            <Text style={styles.bubbleText}>
-              Drag marker to location requiring the service
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            onPress={async () => await getLocationAsync()}
-            style={styles.bubble}
-          >
-            <Text style={styles.bubbleText}>
-              Tap to center to your location
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
 
-      <View style={{ paddingVertical: 10, paddingHorizontal: 15 }}>
-        <TextInput
-          mode="outlined"
-          label="Full Name"
-          placeholder="e.g. Moses Chinthalima"
-          value={fullName.value}
-          error={fullName.error}
-          disabled={loading}
-          onChangeText={(text) =>
-            setFullName({
-              value: text,
-              error: !Regex.NAME.test(text),
-            })
-          }
-        />
+          <TextInput
+            style={{ marginTop: 10 }}
+            mode="outlined"
+            label="Phone Number"
+            placeholder="e.g. +260950039290"
+            value={phone.value}
+            error={phone.error}
+            disabled={loading}
+            onChangeText={(text) =>
+              setPhone({
+                value: text,
+                error: !Regex.ZAMBIAN_PHONE_NUMBER.test(text),
+              })
+            }
+          />
 
-        <TextInput
-          style={{ marginTop: 10 }}
-          mode="outlined"
-          label="Phone Number"
-          placeholder="e.g. +260950039290"
-          value={phone.value}
-          error={phone.error}
-          disabled={loading}
-          onChangeText={(text) =>
-            setPhone({
-              value: text,
-              error: !Regex.ZAMBIAN_PHONE_NUMBER.test(text),
-            })
-          }
-        />
+          <TextInput
+            style={{ marginTop: 10 }}
+            mode="outlined"
+            label="Email Address (optional)"
+            placeholder="e.g. mchola@lwsc.co.zm"
+            value={email.value}
+            error={email.error}
+            disabled={loading}
+            onChangeText={(text) =>
+              setEmail({
+                value: text,
+                error: text.length > 0 && !Regex.EMAIL.test(text),
+              })
+            }
+          />
 
-        <TextInput
-          style={{ marginTop: 10 }}
-          mode="outlined"
-          label="Email Address (optional)"
-          placeholder="e.g. mchola@lwsc.co.zm"
-          value={email.value}
-          error={email.error}
-          disabled={loading}
-          onChangeText={(text) =>
-            setEmail({
-              value: text,
-              error: text.length > 0 && !Regex.EMAIL.test(text),
-            })
-          }
-        />
+          <TextInput
+            style={{ marginTop: 10 }}
+            multiline={true}
+            numberOfLines={3}
+            mode="outlined"
+            label="Address"
+            placeholder="e.g. Plot 5, off Alick Nkhata Road, Mass Media"
+            value={address.value}
+            error={address.error}
+            disabled={loading}
+            onChangeText={(text) =>
+              setAddress({
+                value: text,
+                error: text.length < 10,
+              })
+            }
+          />
 
-        <TextInput
-          style={{ marginTop: 10 }}
-          multiline={true}
-          numberOfLines={3}
-          mode="outlined"
-          label="Address"
-          placeholder="e.g. Plot 5, off Alick Nkhata Road, Mass Media"
-          value={address.value}
-          error={address.error}
-          disabled={loading}
-          onChangeText={(text) =>
-            setAddress({
-              value: text,
-              error: text.length < 10,
-            })
-          }
-        />
+          <TextInput
+            style={{ marginTop: 10 }}
+            mode="outlined"
+            label="Account Number"
+            placeholder="e.g. 1020893"
+            value={account_meter.value}
+            error={account_meter.error}
+            disabled={loading}
+            onChangeText={(text) =>
+              setAccountMeter({
+                value: text,
+                error: text.length > 0 && !/^\d{5,}$/g.test(text),
+              })
+            }
+          />
 
-        <TextInput
-          style={{ marginTop: 10 }}
-          mode="outlined"
-          label="Account Number"
-          placeholder="e.g. 1020893"
-          value={account_meter.value}
-          error={account_meter.error}
-          disabled={loading}
-          onChangeText={(text) =>
-            setAccountMeter({
-              value: text,
-              error: text.length > 0 && !/^\d{5,}$/g.test(text),
-            })
-          }
-        />
+          <TextInput
+            style={{ marginTop: 10 }}
+            multiline={true}
+            numberOfLines={3}
+            mode="outlined"
+            label="Description (optional)"
+            placeholder="e.g. Requesting service xxxx and xxxx due to such and such"
+            value={description.value} //5f44c0a202f336bb804956d1
+            error={description.error}
+            disabled={loading}
+            onChangeText={(text) =>
+              setDescription({
+                value: text,
+                error: text.length > 0 && text.length < 5,
+              })
+            }
+          />
 
-        <TextInput
-          style={{ marginTop: 10 }}
-          multiline={true}
-          numberOfLines={3}
-          mode="outlined"
-          label="Description (optional)"
-          placeholder="e.g. Requesting service xxxx and xxxx due to such and such"
-          value={description.value} //5f44c0a202f336bb804956d1
-          error={description.error}
-          disabled={loading}
-          onChangeText={(text) =>
-            setDescription({
-              value: text,
-              error: text.length > 0 && text.length < 5,
-            })
-          }
-        />
-
-        {(fullName.error ||
-          fullName.value.length === 0 ||
-          phone.error ||
-          phone.value.length === 0 ||
-          address.error ||
-          address.value.length === 0 ||
-          invalidPostService) && (
-          <Subheading
-            style={{
-              color: "maroon",
-              borderColor: Colors.danger.border,
-              backgroundColor: Colors.danger.background,
-              padding: 8,
-              borderRadius: 5,
-              textAlign: "center",
-              marginTop: 10,
-            }}
-          >
-            {fullName.error || fullName.value.length === 0
-              ? "Full Name is required"
-              : phone.error || phone.value.length === 0
-              ? "Please input valid Phone Number"
-              : address.error || address.value.length === 0
-              ? "Address is required"
-              : invalidPostService
-              ? "Account Number is required"
-              : ""}
-          </Subheading>
-        )}
-
-        <Button
-          style={{ marginTop: 15 }}
-          contentStyle={{
-            borderColor: Colors.linkBlue,
-            borderWidth: 0.75,
-            borderRadius: 5,
-            backgroundColor: `${Colors.linkBlue}22`,
-          }}
-          color={`${Colors.LwscBlue}bb`}
-          disabled={
-            loading ||
-            fullName.error ||
+          {(fullName.error ||
             fullName.value.length === 0 ||
             phone.error ||
             phone.value.length === 0 ||
             address.error ||
             address.value.length === 0 ||
-            invalidPostService
-          }
-          loading={loading}
-          //   icon="send"
-          mode="outlined"
-          onPress={handleProceedButton}
-        >
-          Proceed
-        </Button>
-      </View>
-    </ScrollView>
+            account_meter.value.length === 0 ||
+            account_meter.error ||
+            invalidPostService) && (
+            <Subheading
+              style={{
+                color: "maroon",
+                borderColor: Colors.danger.border,
+                backgroundColor: Colors.danger.background,
+                padding: 8,
+                borderRadius: 5,
+                textAlign: "center",
+                marginTop: 10,
+              }}
+            >
+              {fullName.error || fullName.value.length === 0
+                ? "Full Name is required"
+                : phone.error || phone.value.length === 0
+                ? "Please input valid Phone Number"
+                : address.error || address.value.length === 0
+                ? "Address is required"
+                : invalidPostService
+                ? "Account Number is required"
+                : ""}
+            </Subheading>
+          )}
+
+          <Button
+            style={{ marginTop: 15 }}
+            contentStyle={{
+              borderColor: Colors.linkBlue,
+              borderWidth: 0.75,
+              borderRadius: 5,
+              backgroundColor: `${Colors.linkBlue}`,
+            }}
+            labelStyle={{ color: "#fff" }}
+            color={`${Colors.linkBlue}`}
+            disabled={
+              loading ||
+              fullName.error ||
+              fullName.value.length === 0 ||
+              phone.error ||
+              phone.value.length === 0 ||
+              address.error ||
+              address.value.length === 0 ||
+              invalidPostService
+            }
+            loading={loading}
+            //   icon="send"
+            mode="outlined"
+            onPress={handleProceedButton}
+          >
+            Proceed
+          </Button>
+        </View>
+      </ScrollView>
+    </LinearGradient>
   );
 }
 
@@ -441,7 +456,7 @@ const styles = StyleSheet.create({
   container: {
     display: "flex",
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "white",
+    // backgroundColor: "white",
   },
   mapContainer: {
     justifyContent: "space-between",

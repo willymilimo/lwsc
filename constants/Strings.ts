@@ -1,4 +1,4 @@
-import { ENV } from 'react-native-dotenv'
+import { ENV } from "react-native-dotenv";
 // console.log(ENV)
 
 export default {
@@ -41,6 +41,7 @@ export default {
   ServiceInvoiceScreen: "Service Invoice",
   DeprecationScreen: "Update Required",
   VersionCheckScreen: "Checking Version",
+  PaymentOptionsServicesScreen: "Payment Methods",
 
   /*************** Begin REDUCER TYPES *****************/
   WHITE_THEME: "WHITE_THEME",
@@ -104,15 +105,21 @@ export default {
   MESSENGER: "http://m.me/488903867833451",
   WHATSAPP: "+260966621305",
 
-  API_CREDS: {
-    username: "lwsc_mobile_app_dev",
-    password: "#www@1234_lwsc_app",
-  },
+  API_CREDS:
+    ENV == "PROD"
+      ? {
+          username: "lwsc_mobile_app_production_v1",
+          password: " #$@LWSC2020@%^@!$@^&@%$",
+        }
+      : {
+          username: "lwsc_mobile_app_dev",
+          password: "#www@1234_lwsc_app",
+        },
 
   API_BASE_URL:
-  (ENV === 'DEV' || ENV === 'TEST')
-    ? 'http://41.72.107.14:3020/api/v1/'
-    : 'https://middleware.microtech.co.zm:3000/api/v1',
+    ENV === "DEV" || ENV === "TEST"
+      ? "http://41.72.107.14:3020/api/v1/"
+      : "https://middleware.microtech.co.zm:3000/api/v1",
 
   INTERNET_FAILURE: {
     title: "NO INTERNET",

@@ -96,7 +96,7 @@ const ServiceInvoiceScreen = ({ services, route }: PropsI) => {
         //   icon="send"
         mode="outlined"
         onPress={() =>
-          navigator.navigate(Strings.PaymentMethodScreen, {
+          navigator.navigate(Strings.PaymentOptionsServicesScreen, {
             invoice,
             service,
             bookNumber,

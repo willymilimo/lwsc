@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from "axios";
+import { encode as btoa } from "base-64";
 import { IResponse } from "./iresponse";
 import { AccountI } from "./account";
 import { IdentityType } from "../types/identity-type";
@@ -25,12 +26,17 @@ import Strings from "../constants/Strings";
 import { ServiceInvoiceI } from "./service-invoice";
 
 // axios.defaults.auth = Strings.API_CREDS;
-axios.defaults.headers.Authorization =
-  "Basic bHdzY19tb2JpbGVfYXBwX2Rldjojd3d3QDEyMzRfbHdzY19hcHA=";
+// axios.defaults.headers.Authorization = "Basic bHdzY19tb2JpbGVfYXBwX2Rldjojd3d3QDEyMzRfbHdzY19hcHA=";
+axios.defaults.headers.Authorization = "Basic " + btoa(`${Strings.API_CREDS.username}:${Strings.API_CREDS.password}`);
+console.log(`${Strings.API_CREDS.username}:${Strings.API_CREDS.password}`);
+// console.log(axios.defaults.headers.Authorization);
+// console.log("Basic bHdzY19tb2JpbGVfYXBwX2Rldjojd3d3QDEyMzRfbHdzY19hcHA=")
+
+
 // axios.defaults.baseURL = "http://41.72.107.14:3000/api/v1/";
 axios.defaults.baseURL = Strings.API_BASE_URL;
 //http://41.72.107.14:3020/
-axios.defaults.timeout = 60000;
+// axios.defaults.timeout = 60000;
 
 // console.log(axios.defaults.baseURL);
 
@@ -293,6 +299,7 @@ export const fetchServiceInvoice = async (
   service_type: string,
   account_number: string
 ): Promise<AxiosResponse<IResponse<ServiceInvoiceI>>> => {
+  console.log(`services/invoices/fetch?service_type=${service_type}&account_number=${account_number}`)
   return await axios.get(
     `services/invoices/fetch?service_type=${service_type}&account_number=${account_number}`
   );

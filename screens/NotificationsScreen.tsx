@@ -23,6 +23,7 @@ import {
   addNotification,
 } from "../redux/actions/notifications";
 import { uuid } from "../helpers/functions";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface PropI {
   notifications: NotificationI[];
@@ -77,7 +78,7 @@ const NotificationsScreen = ({
           }}
           style={{
             padding: 10,
-            backgroundColor: is_read ? "#fcfcfc" : `${Colors.linkBlue}11`,
+            backgroundColor: is_read ? "#fcfcfc" : `#ececec`,
           }}
         >
           <View
@@ -136,23 +137,30 @@ const NotificationsScreen = ({
 
   return (
     <SafeAreaView style={container}>
-      {loading ? (
-        <ActivityIndicator
-          style={{ marginTop: 50 }}
-          size="large"
-          color={Colors.LwscOrange}
-        />
-      ) : (
-        <FlatList
-          onRefresh={getchNotifications}
-          removeClippedSubviews={true}
-          maxToRenderPerBatch={20}
-          initialNumToRender={20}
-          data={notifications}
-          keyExtractor={(item) => uuid()}
-          renderItem={renderListItem}
-        />
-      )}
+      <LinearGradient
+        start={[0, 0]}
+        end={[1, 0]}
+        colors={["#56cbf1", "#5a86e4"]}
+        style={{ display: "flex", flex: 1 }}
+      >
+        {loading ? (
+          <ActivityIndicator
+            style={{ marginTop: 50 }}
+            size="large"
+            color={Colors.LwscOrange}
+          />
+        ) : (
+          <FlatList
+            onRefresh={getchNotifications}
+            removeClippedSubviews={true}
+            maxToRenderPerBatch={20}
+            initialNumToRender={20}
+            data={notifications}
+            keyExtractor={(item) => uuid()}
+            renderItem={renderListItem}
+          />
+        )}
+      </LinearGradient>
     </SafeAreaView>
   );
 };
