@@ -84,7 +84,7 @@ const HomeScreen = ({ theme, route }: HomeI) => {
                   width: "82%",
                   height: "82%",
                   borderRadius: 10,
-                  backgroundColor: "#ffffffee",
+                  backgroundColor: "#ffffff",
                   shadowColor: `${Colors.linkBlue}22`,
 
                   elevation: 5,

@@ -37,7 +37,7 @@ console.log(`${Strings.API_CREDS.username}:${Strings.API_CREDS.password}`);
 // axios.defaults.baseURL = "http://41.72.107.14:3000/api/v1/";
 axios.defaults.baseURL = Strings.API_BASE_URL;
 //http://41.72.107.14:3020/
-// axios.defaults.timeout = 60000;
+axios.defaults.timeout = 6000;
 
 // console.log(axios.defaults.baseURL);
 
@@ -147,7 +147,11 @@ export const uploadFiles = async (
     fd,
     {
       headers: {
+        timeout: "6000",
         "content-type": "multipart/form-data",
+        Authorization:
+          "Basic " +
+          btoa(`${Strings.API_CREDS.username}:${Strings.API_CREDS.password}`),
       },
     }
   );

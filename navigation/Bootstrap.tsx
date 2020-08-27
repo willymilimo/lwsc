@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { connect } from "react-redux";
+import * as Permissions from "expo-permissions";
 import { RootReducerI } from "../redux/reducers";
 import { bindActionCreators } from "redux";
 import { setBillGroups } from "../redux/actions/bill-groups";
@@ -51,6 +52,7 @@ import Layouts from "../constants/Layouts";
 import { setLoadTime } from "../redux/actions/load-time";
 import { setServiceTypes } from "../redux/actions/services";
 import { ServiceItemI, ServiceItem } from "../models/service-item";
+import { useNavigation } from "@react-navigation/native";
 
 const Stack = createStackNavigator();
 
@@ -391,6 +393,29 @@ const Bootstrap = ({
     }
 
     setLoading(false);
+
+    await askLocationPermission();
+    
+  };
+
+  const askLocationPermission = async () => {
+    var { status } = await Permissions.askAsync(Permissions.LOCATION);
+    if (status !== "granted") {
+      Alert.alert(
+        "Location Permission",
+        "Sorry, we need location permissions to make this work!",
+        [
+          {
+            text: 'Exit',
+            onPress: () => BackHandler.exitApp()
+          },
+          {
+            text: "Grant Permission",
+            onPress: async () => await askLocationPermission(),
+          },
+        ]
+      );
+    }
   };
 
   const getConfigStatus = async () => {

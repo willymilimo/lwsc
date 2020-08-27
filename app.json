@@ -30,7 +30,16 @@
     "android": {
       "package": "com.lwsc.utility",
       "versionCode": 4,
-       "useNextNotificationsApi": true
+      "useNextNotificationsApi": true,
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "READ_CONTACTS",
+        "READ_EXTERNAL_STORAGE",
+        "READ_INTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "packagerOpts": {
       "config": "metro.config.js",

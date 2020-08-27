@@ -1,17 +1,9 @@
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Dimensions,
-  Alert,
-  Modal,
-  Picker,
-} from "react-native";
-import { ServiceType } from "../../types/service-type";
+import { StyleSheet, Text, View, Dimensions, Alert, Modal } from "react-native";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
+import * as Permissions from "expo-permissions";
 import Colors from "../../constants/Colors";
 import {
   Button,
@@ -30,8 +22,6 @@ import Strings from "../../constants/Strings";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { ServiceItemI } from "../../models/service-item";
-import { BookNumberI } from "../../models/meter-reading";
-import { ServiceReportI } from "../../models/service-report";
 import { LinearGradient } from "expo-linear-gradient";
 const { width, height } = Dimensions.get("window");
 
@@ -94,6 +84,22 @@ export default function GeneralServiceForm({
     });
   }, [navigation]);
 
+  const askLocationPermission = async () => {
+    var { status } = await Permissions.askAsync(Permissions.LOCATION);
+    if (status !== "granted") {
+      Alert.alert(
+        "Location Permission",
+        "Sorry, we need location permissions to make this work!",
+        [
+          {
+            text: "Grant Permission",
+            onPress: async () => await askLocationPermission(),
+          },
+        ]
+      );
+    }
+  };
+
   const getLocationAsync = async () => {
     let { status } = await Location.requestPermissionsAsync();
     if (status !== "granted") {
@@ -119,7 +125,7 @@ export default function GeneralServiceForm({
   };
 
   React.useEffect(() => {
-    getLocationAsync();
+    askLocationPermission();
   }, []);
 
   const handleProceedButton = () => {

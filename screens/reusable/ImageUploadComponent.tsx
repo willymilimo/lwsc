@@ -60,8 +60,7 @@ export default function ImageUploadComponent({
       // const uri = manipResult.uri.replace(/.jpg$/i, ".jpg");
       // console.log(uri);
       const { status, data } = await uploadFiles([manipResult.uri]);
-
-      console.log(status);
+      
       if (status === 200 && data.success && data.payload.length) {
         uploadCallback(data.payload);
         setImage(manipResult);
@@ -69,7 +68,7 @@ export default function ImageUploadComponent({
         throw new Error(JSON.stringify(data));
       }
     } catch (err) {
-      console.error(err);
+      console.log(err);
       Alert.alert(
         Strings.SELF_REPORTING_PROBLEM.title,
         Strings.SELF_REPORTING_PROBLEM.message
