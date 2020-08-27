@@ -36,11 +36,11 @@ export default function App() {
     <Provider store={store}>
       <PaperProvider>
         <>
-          {/* <Toast
+          <Toast
             visible={!internetRecheable}
             message={Strings.INTERNET_FAILURE.message}
             center={true}
-          /> */}
+          />
           <NavigationContainer ref={navigationRef}>
             <StatusBar
               backgroundColor={`${Colors.LwscBlue}cc`}

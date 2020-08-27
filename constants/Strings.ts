@@ -1,4 +1,5 @@
 import { ENV } from "react-native-dotenv";
+import { encode as btoa } from "base-64";
 // console.log(ENV)
 
 export default {
@@ -123,6 +124,8 @@ export default {
     ENV === "DEV" || ENV === "TEST"
       ? "http://41.72.107.14:3020/api/v1/"
       : "https://middleware.microtech.co.zm:3000/api/v1",
+
+  Authorization: "Basic " + btoa(`lwsc_mobile_app_dev:#www@1234_lwsc_app`),
 
   INTERNET_FAILURE: {
     title: "NO INTERNET",

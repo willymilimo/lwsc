@@ -15,8 +15,9 @@ import * as ImageManipulator from "expo-image-manipulator";
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 import Strings from "../../constants/Strings";
 import { useNavigation } from "@react-navigation/native";
-import { uploadFiles } from "../../models/axios";
+import { uploadFiles, upload } from "../../models/axios";
 import { UploadFileI } from "../../models/upload-file";
+import * as FileSystem from "expo-file-system";
 
 interface IUC {
   buttonName?: string;
@@ -55,17 +56,24 @@ export default function ImageUploadComponent({
         { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
       );
 
+      const url =
+        "https://lwsc.microtech.co.zm/api/v1/uploads/files/disk/create";
+
+      const { status, body} = await FileSystem.uploadAsync(url, manipResult.uri, {});
+      const { success, payload } = JSON.parse(body);
+
       // manipResult.uri
       // console.log(manipResult.uri);
       // const uri = manipResult.uri.replace(/.jpg$/i, ".jpg");
       // console.log(uri);
-      const { status, data } = await uploadFiles([manipResult.uri]);
-      
-      if (status === 200 && data.success && data.payload.length) {
-        uploadCallback(data.payload);
+      // const res = await upload(manipResult.uri);
+      // console.log(res.status, res.statusText)
+
+      if (status === 200 && success && payload.length) {
+        uploadCallback(payload);
         setImage(manipResult);
       } else {
-        throw new Error(JSON.stringify(data));
+        throw new Error(body);
       }
     } catch (err) {
       console.log(err);

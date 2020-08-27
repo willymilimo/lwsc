@@ -34,6 +34,7 @@
     "expo-location": "~8.2.1",
     "expo-notifications": "~0.3.3",
     "expo-permissions": "~9.0.1",
+    "mime": "^2.4.6",
     "react": "16.11.0",
     "react-dom": "16.11.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-38.0.2.tar.gz",
@@ -53,6 +54,7 @@
     "react-native-svg": "12.1.0",
     "react-native-svg-transformer": "^0.14.3",
     "react-native-tesseract-ocr": "^1.0.10",
+    "react-native-upload-image-expo": "^1.2.3",
     "react-native-vector-icons": "^6.6.0",
     "react-native-web": "~0.11.7",
     "react-native-webview": "9.4.0",
@@ -60,7 +62,8 @@
     "react-navigation-drawer": "^2.4.13",
     "react-redux": "^7.2.0",
     "redux": "^4.0.5",
-    "sentry-expo": "^2.1.2"
+    "sentry-expo": "^2.1.2",
+    "expo-file-system": "~9.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.10.2",

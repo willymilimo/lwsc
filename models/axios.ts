@@ -127,33 +127,71 @@ export const applyForPaymentSchedule = async (account: AccountI) => {
   return await axios.post("apply-for-payment-schedule", account);
 };
 
+export const upload = async (uri: string): Promise<any> => {
+  let apiUrl = "https://lwsc.microtech.co.zm/api/v1/uploads/files/disk/create";
+
+  // Note:
+  // Uncomment this if you want to experiment with local server
+  //
+  // if (Constants.isDevice) {
+  //   apiUrl = `https://your-ngrok-subdomain.ngrok.io/upload`;
+  // } else {
+  //   apiUrl = `http://localhost:3000/upload`
+  // }
+
+  let uriParts = uri.split(".");
+  let fileType = uriParts[uriParts.length - 1];
+
+  let formData = new FormData();
+  formData.append("photo", {
+    uri,
+    name: `photo.${fileType}`,
+    type: `image/${fileType}`,
+  });
+
+  let options = {
+    method: "POST",
+    body: formData,
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "multipart/form-data",
+    },
+  };
+
+  return fetch(apiUrl, options);
+};
+
 export const uploadFiles = async (
   uris: string[]
 ): Promise<AxiosResponse<IResponse<UploadFileI[]>>> => {
   const fd = new FormData();
   uris.forEach((uri, i) => {
     // fd.append(`reading${i}`, file);
-    let uriParts = uri.split(".");
-    let fileType = uriParts[uriParts.length - 1];
+    const newImageUri = "file:///" + uri.split("file:/").join("");
+    console.log(uri);
+    console.log(newImageUri);
+
+    // let uriParts = uri.split(".");
+    // let fileType = uriParts[uriParts.length - 1];
     fd.append("photo", {
-      uri,
-      name: `photo.${fileType}`,
-      type: `image/${fileType}`,
+      uri: newImageUri,
+      name: newImageUri.split("/").pop(),
+      // type: mime.getType(newImageUri),
     } as any);
   });
 
   return await axios.post(
     "https://lwsc.microtech.co.zm/api/v1/uploads/files/disk/create",
-    fd,
-    {
-      headers: {
-        timeout: "6000",
-        "content-type": "multipart/form-data",
-        Authorization:
-          "Basic " +
-          btoa(`${Strings.API_CREDS.username}:${Strings.API_CREDS.password}`),
-      },
-    }
+    fd
+    // {
+    //   headers: {
+    //     // timeout: "6000",
+    //     "content-type": "multipart/form-data",
+    // Authorization:
+    //   "Basic " +
+    //   btoa(`${Strings.API_CREDS.username}:${Strings.API_CREDS.password}`),
+    //   },
+    // }
   );
 };
 
