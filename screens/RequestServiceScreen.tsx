@@ -123,7 +123,7 @@ const RequestServiceScreen = ({ user, services, route }: PropI) => {
           Alert.alert(
             Strings.SELF_REPORTING_PROBLEM.title,
             Strings.SELF_REPORTING_PROBLEM.message,
-            [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
+            // [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
           );
         }
       })
@@ -132,7 +132,7 @@ const RequestServiceScreen = ({ user, services, route }: PropI) => {
         Alert.alert(
           Strings.SELF_REPORTING_PROBLEM.title,
           Strings.SELF_REPORTING_PROBLEM.message,
-          [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
+          // [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
         );
       })
       .finally(() => setLoading(false));

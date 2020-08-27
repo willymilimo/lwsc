@@ -358,7 +358,7 @@ const Bootstrap = ({
 
       try {
         if (serviceTypesStr) {
-          console.log(serviceTypesStr)
+          // console.log(serviceTypesStr)
           setServiceTypes(
             JSON.parse(serviceTypesStr).map(
               (item: ServiceItemI) => new ServiceItem(item)

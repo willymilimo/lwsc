@@ -53,6 +53,7 @@ import {
 } from "../models/axios";
 import { formatDate, formatDateTime } from "../helpers/functions";
 import { UserReducerI } from "../redux/reducers/user";
+import { LinearGradient } from "expo-linear-gradient";
 
 const ASPECT_RATIO = width / height;
 const LATITUDE = -15.37496;
@@ -305,325 +306,339 @@ const ReadMeterScreen = ({
   };
 
   return (
-    <ScrollView style={container}>
-      <Modal animationType="slide" transparent visible={loading}>
-        <View style={[styles.centeredView, { backgroundColor: "#00000077" }]}>
-          <View style={styles.modalView}>
-            <ActivityIndicator size="large" color={Colors.LwscOrange} />
+    <LinearGradient
+      start={[0, 0]}
+      end={[1, 0]}
+      colors={["#56cbf1", "#5a86e4"]}
+      style={{ display: "flex", flex: 1 }}
+    >
+      <ScrollView style={container}>
+        <Modal animationType="slide" transparent visible={loading}>
+          <View style={[styles.centeredView, { backgroundColor: "#00000077" }]}>
+            <View style={styles.modalView}>
+              <ActivityIndicator size="large" color={Colors.LwscOrange} />
+            </View>
+          </View>
+        </Modal>
+
+        <View style={mapContainer}>
+          <MapView
+            ref={(ref) => (map = ref as MapView)}
+            zoomEnabled={true}
+            showsUserLocation={true}
+            region={region}
+            onRegionChangeComplete={() => setRegion(region)}
+            initialRegion={region}
+            style={mapStyle}
+          >
+            <Marker
+              coordinate={{
+                longitude: region.longitude,
+                latitude: region.latitude,
+              }}
+              pinColor={`${Colors.LwscRed}`}
+            />
+          </MapView>
+          <FAB
+            onPress={onPressZoomOut}
+            style={{
+              position: "absolute",
+              margin: 16,
+              right: 0,
+              bottom: 50,
+              backgroundColor: "#ffffff77",
+              borderWidth: 0.75,
+              borderColor: `${Colors.LwscBlack}01`,
+            }}
+            small
+            icon={({ color }) => (
+              <Feather
+                name="zoom-in"
+                size={25}
+                color={color}
+                style={{ backgroundColor: "transparent" }}
+              />
+            )}
+          />
+          <FAB
+            onPress={onPressZoomIn}
+            style={{
+              position: "absolute",
+              margin: 16,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "#ffffff77",
+              borderWidth: 0.75,
+              borderColor: `${Colors.LwscBlack}01`,
+            }}
+            small
+            icon={({ color }) => (
+              <Feather
+                name="zoom-out"
+                size={25}
+                color={color}
+                style={{ backgroundColor: "transparent" }}
+              />
+            )}
+          />
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              onPress={async () => await getLocationAsync()}
+              style={styles.bubble}
+            >
+              <Text style={styles.bubbleText}>
+                Tap to center to your location
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
-      </Modal>
 
-      <View style={mapContainer}>
-        <MapView
-          ref={(ref) => (map = ref as MapView)}
-          zoomEnabled={true}
-          showsUserLocation={true}
-          region={region}
-          onRegionChangeComplete={() => setRegion(region)}
-          initialRegion={region}
-          style={mapStyle}
-        >
-          <Marker
-            coordinate={{
-              longitude: region.longitude,
-              latitude: region.latitude,
-            }}
-            pinColor={`${Colors.LwscRed}`}
+        <View style={{ paddingVertical: 15, paddingHorizontal: 10 }}>
+          <ImageUploadComponent
+            buttonName="Capture Meter Reading"
+            uploadCallback={setUploadFiles}
+            deleteCallback={() => setUploadFiles(undefined)}
+            color={Colors.linkBlue}
+            contentStyle={{ backgroundColor: "white" }}
           />
-        </MapView>
-        <FAB
-          onPress={onPressZoomOut}
-          style={{
-            position: "absolute",
-            margin: 16,
-            right: 0,
-            bottom: 50,
-            backgroundColor: "#ffffff77",
-            borderWidth: 0.75,
-            borderColor: `${Colors.LwscBlack}01`,
-          }}
-          small
-          icon={({ color }) => (
-            <Feather
-              name="zoom-in"
-              size={25}
-              color={color}
-              style={{ backgroundColor: "transparent" }}
+          <View style={styles.content}>
+            <MeterItem
+              icon={
+                <MaterialCommunityIcons
+                  name="dots-horizontal-circle-outline"
+                  size={19}
+                  color={Colors.linkBlue}
+                />
+              }
+              title="Operational Status"
+              value={property.Meter_Status}
             />
-          )}
-        />
-        <FAB
-          onPress={onPressZoomIn}
-          style={{
-            position: "absolute",
-            margin: 16,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "#ffffff77",
-            borderWidth: 0.75,
-            borderColor: `${Colors.LwscBlack}01`,
-          }}
-          small
-          icon={({ color }) => (
-            <Feather
-              name="zoom-out"
-              size={25}
-              color={color}
-              style={{ backgroundColor: "transparent" }}
+            <MeterItem
+              icon={
+                <MaterialCommunityIcons
+                  size={20}
+                  color={Colors.linkBlue}
+                  name="home-group"
+                />
+              }
+              title="Bill Group"
+              value={`${billGroup.GROUP_ID} - ${billGroup.DESCRIPTION}`}
             />
-          )}
-        />
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            onPress={async () => await getLocationAsync()}
-            style={styles.bubble}
-          >
-            <Text style={styles.bubbleText}>
-              Tap to center to your location
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View style={{ padding: 15 }}>
-        <ImageUploadComponent
-          buttonName="Capture Meter Reading"
-          uploadCallback={setUploadFiles}
-          deleteCallback={() => setUploadFiles(undefined)}
-        />
-        <View>
-          <MeterItem
-            icon={
-              <MaterialCommunityIcons
-                name="dots-horizontal-circle-outline"
-                size={19}
-                color={Colors.linkBlue}
-              />
-            }
-            title="Operational Status"
-            value={property.Meter_Status}
-          />
-          <MeterItem
-            icon={
-              <MaterialCommunityIcons
-                size={20}
-                color={Colors.linkBlue}
-                name="home-group"
-              />
-            }
-            title="Bill Group"
-            value={`${billGroup.GROUP_ID} - ${billGroup.DESCRIPTION}`}
-          />
-          <MeterItem
-            icon={
-              <Ionicons
-                name="md-speedometer"
-                size={25}
-                color={Colors.linkBlue}
-              />
-            }
-            title="Account-Meter Number"
-            value={`${property.AccountNumber} - ${property.MeterNumber}`}
-          />
-          <MeterItem
-            icon={<Entypo name="address" color={Colors.linkBlue} size={25} />}
-            title="Address"
-            value={`${property.Customer_Address}`}
-          />
-          {!!property.PLOT_NO && (
             <MeterItem
               icon={
                 <Ionicons
-                  name={`${Platform.OS === "ios" ? "ios" : "md"}-home`}
+                  name="md-speedometer"
                   size={25}
                   color={Colors.linkBlue}
                 />
               }
-              title="Plot Number"
-              value={property.PLOT_NO}
+              title="Account-Meter Number"
+              value={`${property.AccountNumber} - ${property.MeterNumber}`}
             />
-          )}
-          <MeterItem
-            icon={<Entypo name="location" size={20} color={Colors.linkBlue} />}
-            title="Township"
-            value={property.Township}
-          />
-          <MeterItem
-            icon={
-              <MaterialCommunityIcons
-                name="timetable"
-                size={20}
-                color={Colors.linkBlue}
-              />
-            }
-            title="Previous Reading Date"
-            value={property.previousReadingDate.toDateString()}
-          />
-          <MeterItem
-            icon={
-              <SimpleLineIcons
-                name="speedometer"
-                size={19}
-                color={Colors.linkBlue}
-              />
-            }
-            title="Previous Reading"
-            value={property.PreviousReading}
-          />
-        </View>
-
-        <TextInput
-          style={{ marginTop: 10, backgroundColor: "white" }}
-          disabled={loading}
-          mode="outlined"
-          label={"Meter Reading"}
-          value={meterReading.value.toString()}
-          error={meterReading.error}
-          onChangeText={(value) => {
-            const val = parseFloat(value);
-            setMeterReading({
-              value: isNaN(val) ? 0 : val,
-              error: isNaN(val) || val < property.PreviousReading,
-            });
-          }}
-        />
-
-        {user.authToken !== "" && (
-          <>
-            <View
-              style={{
-                borderWidth: 1,
-                borderBottomColor: Colors.borderColorDark,
-                borderStyle: "solid",
-                borderRadius: 5,
-                marginTop: 10,
-              }}
-            >
-              <Picker
-                selectedValue={access.value}
-                onValueChange={(itemValue, index) => {
-                  setAccess({
-                    value: itemValue,
-                    error: !displayItems.no_access.some(
-                      (value) => value.code === itemValue
-                    ),
-                  });
-                }}
-              >
-                <Picker.Item
-                  label="-- Select Access Description --"
-                  value="-- Select Access Description --"
-                />
-                {displayItems.no_access.map((noac) => {
-                  // console.log(noac);
-                  return (
-                    <Picker.Item
-                      key={`${noac.DESCRIBE}_${noac.code}`}
-                      label={noac.DESCRIBE}
-                      value={noac.code}
-                    />
-                  );
-                })}
-              </Picker>
-            </View>
-
-            <View
-              style={{
-                borderWidth: 1,
-                borderBottomColor: Colors.borderColorDark,
-                borderStyle: "solid",
-                borderRadius: 5,
-                marginTop: 10,
-              }}
-            >
-              <Picker
-                selectedValue={note.value}
-                onValueChange={(itemValue, index) => {
-                  setNote({
-                    value: itemValue,
-                    error: !displayItems.notes.some(
-                      (value) => value.CODE === itemValue
-                    ),
-                  });
-                }}
-              >
-                <Picker.Item
-                  label="-- Select Note --"
-                  value="-- Select Note --"
-                />
-                {displayItems.notes.map((an) => (
-                  <Picker.Item
-                    key={`${an.DESCRIBE}_${an.CODE}`}
-                    label={an.DESCRIBE}
-                    value={an.CODE}
+            <MeterItem
+              icon={<Entypo name="address" color={Colors.linkBlue} size={25} />}
+              title="Address"
+              value={`${property.Customer_Address}`}
+            />
+            {!!property.PLOT_NO && (
+              <MeterItem
+                icon={
+                  <Ionicons
+                    name={`${Platform.OS === "ios" ? "ios" : "md"}-home`}
+                    size={25}
+                    color={Colors.linkBlue}
                   />
-                ))}
-              </Picker>
-            </View>
-          </>
-        )}
+                }
+                title="Plot Number"
+                value={property.PLOT_NO}
+              />
+            )}
+            <MeterItem
+              icon={
+                <Entypo name="location" size={20} color={Colors.linkBlue} />
+              }
+              title="Township"
+              value={property.Township}
+            />
+            <MeterItem
+              icon={
+                <MaterialCommunityIcons
+                  name="timetable"
+                  size={20}
+                  color={Colors.linkBlue}
+                />
+              }
+              title="Previous Reading Date"
+              value={property.previousReadingDate.toDateString()}
+            />
+            <MeterItem
+              icon={
+                <SimpleLineIcons
+                  name="speedometer"
+                  size={19}
+                  color={Colors.linkBlue}
+                />
+              }
+              title="Previous Reading"
+              value={property.PreviousReading}
+            />
+          </View>
 
-        {(meterReading.error ||
-          meterReading.value === 0 ||
-          note.value === "-- Select Note --" ||
-          note.error ||
-          access.value === "-- Select Access Description --" ||
-          access.error ||
-          !uploadFiles ||
-          !uploadFiles.length) && (
-          <Subheading
-            style={{
-              color: "maroon",
-              borderColor: Colors.danger.border,
-              backgroundColor: Colors.danger.background,
-              padding: 8,
+          <View style={styles.content}>
+            <TextInput
+              style={{ marginTop: 10, backgroundColor: "white" }}
+              disabled={loading}
+              mode="outlined"
+              label={"Meter Reading"}
+              value={meterReading.value.toString()}
+              error={meterReading.error}
+              onChangeText={(value) => {
+                const val = parseFloat(value);
+                setMeterReading({
+                  value: isNaN(val) ? 0 : val,
+                  error: isNaN(val) || val < property.PreviousReading,
+                });
+              }}
+            />
+
+            {user.authToken !== "" && (
+              <>
+                <View
+                  style={{
+                    borderWidth: 1,
+                    borderBottomColor: Colors.borderColorDark,
+                    borderStyle: "solid",
+                    borderRadius: 5,
+                    marginTop: 10,
+                  }}
+                >
+                  <Picker
+                    selectedValue={access.value}
+                    onValueChange={(itemValue, index) => {
+                      setAccess({
+                        value: itemValue,
+                        error: !displayItems.no_access.some(
+                          (value) => value.code === itemValue
+                        ),
+                      });
+                    }}
+                  >
+                    <Picker.Item
+                      label="-- Select Access Description --"
+                      value="-- Select Access Description --"
+                    />
+                    {displayItems.no_access.map((noac) => {
+                      // console.log(noac);
+                      return (
+                        <Picker.Item
+                          key={`${noac.DESCRIBE}_${noac.code}`}
+                          label={noac.DESCRIBE}
+                          value={noac.code}
+                        />
+                      );
+                    })}
+                  </Picker>
+                </View>
+
+                <View
+                  style={{
+                    borderWidth: 1,
+                    borderBottomColor: Colors.borderColorDark,
+                    borderStyle: "solid",
+                    borderRadius: 5,
+                    marginTop: 10,
+                  }}
+                >
+                  <Picker
+                    selectedValue={note.value}
+                    onValueChange={(itemValue, index) => {
+                      setNote({
+                        value: itemValue,
+                        error: !displayItems.notes.some(
+                          (value) => value.CODE === itemValue
+                        ),
+                      });
+                    }}
+                  >
+                    <Picker.Item
+                      label="-- Select Note --"
+                      value="-- Select Note --"
+                    />
+                    {displayItems.notes.map((an) => (
+                      <Picker.Item
+                        key={`${an.DESCRIBE}_${an.CODE}`}
+                        label={an.DESCRIBE}
+                        value={an.CODE}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+              </>
+            )}
+
+            {(meterReading.error ||
+              meterReading.value === 0 ||
+              note.value === "-- Select Note --" ||
+              note.error ||
+              access.value === "-- Select Access Description --" ||
+              access.error ||
+              !uploadFiles ||
+              !uploadFiles.length) && (
+              <Subheading
+                style={{
+                  color: "maroon",
+                  borderColor: Colors.danger.border,
+                  backgroundColor: Colors.danger.background,
+                  padding: 8,
+                  borderRadius: 5,
+                  textAlign: "center",
+                  marginTop: 10,
+                }}
+              >
+                {!uploadFiles || !uploadFiles.length
+                  ? "Ensure you capture the meter reading"
+                  : meterReading.error || meterReading.value === 0
+                  ? "Ensure meter reading is greater or equal to previous reading"
+                  : access.value === "-- Select Access Description --" ||
+                    access.error
+                  ? "Ensure you select an access description"
+                  : note.value === "-- Select Note --" || note.error
+                  ? "Ensure you select a note"
+                  : ""}
+              </Subheading>
+            )}
+          </View>
+
+          <Button
+            style={{ marginTop: 15 }}
+            contentStyle={{
+              borderColor: Colors.linkBlue,
+              borderWidth: 0.75,
               borderRadius: 5,
-              textAlign: "center",
-              marginTop: 10,
+              backgroundColor: `${Colors.LwscBlue}`,
             }}
+            labelStyle={{ color: "#fff" }}
+            color={`${Colors.LwscBlue}`}
+            loading={loading}
+            disabled={
+              loading ||
+              meterReading.error ||
+              meterReading.value === 0 ||
+              note.value === "-- Select Note --" ||
+              note.error ||
+              access.value === "-- Select Access Description --" ||
+              access.error ||
+              !uploadFiles ||
+              !uploadFiles.length
+            }
+            mode="outlined"
+            onPress={submitMeterReading}
           >
-            {!uploadFiles || !uploadFiles.length
-              ? "Ensure you capture the meter reading"
-              : meterReading.error || meterReading.value === 0
-              ? "Ensure meter reading is greater or equal to previous reading"
-              : access.value === "-- Select Access Description --" ||
-                access.error
-              ? "Ensure you select an access description"
-              : note.value === "-- Select Note --" || note.error
-              ? "Ensure you select a note"
-              : ""}
-          </Subheading>
-        )}
-
-        <Button
-          style={{ marginTop: 15 }}
-          contentStyle={{
-            borderColor: Colors.linkBlue,
-            borderWidth: 0.75,
-            borderRadius: 5,
-            backgroundColor: `${Colors.linkBlue}22`,
-          }}
-          color={`${Colors.LwscBlue}bb`}
-          loading={loading}
-          disabled={
-            loading ||
-            meterReading.error ||
-            meterReading.value === 0 ||
-            note.value === "-- Select Note --" ||
-            note.error ||
-            access.value === "-- Select Access Description --" ||
-            access.error ||
-            !uploadFiles ||
-            !uploadFiles.length
-          }
-          mode="outlined"
-          onPress={submitMeterReading}
-        >
-          Submit Reading
-        </Button>
-      </View>
-    </ScrollView>
+            Submit Reading
+          </Button>
+        </View>
+      </ScrollView>
+    </LinearGradient>
   );
 };
 
@@ -648,7 +663,25 @@ const styles = StyleSheet.create({
   container: {
     display: "flex",
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "white",
+    // backgroundColor: "white",
+  },
+  content: {
+    borderRadius: 5,
+    display: "flex",
+    flexDirection: "column",
+    padding: 10,
+    marginTop: 10,
+    backgroundColor: "#fff",
+    shadowColor: `${Colors.linkBlue}22`,
+
+    elevation: 5,
+
+    shadowOffset: {
+      width: 1,
+      height: 1,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 1,
   },
   fab: {
     backgroundColor: "red",

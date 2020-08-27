@@ -27,11 +27,12 @@ import { ServiceInvoiceI } from "./service-invoice";
 
 // axios.defaults.auth = Strings.API_CREDS;
 // axios.defaults.headers.Authorization = "Basic bHdzY19tb2JpbGVfYXBwX2Rldjojd3d3QDEyMzRfbHdzY19hcHA=";
-axios.defaults.headers.Authorization = "Basic " + btoa(`${Strings.API_CREDS.username}:${Strings.API_CREDS.password}`);
+axios.defaults.headers.Authorization =
+  "Basic " +
+  btoa(`${Strings.API_CREDS.username}:${Strings.API_CREDS.password}`);
 console.log(`${Strings.API_CREDS.username}:${Strings.API_CREDS.password}`);
 // console.log(axios.defaults.headers.Authorization);
 // console.log("Basic bHdzY19tb2JpbGVfYXBwX2Rldjojd3d3QDEyMzRfbHdzY19hcHA=")
-
 
 // axios.defaults.baseURL = "http://41.72.107.14:3000/api/v1/";
 axios.defaults.baseURL = Strings.API_BASE_URL;
@@ -110,7 +111,14 @@ export const fetchServices = async (): Promise<
 
 export const applyForService = async (
   service: ServiceApplicationI
-): Promise<AxiosResponse<IResponse>> => {
+): Promise<
+  AxiosResponse<
+    IResponse<{
+      transaction_id: string;
+      full_redirect_url: string;
+    }>
+  >
+> => {
   // console.log(service);
   return await axios.post("services/applications/create", service);
 };
@@ -299,7 +307,9 @@ export const fetchServiceInvoice = async (
   service_type: string,
   account_number: string
 ): Promise<AxiosResponse<IResponse<ServiceInvoiceI>>> => {
-  console.log(`services/invoices/fetch?service_type=${service_type}&account_number=${account_number}`)
+  console.log(
+    `services/invoices/fetch?service_type=${service_type}&account_number=${account_number}`
+  );
   return await axios.get(
     `services/invoices/fetch?service_type=${service_type}&account_number=${account_number}`
   );

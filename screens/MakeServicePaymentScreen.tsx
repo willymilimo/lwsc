@@ -56,7 +56,7 @@ const MakeServicePaymentScreen = ({ navigation, route }: PaymentScreenI) => {
   const { container, methodStyle, formContainer, contentBox } = styles;
   const { params, method } = route.params;
   const { invoice, service, bookNumber } = params;
-  console.log(route.params);
+//   console.log(route.params);
   const { image, placeholder, regex } = getItem(method.id);
   // console.log(params, method, image, placeholder);
   const isPrepaid = params instanceof Prepaid;
@@ -123,11 +123,13 @@ const MakeServicePaymentScreen = ({ navigation, route }: PaymentScreenI) => {
     applyForService(serviceApplication)
       .then(({ status, data }) => {
         const { success, error, payload, message } = data;
+        console.log(message)
 
         if (status === 200) {
           if (success) {
             if (method.id === "visa_master_card") {
-              navigation.navigate(Strings.WebviewScreen, payload);
+            //   console.log(payload);
+                navigation.navigate(Strings.WebviewScreen, payload);
             } else {
               Alert.alert(
                 Strings.PIN_INPUT.title,
@@ -166,21 +168,20 @@ const MakeServicePaymentScreen = ({ navigation, route }: PaymentScreenI) => {
   async function makePaymentRequest() {
     const serviceApplication: ServiceApplicationI = new ServiceApplication({
       ...service,
-      service_type: service.service_type,
       first_name: service.first_name,
       last_name: service.last_name,
       phone: service.phone,
-      email: service.email,
+      email: email.value,
       area: bookNumber.DESCRIBE,
       address: service.address,
       description: service.description,
-      post_to_customer_balance: service.post_to_customer_balance,
       bill_group: bookNumber.BILLGROUP,
       amount: invoice.totalcharge,
       phone_number: phone.value,
       payment_channel: method.id,
+      ...invoice,
     });
-    console.log(serviceApplication);
+    // console.log(serviceApplication);
 
     confirmPayment(serviceApplication);
   }

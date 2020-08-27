@@ -175,10 +175,6 @@ export default function GeneralServiceForm({
     mapRef.animateToRegion(region, 100);
   };
 
-  const invalidPostService =
-    service.billable &&
-    (account_meter.error || account_meter.value.length === 0);
-
   return (
     <LinearGradient
       start={[0, 0]}
@@ -395,7 +391,8 @@ export default function GeneralServiceForm({
             address.value.length === 0 ||
             account_meter.value.length === 0 ||
             account_meter.error ||
-            invalidPostService) && (
+            account_meter.value.length === 0 ||
+            account_meter.error) && (
             <Subheading
               style={{
                 color: "maroon",
@@ -413,7 +410,7 @@ export default function GeneralServiceForm({
                 ? "Please input valid Phone Number"
                 : address.error || address.value.length === 0
                 ? "Address is required"
-                : invalidPostService
+                : account_meter.value.length === 0 || account_meter.error
                 ? "Account Number is required"
                 : ""}
             </Subheading>
@@ -437,7 +434,8 @@ export default function GeneralServiceForm({
               phone.value.length === 0 ||
               address.error ||
               address.value.length === 0 ||
-              invalidPostService
+              account_meter.value.length === 0 ||
+              account_meter.error
             }
             loading={loading}
             //   icon="send"

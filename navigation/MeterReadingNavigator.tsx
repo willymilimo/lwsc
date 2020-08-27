@@ -22,14 +22,15 @@ interface PropI {
 const MeterReadingNavigator = ({ user }: PropI) => {
   const navigator = useNavigation();
   const [isLoggedIn, setIsLoggedIn] = useState(
-    user.authToken && user.createdAt && user.manNumber
+    user.authToken && user.createdAt
   );
 
   useEffect(() => {
     let is_subscribed = true;
 
+    console.log(is_subscribed, user.authToken, user.createdAt);
     if (is_subscribed) {
-      setIsLoggedIn(user.authToken && user.createdAt && user.manNumber);
+      setIsLoggedIn(user.authToken && user.createdAt);
     }
 
     return () => {
