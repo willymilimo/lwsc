@@ -86,7 +86,7 @@ export default function GeneralServiceForm({
     error: false,
   });
 
-  console.log(service);
+  // console.log(service);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -176,7 +176,7 @@ export default function GeneralServiceForm({
   };
 
   const invalidPostService =
-    service.post_service &&
+    service.billable &&
     (account_meter.error || account_meter.value.length === 0);
 
   return (
@@ -425,10 +425,10 @@ export default function GeneralServiceForm({
               borderColor: Colors.linkBlue,
               borderWidth: 0.75,
               borderRadius: 5,
-              backgroundColor: `${Colors.linkBlue}`,
+              backgroundColor: `${Colors.whiteColor}`,
             }}
-            labelStyle={{ color: "#fff" }}
-            color={`${Colors.linkBlue}`}
+            labelStyle={{ color: Colors.linkBlue }}
+            color={`${Colors.whiteColor}`}
             disabled={
               loading ||
               fullName.error ||

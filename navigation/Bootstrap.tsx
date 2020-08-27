@@ -48,6 +48,9 @@ import DeprecationScreen from "../screens/DeprecationScreen";
 import StackNavigator from "./StackNavigator";
 import { LinearGradient } from "expo-linear-gradient";
 import Layouts from "../constants/Layouts";
+import { setLoadTime } from "../redux/actions/load-time";
+import { setServiceTypes } from "../redux/actions/services";
+import { ServiceItemI, ServiceItem } from "../models/service-item";
 
 const Stack = createStackNavigator();
 
@@ -66,6 +69,8 @@ interface PropI {
   setActiveAccount(activeAccount: ActiveAccountReducerI): void;
   setPaymentHistory(history: StatementI[]): void;
   setUserReducer(userReducer: UserReducerI): void;
+  setLoadTime(loadTime: Date): void;
+  setServiceType(services: ServiceItemI[]): void;
 }
 
 const Loader = () => {
@@ -95,7 +100,9 @@ const Loader = () => {
           >{`Please wait...`}</Text>
         </Surface>
         <View style={styles.footer}>
-          <Text style={{color: '#fff', padding: 10}}>Powered by Microtech</Text>
+          <Text style={{ color: "#fff", padding: 10 }}>
+            Powered by Microtech
+          </Text>
         </View>
       </LinearGradient>
     </View>
@@ -114,13 +121,15 @@ const Bootstrap = ({
   setActiveAccount,
   setPaymentHistory,
   setUserReducer,
+  setLoadTime,
+  setServiceType,
 }: PropI) => {
   const [activeTheme, setActiveTheme] = React.useState(themeReducer.theme);
   const [loading, setLoading] = useState(true);
   const [deprecated, setDeprecated] = useState(false);
 
   const bootstrapAsync = async () => {
-    console.log('started')
+    // console.log("started");
     setLoading(true);
     const isDeprecated = await getConfigStatus();
     setDeprecated(isDeprecated);
@@ -138,6 +147,8 @@ const Bootstrap = ({
       let notifications;
       let pushTokenStr;
       let userStr;
+      let loadTimeStr;
+      let serviceTypesStr;
 
       try {
         // await AsyncStorage.clear();
@@ -210,7 +221,18 @@ const Bootstrap = ({
       } catch (e) {
         // Restoring token failed
       }
-      console.log('1')
+
+      try {
+        loadTimeStr = await AsyncStorage.getItem(Strings.LOAD_TIME_STORAGE);
+        console.log(loadTimeStr);
+      } catch (e) {}
+
+      try {
+        serviceTypesStr = await AsyncStorage.getItem(Strings.SERVICES_STORAGE);
+        // console.log(serviceTypesStr)
+      } catch (e) {}
+
+      // console.log('1')
 
       try {
         if (theme) {
@@ -220,7 +242,7 @@ const Bootstrap = ({
       } catch (err) {
         console.log(`theme: ${theme}`);
       }
-      console.log('2')
+      // console.log("2");
 
       try {
         if (accounts) {
@@ -240,7 +262,7 @@ const Bootstrap = ({
       } catch (err) {
         console.log(`accounts: ${accounts}`);
       }
-      console.log('3')
+      // console.log('3')
 
       try {
         if (paypoints) {
@@ -250,7 +272,7 @@ const Bootstrap = ({
           setPayPoints(JSON.parse(paypoints));
         }
       } catch (er) {}
-      console.log('4')
+      // console.log('4')
 
       try {
         if (paymentHistory) {
@@ -261,7 +283,7 @@ const Bootstrap = ({
       } catch (err) {
         console.log(`paymentHistory: ${paymentHistory}`);
       }
-      console.log('5')
+      // console.log('5')
 
       try {
         // console.log(billGroups)
@@ -278,7 +300,7 @@ const Bootstrap = ({
       } catch (er) {
         console.log(`notifications: ${notifications}`);
       }
-      console.log('6')
+      // console.log('6')
 
       try {
         if (bookNumbers) {
@@ -293,7 +315,7 @@ const Bootstrap = ({
       } catch (err) {
         console.log(`bookNumbers: ${bookNumbers}`);
       }
-      console.log('7')
+      // console.log('7')
 
       try {
         if (accessNotes) {
@@ -302,7 +324,7 @@ const Bootstrap = ({
       } catch (err) {
         console.log(`accessNotes: ${accessNotes}`);
       }
-      console.log('8')
+      // console.log('8')
 
       try {
         if (activeAccount) {
@@ -311,7 +333,7 @@ const Bootstrap = ({
       } catch (err) {
         console.log(`activeAccount: ${activeAccount}`);
       }
-      console.log('9')
+      // console.log('9')
 
       try {
         if (notifications) {
@@ -324,7 +346,28 @@ const Bootstrap = ({
       } catch (err) {
         console.log(`userStr: ${notifications}`);
       }
-      console.log('last')
+      // console.log('last')
+
+      try {
+        if (loadTimeStr) {
+          setLoadTime(new Date(loadTimeStr));
+        } else {
+          setLoadTime(new Date());
+        }
+      } catch (err) {}
+
+      try {
+        if (serviceTypesStr) {
+          console.log(serviceTypesStr)
+          setServiceTypes(
+            JSON.parse(serviceTypesStr).map(
+              (item: ServiceItemI) => new ServiceItem(item)
+            )
+          );
+        }
+      } catch (e) {
+        console.log(e)
+      }
 
       try {
         if (userStr) {
@@ -348,9 +391,7 @@ const Bootstrap = ({
     }
 
     setLoading(false);
-    console.log('finished..')
   };
-
 
   const getConfigStatus = async () => {
     const { status, data } = await fetchConfigStatus();
@@ -365,7 +406,7 @@ const Bootstrap = ({
   useEffect(() => {
     let is_subscribed = true;
 
-    console.log('boostrapping.....')
+    // console.log("boostrapping.....");
 
     if (is_subscribed) {
       try {
@@ -376,7 +417,7 @@ const Bootstrap = ({
       }
     }
     return () => {
-      console.log('stopped effecting.....')
+      // console.log("stopped effecting.....");
       is_subscribed = false;
     };
   }, []);
@@ -421,7 +462,7 @@ const styles = StyleSheet.create({
     right: 0,
     paddingRight: 10,
     paddingBottom: 10,
-    color: '#fff'
+    color: "#fff",
   },
   gradientStyle: {
     height: Layouts.window.height,
@@ -450,6 +491,8 @@ const matchDispatchToProps = (dispatch: any) =>
       setPushToken,
       setPaymentHistory,
       setUserReducer,
+      setLoadTime,
+      setServiceTypes,
     },
     dispatch
   );

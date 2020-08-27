@@ -111,7 +111,7 @@ export const fetchServices = async (): Promise<
 export const applyForService = async (
   service: ServiceApplicationI
 ): Promise<AxiosResponse<IResponse>> => {
-  console.log(service);
+  // console.log(service);
   return await axios.post("services/applications/create", service);
 };
 

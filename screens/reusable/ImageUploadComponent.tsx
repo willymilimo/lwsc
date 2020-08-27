@@ -22,16 +22,26 @@ interface IUC {
   buttonName?: string;
   uploadCallback(uploadFile: UploadFileI[]): void;
   deleteCallback?(): void;
+  contentStyle?: any;
+  color?: string;
+  labelStyle?: any;
 }
 
 export default function ImageUploadComponent({
   buttonName,
   uploadCallback,
   deleteCallback,
+  contentStyle,
+  labelStyle,
+  color,
 }: IUC) {
   const navigator = useNavigation();
   const [loading, setLoading] = useState(false);
   const [image, setImage] = useState<ImageManipulator.ImageResult | null>(null);
+
+  contentStyle = contentStyle || {};
+  color = color || `${Colors.LwscBlue}bb`;
+  labelStyle = labelStyle || {};
 
   const convertImage = async (
     image: {
@@ -51,7 +61,7 @@ export default function ImageUploadComponent({
       // console.log(uri);
       const { status, data } = await uploadFiles([manipResult.uri]);
 
-      console.log(status)
+      console.log(status);
       if (status === 200 && data.success && data.payload.length) {
         uploadCallback(data.payload);
         setImage(manipResult);
@@ -188,8 +198,9 @@ export default function ImageUploadComponent({
             borderWidth: 0.75,
             borderRadius: 5,
             backgroundColor: `${Colors.linkBlue}22`,
+            ...contentStyle,
           }}
-          color={`${Colors.LwscBlue}bb`}
+          color={color}
           icon={({ color }) => (
             <Ionicons
               color={color}

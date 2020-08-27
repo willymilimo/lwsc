@@ -42,6 +42,7 @@ export default {
   DeprecationScreen: "Update Required",
   VersionCheckScreen: "Checking Version",
   PaymentOptionsServicesScreen: "Payment Methods",
+  MakeServicePaymentScreen: "Service Payment",
 
   /*************** Begin REDUCER TYPES *****************/
   WHITE_THEME: "WHITE_THEME",
@@ -67,6 +68,8 @@ export default {
   ACCESS_NOTES_STORAGE: "ACCESS_NOTES_STORAGE",
   ACTIVE_ACCOUNT_STORAGE: "ACTIVE_ACCOUNT_STORAGE",
   PUSH_TOKEN_STORAGE: "PUSH_TOKEN_STORACE",
+  SERVICES_STORAGE: "SERVICES_STORAGE",
+  LOAD_TIME_STORAGE: "LOAD_TIME_STORAGE",
   /*************** End Storage Constants *****************/
 
   // API

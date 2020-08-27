@@ -27,9 +27,11 @@ import { bindActionCreators } from "redux";
 import { setServiceTypes } from "../redux/actions/services";
 import { fetchServices } from "../models/axios";
 import { LinearGradient } from "expo-linear-gradient";
+import { isMoreThanOneDay } from "../helpers/functions";
 
 interface ServicesI {
   navigation: NavType;
+  loadTime: Date;
   serviceTypes: ServiceItemI[];
   setServiceTypes(serviceType: ServiceItemI[]): void;
 }
@@ -37,6 +39,7 @@ interface ServicesI {
 const ServicesScreen = ({
   navigation,
   serviceTypes,
+  loadTime,
   setServiceTypes,
 }: ServicesI) => {
   const { container, btnsBox, iconContainer } = styles;
@@ -45,26 +48,36 @@ const ServicesScreen = ({
   useEffect(() => {
     let is_subscribed = true;
 
-    if (!serviceTypes.length) {
+    // console.log(serviceTypes)
+    // console.log(
+    //   'all => ' + is_subscribed && (isMoreThanOneDay(loadTime) || serviceTypes.length == 0),
+    //   '\nis_subscribed => ' + is_subscribed,
+    //   '\nisMoreThanOneDay => ' + isMoreThanOneDay(loadTime),
+    //   '\nserviceTypes.length => ' + serviceTypes.length
+    // );
+
+    if (
+      is_subscribed &&
+      (isMoreThanOneDay(loadTime) || serviceTypes.length == 0)
+    ) {
+      // console.log('fetching.......')
       setLoading(true);
       fetchServices()
         .then(({ status, data }) => {
-          if (is_subscribed) {
-            const { success, payload, error, message } = data;
-            // console.log(status, data)
+          const { success, payload, error, message } = data;
+          // console.log(status, data.payload)
 
-            if (status === 200 && success) {
-              setServiceTypes(
-                payload
-                  .filter((item) => item.is_active)
-                  .map((item) => new ServiceItem(item))
-              );
-            } else {
-              Alert.alert(
-                "Services Error",
-                error || message || "Failed to retrieve services."
-              );
-            }
+          if (status === 200 && success) {
+            setServiceTypes(
+              payload
+                .filter((item) => item.is_active)
+                .map((item) => new ServiceItem(item))
+            );
+          } else {
+            Alert.alert(
+              "Services Error",
+              error || message || "Failed to retrieve services."
+            );
           }
         })
         .catch((err) => {
@@ -82,7 +95,7 @@ const ServicesScreen = ({
     return () => {
       is_subscribed = false;
     };
-  }, [serviceTypes]);
+  }, [serviceTypes, loadTime]);
 
   const createIcon = (
     icon: string,
@@ -156,7 +169,7 @@ const ServicesScreen = ({
               <ActivityIndicator
                 size={50}
                 animating={true}
-                color={Colors.colorGreen}
+                color={Colors.whiteColor}
               />
             </View>
           ) : !serviceTypes.length ? (
@@ -244,8 +257,9 @@ const ServicesScreen = ({
   );
 };
 
-const mapPropsToState = ({ services }: RootReducerI) => ({
+const mapPropsToState = ({ services, loadTime }: RootReducerI) => ({
   serviceTypes: services,
+  loadTime,
 });
 const mapDispatchToProps = (dispatch: any) =>
   bindActionCreators(

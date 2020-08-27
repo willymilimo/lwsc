@@ -12,6 +12,7 @@ import { BookNumberI } from "../models/meter-reading";
 import { toFixed } from "../helpers/functions";
 import Colors from "../constants/Colors";
 import Strings from "../constants/Strings";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface PropsI {
   services: ServiceItemI[];
@@ -57,55 +58,64 @@ const ServiceInvoiceScreen = ({ services, route }: PropsI) => {
   };
 
   return (
-    <ScrollView style={container}>
-      {flexRowItem(
-        "Service Type",
-        services.filter((s) => s._id === service_type)[0].title
-      )}
-      {flexRowItem("Name", `${first_name} ${last_name}`)}
-      {flexRowItem("Phone #", phone)}
-      {!!email && flexRowItem("Email", email)}
-      {!!address && flexRowItem("Address", address)}
-      {flexRowItem("Area", bookNumber.DESCRIBE)}
-      {!!description && flexRowItem("Description", description)}
-      {!!meter_number &&
-        flexRowItem("Account #", account_number || meter_number)}
-      <Divider style={{ marginVertical: 10 }} />
+    <LinearGradient
+      start={[0, 0]}
+      end={[1, 0]}
+      colors={["#56cbf1", "#5a86e4"]}
+      style={{ display: "flex", flex: 1 }}
+    >
+      <ScrollView style={container}>
+        <View style={styles.content}>
+          {flexRowItem(
+            "Service Type",
+            services.filter((s) => s._id === service_type)[0].title
+          )}
+          {flexRowItem("Name", `${first_name} ${last_name}`)}
+          {flexRowItem("Phone #", phone)}
+          {!!email && flexRowItem("Email", email)}
+          {!!address && flexRowItem("Address", address)}
+          {flexRowItem("Area", bookNumber.DESCRIBE)}
+          {!!description && flexRowItem("Description", description)}
+          {!!meter_number &&
+            flexRowItem("Account #", account_number || meter_number)}
+          <Divider style={{ marginVertical: 10 }} />
 
-      {flexRowItem("Customer Type", customer_type, {
-        textTransform: "capitalize",
-      })}
-      {flexRowItem("Penalty Charge", `ZMW${toFixed(penalty_charge)}`)}
-      {flexRowItem("Fee Charge", `ZMW${toFixed(fee_charge)}`)}
-      {flexRowItem(
-        "Total Charge",
-        `ZMW${toFixed(total_charge || penalty_charge + fee_charge)}`
-      )}
+          {flexRowItem("Customer Type", customer_type, {
+            textTransform: "capitalize",
+          })}
+          {flexRowItem("Penalty Charge", `ZMW${toFixed(penalty_charge)}`)}
+          {flexRowItem("Fee Charge", `ZMW${toFixed(fee_charge)}`)}
+          {flexRowItem(
+            "Total Charge",
+            `ZMW${toFixed(total_charge || penalty_charge + fee_charge)}`
+          )}
 
-      <Button
-        style={{ marginTop: 15 }}
-        contentStyle={{
-          borderColor: Colors.linkBlue,
-          borderWidth: 0.75,
-          borderRadius: 5,
-          backgroundColor: `${Colors.linkBlue}22`,
-        }}
-        color={`${Colors.LwscBlue}bb`}
-        disabled={loading}
-        loading={loading}
-        //   icon="send"
-        mode="outlined"
-        onPress={() =>
-          navigator.navigate(Strings.PaymentOptionsServicesScreen, {
-            invoice,
-            service,
-            bookNumber,
-          })
-        }
-      >
-        Make Payment
-      </Button>
-    </ScrollView>
+          <Button
+            style={{ marginTop: 15 }}
+            contentStyle={{
+              borderColor: Colors.linkBlue,
+              borderWidth: 0.75,
+              borderRadius: 5,
+              backgroundColor: `${Colors.linkBlue}22`,
+            }}
+            color={`${Colors.LwscBlue}bb`}
+            disabled={loading}
+            loading={loading}
+            //   icon="send"
+            mode="outlined"
+            onPress={() =>
+              navigator.navigate(Strings.PaymentOptionsServicesScreen, {
+                invoice,
+                service,
+                bookNumber,
+              })
+            }
+          >
+            Make Payment
+          </Button>
+        </View>
+      </ScrollView>
+    </LinearGradient>
   );
 };
 
@@ -119,8 +129,8 @@ const styles = StyleSheet.create({
   container: {
     display: "flex",
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "white",
-    padding: 20,
+    // backgroundColor: "white",
+    padding: 10,
   },
   flexRow: {
     display: "flex",
@@ -134,5 +144,23 @@ const styles = StyleSheet.create({
   },
   value: {
     fontSize: 14,
+  },
+  content: {
+    borderRadius: 5,
+    display: "flex",
+    flexDirection: "column",
+    padding: 15,
+    // margin: 5,
+    backgroundColor: "#fff",
+    shadowColor: `${Colors.linkBlue}22`,
+
+    elevation: 5,
+
+    shadowOffset: {
+      width: 1,
+      height: 1,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 1,
   },
 });

@@ -55,6 +55,8 @@ import { setUserReducer } from "../redux/actions/user";
 import MeterReadingNavigator from "./MeterReadingNavigator";
 import { navigate } from "./RootNavigation";
 import ServiceInvoiceScreen from "../screens/ServiceInvoiceScreen";
+import PaymentOptionsServicesScreen from "../screens/PaymentOptionsServicesScreen";
+import MakeServicePaymentScreen from "../screens/MakeServicePaymentScreen";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -72,13 +74,9 @@ interface SNI {
   notifications: NotificationI[];
   setPushToken(token: string): void;
   addNotification(notifications: NotificationI): void;
-
 }
 
-const StackNavigator = ({
-  themeReducer,
-  addNotification,
-}: SNI) => {
+const StackNavigator = ({ themeReducer, addNotification }: SNI) => {
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState(false);
   const [landScreen, setLandScreen] = useState({ screen: "Home" });
@@ -251,6 +249,14 @@ const StackNavigator = ({
       <Stack.Screen
         name={Strings.ServiceInvoiceScreen}
         component={ServiceInvoiceScreen}
+      />
+      <Stack.Screen
+        name={Strings.PaymentOptionsServicesScreen}
+        component={PaymentOptionsServicesScreen}
+      />
+      <Stack.Screen
+        name={Strings.MakeServicePaymentScreen}
+        component={MakeServicePaymentScreen}
       />
     </Stack.Navigator>
   );
