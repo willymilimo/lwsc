@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from "axios";
+import { encode as btoa } from "base-64";
 import { IResponse } from "./iresponse";
 import { AccountI } from "./account";
 import { IdentityType } from "../types/identity-type";
@@ -24,13 +25,21 @@ import { PaymentChannelI } from "../types/payment-channel";
 import Strings from "../constants/Strings";
 import { ServiceInvoiceI } from "./service-invoice";
 
+import mime from "mime";
+
 // axios.defaults.auth = Strings.API_CREDS;
+// axios.defaults.headers.Authorization = "Basic bHdzY19tb2JpbGVfYXBwX2Rldjojd3d3QDEyMzRfbHdzY19hcHA=";
 axios.defaults.headers.Authorization =
-  "Basic bHdzY19tb2JpbGVfYXBwX2Rldjojd3d3QDEyMzRfbHdzY19hcHA=";
+  "Basic " +
+  btoa(`${Strings.API_CREDS.username}:${Strings.API_CREDS.password}`);
+console.log(`${Strings.API_CREDS.username}:${Strings.API_CREDS.password}`);
+// console.log(axios.defaults.headers.Authorization);
+// console.log("Basic bHdzY19tb2JpbGVfYXBwX2Rldjojd3d3QDEyMzRfbHdzY19hcHA=")
+
 // axios.defaults.baseURL = "http://41.72.107.14:3000/api/v1/";
 axios.defaults.baseURL = Strings.API_BASE_URL;
 //http://41.72.107.14:3020/
-// axios.defaults.timeout = 60000;
+axios.defaults.timeout = 6000;
 
 // console.log(axios.defaults.baseURL);
 
@@ -104,13 +113,45 @@ export const fetchServices = async (): Promise<
 
 export const applyForService = async (
   service: ServiceApplicationI
-): Promise<AxiosResponse<IResponse>> => {
-  console.log(service);
+): Promise<
+  AxiosResponse<
+    IResponse<{
+      transaction_id: string;
+      full_redirect_url: string;
+    }>
+  >
+> => {
+  // console.log(service);
   return await axios.post("services/applications/create", service);
 };
 
 export const applyForPaymentSchedule = async (account: AccountI) => {
   return await axios.post("apply-for-payment-schedule", account);
+};
+
+export const upload = async (uri: string): Promise<any> => {
+  let apiUrl = "https://lwsc.microtech.co.zm/api/v1/uploads/files/disk/create";
+
+
+  const newImageUri = "file:///" + uri.split("file:/").join("");
+
+  const formData = new FormData();
+  formData.append("image", {
+    uri: newImageUri,
+    type: mime.getType(newImageUri),
+    name: newImageUri.split("/").pop(),
+  } as any);
+
+  let options = {
+    method: "POST",
+    body: formData,
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "multipart/form-data",
+    },
+  };
+
+  return fetch(apiUrl, options);
 };
 
 export const uploadFiles = async (
@@ -119,23 +160,31 @@ export const uploadFiles = async (
   const fd = new FormData();
   uris.forEach((uri, i) => {
     // fd.append(`reading${i}`, file);
-    let uriParts = uri.split(".");
-    let fileType = uriParts[uriParts.length - 1];
+    const newImageUri = "file:///" + uri.split("file:/").join("");
+    console.log(uri);
+    console.log(newImageUri);
+
+    // let uriParts = uri.split(".");
+    // let fileType = uriParts[uriParts.length - 1];
     fd.append("photo", {
-      uri,
-      name: `photo.${fileType}`,
-      type: `image/${fileType}`,
+      uri: newImageUri,
+      name: newImageUri.split("/").pop(),
+      // type: mime.getType(newImageUri),
     } as any);
   });
 
   return await axios.post(
     "https://lwsc.microtech.co.zm/api/v1/uploads/files/disk/create",
-    fd,
-    {
-      headers: {
-        "content-type": "multipart/form-data",
-      },
-    }
+    fd
+    // {
+    //   headers: {
+    //     // timeout: "6000",
+    //     "content-type": "multipart/form-data",
+    // Authorization:
+    //   "Basic " +
+    //   btoa(`${Strings.API_CREDS.username}:${Strings.API_CREDS.password}`),
+    //   },
+    // }
   );
 };
 
@@ -293,6 +342,9 @@ export const fetchServiceInvoice = async (
   service_type: string,
   account_number: string
 ): Promise<AxiosResponse<IResponse<ServiceInvoiceI>>> => {
+  console.log(
+    `services/invoices/fetch?service_type=${service_type}&account_number=${account_number}`
+  );
   return await axios.get(
     `services/invoices/fetch?service_type=${service_type}&account_number=${account_number}`
   );
