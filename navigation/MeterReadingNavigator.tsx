@@ -13,6 +13,7 @@ import Colors from "../constants/Colors";
 import Strings from "../constants/Strings";
 import ReadMeterScreen from "../screens/ReadMeterScreen";
 import HeaderRightComponent from "./HeaderRightComponent";
+import SelectAreaScreenNoLogin from "../screens/SelectAreaScreenNoLogin";
 
 const Stack = createStackNavigator();
 
@@ -68,9 +69,9 @@ const MeterReadingNavigator = ({ user }: PropI) => {
             }}
           />
           <Stack.Screen
-            name={Strings.SelectAreaScreen}
-            component={SelectAreaScreen}
-            initialParams={{ toRoute: Strings.SelectAreaScreen }}
+            name={Strings.SelectAreaScreenNoLogin}
+            component={SelectAreaScreenNoLogin}
+            initialParams={{ toRoute: Strings.SelectAreaScreenNoLogin }}
           />
           <Stack.Screen
             name={Strings.PropertiesScreen}

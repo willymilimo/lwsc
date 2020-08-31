@@ -170,7 +170,7 @@ const SignInScreen = ({ user, setUserReducer }: PropI) => {
                 color={Colors.linkBlue}
                 labelStyle={{ textTransform: "capitalize" }}
                 onPress={() => {
-                  navigator.navigate(Strings.SelectAreaScreen, {
+                  navigator.navigate(Strings.SelectAreaScreenNoLogin, {
                     toRoute: Strings.PropertiesScreen,
                   });
                 }}
@@ -197,7 +197,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(SignInScreen);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "red",
+    backgroundColor: "#56cbf1",
   },
   gradientStyle: {
     height: Layouts.window.height,

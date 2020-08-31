@@ -248,7 +248,7 @@ const ManageAccountScreen = ({
           <Dialog visible={showDialog} onDismiss={() => setShowDialog(false)}>
             <Dialog.Title>{`Add ${type}`}</Dialog.Title>
             <Dialog.Content>
-              <RadioButton.Group
+              {/* <RadioButton.Group
                 onValueChange={(value) => setType(value as AddType)}
                 value={type}
               >
@@ -262,6 +262,21 @@ const ManageAccountScreen = ({
                     <RadioButton color="#3366cc" value={AddType.meter} />
                   </View>
                 </View>
+              </RadioButton.Group> */}
+              <RadioButton.Group
+                onValueChange={(value) => setType(value as AddType)}
+                value={type}
+              >
+                <RadioButton.Item
+                  color="#3366cc"
+                  label="Account"
+                  value={AddType.account}
+                />
+                <RadioButton.Item
+                  color="#3366cc"
+                  label="Meter"
+                  value={AddType.meter}
+                />
               </RadioButton.Group>
               <TextInput
                 mode="outlined"

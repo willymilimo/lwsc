@@ -145,7 +145,27 @@ const BookNumbersScreen = ({ bookNumbers, setBookNumbers, route }: PropI) => {
   return (
     <>
       <View style={styles.container}>
-        {!loading && !Object.keys(displayList).length ? (
+        {loading ? (
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <ActivityIndicator size="large" color={Colors.LwscOrange} />
+              <Text
+                style={{
+                  marginTop: 20,
+                  textAlign: "center",
+                }}
+              >
+                Loading book numbers
+              </Text>
+              <Text
+                style={{
+                  marginTop: 20,
+                  textAlign: "center",
+                }}
+              >{`Please wait...`}</Text>
+            </View>
+          </View>
+        ) : !Object.keys(displayList).length ? (
           <Text>
             Unable to fetch book numbers. Please ensure you are connected to the
             internet.
@@ -174,27 +194,7 @@ const BookNumbersScreen = ({ bookNumbers, setBookNumbers, route }: PropI) => {
       </View>
       <Provider>
         <Portal>
-          <Modal visible={loading}>
-            <View style={styles.centeredView}>
-              <View style={styles.modalView}>
-                <ActivityIndicator size="large" color={Colors.LwscOrange} />
-                <Text
-                  style={{
-                    marginTop: 20,
-                    textAlign: "center",
-                  }}
-                >
-                  Loading book numbers
-                </Text>
-                <Text
-                  style={{
-                    marginTop: 20,
-                    textAlign: "center",
-                  }}
-                >{`Please wait...`}</Text>
-              </View>
-            </View>
-          </Modal>
+          <Modal visible={loading}></Modal>
         </Portal>
       </Provider>
     </>

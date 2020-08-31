@@ -44,6 +44,7 @@ export default {
   VersionCheckScreen: "Checking Version",
   PaymentOptionsServicesScreen: "Payment Methods",
   MakeServicePaymentScreen: "Service Payment",
+  SelectAreaScreenNoLogin: "Select Your Area",
 
   /*************** Begin REDUCER TYPES *****************/
   WHITE_THEME: "WHITE_THEME",

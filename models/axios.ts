@@ -24,13 +24,14 @@ import { ConsumptionI } from "./consumption";
 import { PaymentChannelI } from "../types/payment-channel";
 import Strings from "../constants/Strings";
 import { ServiceInvoiceI } from "./service-invoice";
+import mime from "mime";
 
 // axios.defaults.auth = Strings.API_CREDS;
 // axios.defaults.headers.Authorization = "Basic bHdzY19tb2JpbGVfYXBwX2Rldjojd3d3QDEyMzRfbHdzY19hcHA=";
 axios.defaults.headers.Authorization =
   "Basic " +
   btoa(`${Strings.API_CREDS.username}:${Strings.API_CREDS.password}`);
-console.log(`${Strings.API_CREDS.username}:${Strings.API_CREDS.password}`);
+// console.log(`${Strings.API_CREDS.username}:${Strings.API_CREDS.password}`);
 // console.log(axios.defaults.headers.Authorization);
 // console.log("Basic bHdzY19tb2JpbGVfYXBwX2Rldjojd3d3QDEyMzRfbHdzY19hcHA=")
 
@@ -130,35 +131,23 @@ export const applyForPaymentSchedule = async (account: AccountI) => {
 export const upload = async (uri: string): Promise<any> => {
   let apiUrl = "https://lwsc.microtech.co.zm/api/v1/uploads/files/disk/create";
 
-  // Note:
-  // Uncomment this if you want to experiment with local server
-  //
-  // if (Constants.isDevice) {
-  //   apiUrl = `https://your-ngrok-subdomain.ngrok.io/upload`;
-  // } else {
-  //   apiUrl = `http://localhost:3000/upload`
-  // }
+  const newImageUri = "file:///" + uri.split("file:/").join("");
 
-  let uriParts = uri.split(".");
-  let fileType = uriParts[uriParts.length - 1];
+  const formData = new FormData();
+  formData.append("image", {
+    uri: newImageUri,
+    type: mime.getType(newImageUri) as string,
+    name: newImageUri.split("/").pop(),
+  } as any);
 
-  let formData = new FormData();
-  formData.append("photo", {
-    uri,
-    name: `photo.${fileType}`,
-    type: `image/${fileType}`,
-  });
-
-  let options = {
-    method: "POST",
-    body: formData,
+  return await axios.post(apiUrl, formData, {
     headers: {
-      Accept: "application/json",
-      "Content-Type": "multipart/form-data",
+      "content-type": "multipart/form-data",
+      Authorization:
+        "Basic " +
+        btoa(`${Strings.API_CREDS.username}:${Strings.API_CREDS.password}`),
     },
-  };
-
-  return fetch(apiUrl, options);
+  });
 };
 
 export const uploadFiles = async (
@@ -174,7 +163,7 @@ export const uploadFiles = async (
     // let uriParts = uri.split(".");
     // let fileType = uriParts[uriParts.length - 1];
     fd.append("photo", {
-      uri: newImageUri,
+      uri,
       name: newImageUri.split("/").pop(),
       // type: mime.getType(newImageUri),
     } as any);
@@ -182,16 +171,16 @@ export const uploadFiles = async (
 
   return await axios.post(
     "https://lwsc.microtech.co.zm/api/v1/uploads/files/disk/create",
-    fd
-    // {
-    //   headers: {
-    //     // timeout: "6000",
-    //     "content-type": "multipart/form-data",
-    // Authorization:
-    //   "Basic " +
-    //   btoa(`${Strings.API_CREDS.username}:${Strings.API_CREDS.password}`),
-    //   },
-    // }
+    fd,
+    {
+      headers: {
+        // timeout: "6000",
+        "content-type": "multipart/form-data",
+        Authorization:
+          "Basic " +
+          btoa(`${Strings.API_CREDS.username}:${Strings.API_CREDS.password}`),
+      },
+    }
   );
 };
 

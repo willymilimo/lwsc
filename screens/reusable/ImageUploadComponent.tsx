@@ -56,24 +56,13 @@ export default function ImageUploadComponent({
         { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
       );
 
-      const url =
-        "https://lwsc.microtech.co.zm/api/v1/uploads/files/disk/create";
+      const {status, data} = await upload(manipResult.uri);
 
-      const { status, body} = await FileSystem.uploadAsync(url, manipResult.uri, {});
-      const { success, payload } = JSON.parse(body);
-
-      // manipResult.uri
-      // console.log(manipResult.uri);
-      // const uri = manipResult.uri.replace(/.jpg$/i, ".jpg");
-      // console.log(uri);
-      // const res = await upload(manipResult.uri);
-      // console.log(res.status, res.statusText)
-
-      if (status === 200 && success && payload.length) {
-        uploadCallback(payload);
+      if (status === 200 && data.success && data.payload.length) {
+        uploadCallback(data.payload);
         setImage(manipResult);
       } else {
-        throw new Error(body);
+        throw new Error(JSON.stringify(data || { error: "unknown exception" }));
       }
     } catch (err) {
       console.log(err);
