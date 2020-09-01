@@ -25,23 +25,13 @@ import { reportLeakage } from "../models/axios";
 import { Feather } from "@expo/vector-icons";
 import { BookNumberI } from "../models/meter-reading";
 import { LinearGradient } from "expo-linear-gradient";
-
-const ASPECT_RATIO = width / height;
-const LATITUDE = -15.37496;
-const LONGITUDE = 28.382121;
-const LATITUDE_DELTA = 0.00922;
-const LONGITUDE_DELTA = 0.00421; //LATITUDE_DELTA * ASPECT_RATIO;
+import MapComponent from "./reusable/MapComponent";
 
 const ReportLeakageScreen = () => {
   let map: MapView;
   const navigator = useNavigation();
-  const { container, mapContainer, mapStyle, flexRow } = styles;
-  const [region, setRegion] = React.useState({
-    latitude: LATITUDE,
-    longitude: LONGITUDE,
-    latitudeDelta: LATITUDE_DELTA,
-    longitudeDelta: LONGITUDE_DELTA,
-  });
+  const { container, flexRow } = styles;
+  const [region, setRegion] = React.useState({ longitude: 0, latitude: 0 });
   const [fullName, setFullName] = React.useState<ControlIT<string>>({
     value: "",
     error: false,
@@ -64,58 +54,7 @@ const ReportLeakageScreen = () => {
   const [uploadFiles, setUploadFiles] = useState<UploadFileI[]>();
   const [loading, setLoading] = useState(false);
   const [leakages, setLeakages] = useState({ water: true, sewer: false });
-
-  const getLocationAsync = async () => {
-    try {
-      let { status } = await Location.requestPermissionsAsync();
-      if (status !== "granted") {
-        const { title, message } = Strings.LOCATION_PERMISSION;
-        Alert.alert(title, message, [
-          {
-            text: "Grant Permission",
-            onPress: async () => await getLocationAsync(),
-          },
-          { text: "Deny", onPress: () => BackHandler.exitApp() },
-        ]);
-      } else {
-        let location = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.BestForNavigation,
-        });
-        setRegion({
-          ...region,
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        });
-      }
-    } catch (error) {
-      const { title, message } = Strings.SELF_REPORTING_PROBLEM;
-      Alert.alert(title, message, [
-        { text: "Ok", onPress: () => navigator.goBack() },
-      ]);
-    }
-  };
-
-  useEffect(() => {
-    getLocationAsync();
-  }, []);
-
-  const onPressZoomOut = () => {
-    setRegion({
-      ...region,
-      latitudeDelta: region.latitudeDelta / 10,
-      longitudeDelta: region.longitudeDelta / 10,
-    });
-    map.animateToRegion(region, 100);
-  };
-
-  const onPressZoomIn = () => {
-    setRegion({
-      ...region,
-      latitudeDelta: region.latitudeDelta * 10,
-      longitudeDelta: region.longitudeDelta * 10,
-    });
-    map.animateToRegion(region, 100);
-  };
+  const [isMapReady, setIsMapReady] = useState(false);
 
   const handleReportLeakageSubmit = () => {
     const space = fullName.value.indexOf(" ");
@@ -156,99 +95,8 @@ const ReportLeakageScreen = () => {
       style={{ display: "flex", flex: 1 }}
     >
       <ScrollView style={container}>
-        <View style={mapContainer}>
-          <MapView
-            ref={(ref) => (map = ref as MapView)}
-            zoomEnabled={true}
-            showsUserLocation={true}
-            region={region}
-            onRegionChangeComplete={() => setRegion(region)}
-            initialRegion={region}
-            style={mapStyle}
-          >
-            <Marker
-              draggable
-              onDragEnd={(e) =>
-                setRegion({
-                  ...region,
-                  latitude: e.nativeEvent.coordinate.latitude,
-                  longitude: e.nativeEvent.coordinate.longitude,
-                })
-              }
-              coordinate={{
-                longitude: region.longitude,
-                latitude: region.latitude,
-              }}
-              pinColor={`${Colors.LwscRed}`}
-            />
-          </MapView>
-          <FAB
-            onPress={onPressZoomOut}
-            style={{
-              position: "absolute",
-              margin: 16,
-              right: 0,
-              bottom: 50,
-              backgroundColor: "#ffffff77",
-              borderWidth: 0.75,
-              borderColor: `${Colors.LwscBlack}01`,
-            }}
-            small
-            icon={({ color }) => (
-              <Feather
-                name="zoom-in"
-                size={25}
-                color={color}
-                style={{ backgroundColor: "transparent" }}
-              />
-            )}
-          />
-          <FAB
-            onPress={onPressZoomIn}
-            style={{
-              position: "absolute",
-              margin: 16,
-              right: 0,
-              bottom: 0,
-              backgroundColor: "#ffffff77",
-              borderWidth: 0.75,
-              borderColor: `${Colors.LwscBlack}01`,
-            }}
-            small
-            icon={({ color }) => (
-              <Feather
-                name="zoom-out"
-                size={25}
-                color={color}
-                style={{ backgroundColor: "transparent" }}
-              />
-            )}
-          />
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[
-                styles.bubble,
-                { backgroundColor: `${Colors.LwscBlack}33`, borderRadius: 10 },
-              ]}
-            >
-              <Text style={styles.bubbleText}>
-                Drag marker to location of the complaint (optional)
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              onPress={async () => await getLocationAsync()}
-              style={styles.bubble}
-            >
-              <Text style={styles.bubbleText}>
-                Tap to center to your location
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={{ paddingVertical: 15, paddingHorizontal: 15 }}>
+        <MapComponent setRegionCallback={setRegion} bubbleText="Drag marker to location of the leak"/>
+        {/*<View style={{ paddingVertical: 15, paddingHorizontal: 15 }}>
           <ImageUploadComponent
             contentStyle={{ backgroundColor: "#fff" }}
             uploadCallback={setUploadFiles}
@@ -398,7 +246,7 @@ const ReportLeakageScreen = () => {
           >
             Continue
           </Button>
-        </View>
+        </View> */}
       </ScrollView>
     </LinearGradient>
   );
@@ -448,7 +296,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   fab: {
-    backgroundColor: "red",
+    // backgroundColor: "red",
     position: "absolute",
     zIndex: 999,
     margin: 16,

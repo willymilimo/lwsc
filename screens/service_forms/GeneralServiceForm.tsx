@@ -1,9 +1,6 @@
 import React from "react";
-import { StyleSheet, Text, View, Dimensions, Alert, Modal } from "react-native";
-import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
-import MapView, { Marker } from "react-native-maps";
-import * as Location from "expo-location";
-import * as Permissions from "expo-permissions";
+import { StyleSheet, View, Dimensions, Modal } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 import Colors from "../../constants/Colors";
 import {
   Button,
@@ -19,10 +16,10 @@ import {
   ServiceApplication,
 } from "../../models/service-application";
 import Strings from "../../constants/Strings";
-import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { ServiceItemI } from "../../models/service-item";
 import { LinearGradient } from "expo-linear-gradient";
+import MapComponent from "../reusable/MapComponent";
 const { width, height } = Dimensions.get("window");
 
 interface GeneralServiceFormI {
@@ -30,25 +27,19 @@ interface GeneralServiceFormI {
   route: { params: { title: string; service: ServiceItemI } };
 }
 
-const ASPECT_RATIO = width / height;
 const LATITUDE = -15.37496;
 const LONGITUDE = 28.382121;
-const LATITUDE_DELTA = 0.00922;
-const LONGITUDE_DELTA = 0.00921; //LATITUDE_DELTA * ASPECT_RATIO;
 
 export default function GeneralServiceForm({
   navigation,
   route,
 }: GeneralServiceFormI) {
-  let mapRef: MapView;
   const navigator = useNavigation();
   const { title, service } = route.params;
   const { container, mapContainer, map } = styles;
   const [region, setRegion] = React.useState({
     latitude: LATITUDE,
     longitude: LONGITUDE,
-    latitudeDelta: LATITUDE_DELTA,
-    longitudeDelta: LONGITUDE_DELTA,
   });
   const [loading, setLoading] = React.useState(false);
   const [fullName, setFullName] = React.useState<ControlIT<string>>({
@@ -83,50 +74,6 @@ export default function GeneralServiceForm({
       headerTitle: title,
     });
   }, [navigation]);
-
-  const askLocationPermission = async () => {
-    var { status } = await Permissions.askAsync(Permissions.LOCATION);
-    if (status !== "granted") {
-      Alert.alert(
-        "Location Permission",
-        "Sorry, we need location permissions to make this work!",
-        [
-          {
-            text: "Grant Permission",
-            onPress: async () => await askLocationPermission(),
-          },
-        ]
-      );
-    }
-  };
-
-  const getLocationAsync = async () => {
-    let { status } = await Location.requestPermissionsAsync();
-    if (status !== "granted") {
-      // setErrorMsg("Permission to access location was denied");
-      Alert.alert(
-        "Location Permission",
-        "We require permission access to show you the nearest paypoints.",
-        [{ text: "OK", onPress: async () => await getLocationAsync() }],
-        { cancelable: false }
-      );
-    } else {
-      let location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.BestForNavigation,
-      });
-      //   console.log(location.coords);
-      // console.log(this.state.region);
-      setRegion({
-        ...region,
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      });
-    }
-  };
-
-  React.useEffect(() => {
-    askLocationPermission();
-  }, []);
 
   const handleProceedButton = () => {
     const name = fullName.value.split(" ");
@@ -163,24 +110,6 @@ export default function GeneralServiceForm({
     });
   };
 
-  const onPressZoomOut = () => {
-    setRegion({
-      ...region,
-      latitudeDelta: region.latitudeDelta / 10,
-      longitudeDelta: region.longitudeDelta / 10,
-    });
-    mapRef.animateToRegion(region, 100);
-  };
-
-  const onPressZoomIn = () => {
-    setRegion({
-      ...region,
-      latitudeDelta: region.latitudeDelta * 10,
-      longitudeDelta: region.longitudeDelta * 10,
-    });
-    mapRef.animateToRegion(region, 100);
-  };
-
   return (
     <LinearGradient
       start={[0, 0]}
@@ -197,98 +126,8 @@ export default function GeneralServiceForm({
           </View>
         </Modal>
 
-        <View style={mapContainer}>
-          <MapView
-            ref={(ref) => (mapRef = ref as MapView)}
-            zoomEnabled={true}
-            showsUserLocation={true}
-            region={region}
-            onRegionChangeComplete={() => setRegion(region)}
-            initialRegion={region}
-            style={styles.map}
-          >
-            <Marker
-              draggable
-              onDragEnd={(e) =>
-                setRegion({
-                  ...region,
-                  latitude: e.nativeEvent.coordinate.latitude,
-                  longitude: e.nativeEvent.coordinate.longitude,
-                })
-              }
-              coordinate={{
-                longitude: region.longitude,
-                latitude: region.latitude,
-              }}
-              pinColor={`${Colors.LwscRed}`}
-            />
-          </MapView>
-          <FAB
-            onPress={onPressZoomOut}
-            style={{
-              position: "absolute",
-              margin: 16,
-              right: 0,
-              bottom: 50,
-              backgroundColor: "#ffffff77",
-              borderWidth: 0.75,
-              borderColor: `${Colors.LwscBlack}01`,
-            }}
-            small
-            icon={({ color }) => (
-              <Feather
-                name="zoom-in"
-                size={25}
-                color={color}
-                style={{ backgroundColor: "transparent" }}
-              />
-            )}
-          />
-          <FAB
-            onPress={onPressZoomIn}
-            style={{
-              position: "absolute",
-              margin: 16,
-              right: 0,
-              bottom: 0,
-              backgroundColor: "#ffffff77",
-              borderWidth: 0.75,
-              borderColor: `${Colors.LwscBlack}01`,
-            }}
-            small
-            icon={({ color }) => (
-              <Feather
-                name="zoom-out"
-                size={25}
-                color={color}
-                style={{ backgroundColor: "transparent" }}
-              />
-            )}
-          />
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[
-                styles.bubble,
-                { backgroundColor: `${Colors.LwscBlack}33`, borderRadius: 10 },
-              ]}
-            >
-              <Text style={styles.bubbleText}>
-                Drag marker to location requiring the service
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              onPress={async () => await getLocationAsync()}
-              style={styles.bubble}
-            >
-              <Text style={styles.bubbleText}>
-                Tap to center to your location
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
+        <MapComponent setRegionCallback={setRegion} bubbleText="Drag marker to location requiring the service" />
+       
         <View style={{ paddingVertical: 10, paddingHorizontal: 15 }}>
           <TextInput
             mode="outlined"

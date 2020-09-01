@@ -25,12 +25,20 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.lwsc.utility",
+      "config": {
+        "googleMapsApiKey": "AIzaSyC3SzcYHLM2kzExSzk-QlNo1Dl_5xRk-bo"
+      },
       "buildNumber": "1.0.4"
     },
     "android": {
       "package": "com.lwsc.utility",
       "versionCode": 4,
       "useNextNotificationsApi": true,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBhxkRvxSLpuAHIbXpgx_oXoOBHufiOeD8"
+        }
+      },
       "permissions": [
         "CAMERA",
         "ACCESS_FINE_LOCATION",

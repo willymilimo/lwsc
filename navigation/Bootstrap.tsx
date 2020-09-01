@@ -52,7 +52,7 @@ import Layouts from "../constants/Layouts";
 import { setLoadTime } from "../redux/actions/load-time";
 import { setServiceTypes } from "../redux/actions/services";
 import { ServiceItemI, ServiceItem } from "../models/service-item";
-import { useNavigation } from "@react-navigation/native";
+import { capitalize } from "../helpers/functions";
 
 const Stack = createStackNavigator();
 
@@ -368,7 +368,7 @@ const Bootstrap = ({
           );
         }
       } catch (e) {
-        console.log(e)
+        console.log(e);
       }
 
       try {
@@ -395,26 +395,42 @@ const Bootstrap = ({
     setLoading(false);
 
     await askLocationPermission();
-    
   };
 
   const askLocationPermission = async () => {
-    var { status } = await Permissions.askAsync(Permissions.LOCATION);
+    var { status, permissions } = await Permissions.askAsync(
+      Permissions.LOCATION,
+      Permissions.CAMERA_ROLL,
+      Permissions.CAMERA,
+      Permissions.CONTACTS,
+      Permissions.NOTIFICATIONS,
+      Permissions.USER_FACING_NOTIFICATIONS
+    );
     if (status !== "granted") {
-      Alert.alert(
-        "Location Permission",
-        "Sorry, we need location permissions to make this work!",
-        [
-          {
-            text: 'Exit',
-            onPress: () => BackHandler.exitApp()
-          },
-          {
-            text: "Grant Permission",
-            onPress: async () => await askLocationPermission(),
-          },
-        ]
-      );
+      const keys = Object.keys(permissions);
+
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        const { status } = permissions[key];
+
+        if (status !== "granted") {
+          Alert.alert(
+            `${capitalize(key)} Permission`,
+            `Sorry, we need ${key.toLocaleLowerCase()} permissions to make this work!`,
+            [
+              {
+                text: "Exit",
+                onPress: () => BackHandler.exitApp(),
+              },
+              {
+                text: "Grant Permission",
+                onPress: async () => await askLocationPermission(),
+              },
+            ]
+          );
+          break;
+        }
+      }
     }
   };
 

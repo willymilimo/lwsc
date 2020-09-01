@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, SafeAreaView, Image } from "react-native";
+import { StyleSheet, Text, View, SafeAreaView, Image, Alert } from "react-native";
 import { connect } from "react-redux";
 import {
   FontAwesome,
@@ -37,6 +37,10 @@ const HomeScreen = ({ theme, route }: HomeI) => {
     gradientStyle
   } = styles;
   const navigation = useNavigation();
+
+  React.useEffect(() => {
+    Alert.alert("Version 1.0");
+  })
 
   return (
     <SafeAreaView style={container}>

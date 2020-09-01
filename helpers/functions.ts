@@ -64,3 +64,7 @@ export function isMoreThanOneDay(loadTime: Date) {
   const oneDay = 60 * 60 * 24 * 1000;
   return new Date().valueOf() - loadTime.valueOf() > oneDay;
 }
+
+export function capitalize(text: string) {
+  return text.charAt(0).toUpperCase() + text.toLocaleLowerCase().slice(1);
+}
