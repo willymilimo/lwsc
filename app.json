@@ -7,7 +7,7 @@
       "android",
       "web"
     ],
-    "version": "1.0.1",
+    "version": "1.0.5",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -25,12 +25,29 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.lwsc.utility",
-      "buildNumber": "1.0.1"
+      "config": {
+        "googleMapsApiKey": "AIzaSyC3SzcYHLM2kzExSzk-QlNo1Dl_5xRk-bo"
+      },
+      "buildNumber": "1.0.5"
     },
     "android": {
       "package": "com.lwsc.utility",
-      "versionCode": 2,
-       "useNextNotificationsApi": true
+      "versionCode": 5,
+      "useNextNotificationsApi": true,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBhxkRvxSLpuAHIbXpgx_oXoOBHufiOeD8"
+        }
+      },
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "READ_CONTACTS",
+        "READ_EXTERNAL_STORAGE",
+        "READ_INTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "packagerOpts": {
       "config": "metro.config.js",

@@ -40,6 +40,7 @@ import {
 import { ActiveAccountReducerI } from "../redux/reducers/active-account";
 import { PropertyI, Property } from "../models/meter-reading";
 import { useNavigation } from "@react-navigation/native";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface MakePaymentScreenI {
   navigation: NavType;
@@ -162,7 +163,6 @@ const ManageAccountScreen = ({
               { onPress: () => navigator.navigate(Strings.HomeTabNavigator) },
             ]);
           }
-
         }
       } else if (!isInit) {
         Alert.alert(
@@ -180,121 +180,142 @@ const ManageAccountScreen = ({
 
   return (
     <View style={container}>
-      <ScrollView style={box}>
-        {payItems.length ? (
-          payItems.map((acc) => {
-            const isAccount = acc instanceof Account;
-            return (
-              <View key={Math.random().toString(36).substring(10)}>
-                <FAB
-                  style={styles.fab}
-                  small
-                  icon="delete-forever"
-                  onPress={() => {
-                    console.log(acc);
-                    if (payItems.length === 1) {
-                      unsetActiveAccount();
+      <LinearGradient
+        start={[0, 0]}
+        end={[1, 0]}
+        colors={["#56cbf1", "#5a86e4"]}
+        style={{ display: "flex", flex: 1 }}
+      >
+        <ScrollView style={box}>
+          {payItems.length ? (
+            payItems.map((acc) => {
+              const isAccount = acc instanceof Account;
+              return (
+                <View key={Math.random().toString(36).substring(10)}>
+                  <FAB
+                    style={styles.fab}
+                    small
+                    icon="delete-forever"
+                    onPress={() => {
+                      console.log(acc);
+                      if (payItems.length === 1) {
+                        unsetActiveAccount();
+                      }
+                      deleteAccount(
+                        isAccount
+                          ? (acc as AccountI).CUSTKEY
+                          : typeof acc === "string"
+                          ? acc
+                          : (acc as PropertyI).MeterNumber
+                      );
+                    }}
+                  />
+                  <BillComponent
+                    key={Math.random().toString(36).substring(10)}
+                    account={acc}
+                    onPress={() =>
+                      navigation.navigate(Strings.PaymentMethodScreen, acc)
                     }
-                    deleteAccount(
-                      isAccount
-                        ? (acc as AccountI).CUSTKEY
-                        : typeof acc === "string"
-                        ? acc
-                        : (acc as PropertyI).MeterNumber
-                    );
-                  }}
-                />
-                <BillComponent
-                  key={Math.random().toString(36).substring(10)}
-                  account={acc}
-                  onPress={() =>
-                    navigation.navigate(Strings.PaymentMethodScreen, acc)
-                  }
-                />
-              </View>
-            );
-          })
-        ) : (
-          <View style={missingAccount}>
-            <Text style={maText}>
-              You have not added any account/meter to your profile
-            </Text>
-            <Button
-              style={{ marginTop: 15 }}
-              contentStyle={{
-                borderColor: Colors.linkBlue,
-                borderWidth: 0.75,
-                borderRadius: 5,
-                backgroundColor: `${Colors.linkBlue}22`,
-              }}
-              color={`${Colors.LwscBlue}bb`}
-              //   loading={loading}
-              //   icon="send"
-              mode="outlined"
-              onPress={() => setShowDialog(true)}
-            >
-              Add Account/Meter
-            </Button>
-          </View>
-        )}
-      </ScrollView>
-      <Portal>
-        <Dialog visible={showDialog} onDismiss={() => setShowDialog(false)}>
-          <Dialog.Title>{`Add ${type}`}</Dialog.Title>
-          <Dialog.Content>
-            <RadioButton.Group
-              onValueChange={(value) => setType(value as AddType)}
-              value={type}
-            >
-              <View style={flexRow}>
-                <View style={flexRow}>
-                  <Text style={radioLabelStyle}>Account</Text>
-                  <RadioButton color="#3366cc" value={AddType.account} />
+                  />
                 </View>
+              );
+            })
+          ) : (
+            <View style={missingAccount}>
+              <Text style={maText}>
+                You have not added any account/meter to your profile
+              </Text>
+              <Button
+                style={{ marginTop: 15 }}
+                contentStyle={{
+                  borderColor: Colors.linkBlue,
+                  borderWidth: 0.75,
+                  borderRadius: 5,
+                  backgroundColor: `${Colors.linkBlue}22`,
+                }}
+                color={`${Colors.LwscBlue}bb`}
+                //   loading={loading}
+                //   icon="send"
+                mode="outlined"
+                onPress={() => setShowDialog(true)}
+              >
+                Add Account/Meter
+              </Button>
+            </View>
+          )}
+        </ScrollView>
+        <Portal>
+          <Dialog visible={showDialog} onDismiss={() => setShowDialog(false)}>
+            <Dialog.Title>{`Add ${type}`}</Dialog.Title>
+            <Dialog.Content>
+              {/* <RadioButton.Group
+                onValueChange={(value) => setType(value as AddType)}
+                value={type}
+              >
                 <View style={flexRow}>
-                  <Text style={radioLabelStyle}>Meter</Text>
-                  <RadioButton color="#3366cc" value={AddType.meter} />
+                  <View style={flexRow}>
+                    <Text style={radioLabelStyle}>Account</Text>
+                    <RadioButton color="#3366cc" value={AddType.account} />
+                  </View>
+                  <View style={flexRow}>
+                    <Text style={radioLabelStyle}>Meter</Text>
+                    <RadioButton color="#3366cc" value={AddType.meter} />
+                  </View>
                 </View>
-              </View>
-            </RadioButton.Group>
-            <TextInput
-              mode="outlined"
-              label={`${type} Number`}
-              keyboardType="number-pad"
-              value={meterAccountNo}
-              disabled={loading}
-              autoFocus={true}
-              onChangeText={(text) => setMeterAccountNo(text.trim())}
-            />
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button
-              loading={loading}
-              onPress={() => handleAccountMeterSubmit()}
-            >
-              Submit
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+              </RadioButton.Group> */}
+              <RadioButton.Group
+                onValueChange={(value) => setType(value as AddType)}
+                value={type}
+              >
+                <RadioButton.Item
+                  color="#3366cc"
+                  label="Account"
+                  value={AddType.account}
+                />
+                <RadioButton.Item
+                  color="#3366cc"
+                  label="Meter"
+                  value={AddType.meter}
+                />
+              </RadioButton.Group>
+              <TextInput
+                mode="outlined"
+                label={`${type} Number`}
+                keyboardType="number-pad"
+                value={meterAccountNo}
+                disabled={loading}
+                autoFocus={true}
+                onChangeText={(text) => setMeterAccountNo(text.trim())}
+              />
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button
+                loading={loading}
+                onPress={() => handleAccountMeterSubmit()}
+              >
+                Submit
+              </Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
 
-      <LwscFAB
-        visible={!showDialog}
-        onPress={() => {
-          setIsBuyForAnother(false);
-          setShowDialog(true);
-        }}
-        label="Add Account/Meter"
-        labelStyle={{ width: 145 }}
-        icon={{
-          name: `${Platform.OS === "ios" ? "ios" : "md"}-add`,
-          type: Ionicons,
-        }}
-        style={{ bottom: 20 }}
-        backgroundColor={Colors.LwscBlue}
-        color="white"
-      />
-      {/* <LwscFAB
+        <LwscFAB
+          visible={!showDialog}
+          onPress={() => {
+            setIsBuyForAnother(false);
+            setShowDialog(true);
+          }}
+          label="Add Account/Meter"
+          labelStyle={{ backgroundColor: "#fff", width: 145 }}
+          icon={{
+            name: `${Platform.OS === "ios" ? "ios" : "md"}-add`,
+            type: Ionicons,
+          }}
+          style={{ bottom: 20 }}
+          backgroundColor={Colors.LwscBlue}
+          color="white"
+        />
+        {/* <LwscFAB
         visible={!showDialog}
         onPress={() => {
           setIsBuyForAnother(true);
@@ -309,6 +330,7 @@ const ManageAccountScreen = ({
         backgroundColor={Colors.LwscBlue}
         color="white"
       /> */}
+      </LinearGradient>
     </View>
   );
 };

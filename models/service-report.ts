@@ -14,6 +14,7 @@ export interface ServiceReportI {
   description?: string;
   files: UploadFileI[];
   bill_group?: string;
+  leakage_types?: string[];
 }
 
 export class ServiceReport implements ServiceReportI {
@@ -29,6 +30,7 @@ export class ServiceReport implements ServiceReportI {
   description?: string;
   files: UploadFileI[];
   bill_group?: string;
+  leakage_types?: string[];
 
   constructor({
     first_name,
@@ -43,6 +45,7 @@ export class ServiceReport implements ServiceReportI {
     description,
     files,
     bill_group,
+    leakage_types,
   }: ServiceReportI) {
     this.first_name = first_name;
     this.last_name = last_name;
@@ -56,5 +59,6 @@ export class ServiceReport implements ServiceReportI {
     this.description = description;
     this.files = files;
     this.bill_group = bill_group;
+    this.leakage_types = leakage_types;
   }
 }

@@ -12,6 +12,7 @@ import properties from "./meter-reading-proerties";
 import accessNotes from "./access-notes";
 import activeAccount from "./active-account";
 import pushToken from "./push-token";
+import loadTime from "./load-time";
 import serviceConstants, { ServiceConstantsI } from "./service-constants";
 import { NotificationI } from "../../models/notification";
 import { ServiceItemI } from "../../models/service-item";
@@ -38,6 +39,7 @@ export interface RootReducerI {
   accessNotes: AccessNotesReducerI;
   activeAccount: string;
   pushToken: string;
+  loadTime: Date;
 }
 
 export default combineReducers({
@@ -55,4 +57,5 @@ export default combineReducers({
   accessNotes,
   activeAccount,
   pushToken,
+  loadTime,
 });

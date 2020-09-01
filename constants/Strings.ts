@@ -1,4 +1,5 @@
-import { ENV } from 'react-native-dotenv'
+import { ENV } from "react-native-dotenv";
+import { encode as btoa } from "base-64";
 // console.log(ENV)
 
 export default {
@@ -39,6 +40,11 @@ export default {
   SignInScreen: "Sign in",
   MeterReadingNavigator: "MeterReadingNavigator",
   ServiceInvoiceScreen: "Service Invoice",
+  DeprecationScreen: "Update Required",
+  VersionCheckScreen: "Checking Version",
+  PaymentOptionsServicesScreen: "Payment Methods",
+  MakeServicePaymentScreen: "Service Payment",
+  SelectAreaScreenNoLogin: "Select Your Area",
 
   /*************** Begin REDUCER TYPES *****************/
   WHITE_THEME: "WHITE_THEME",
@@ -64,6 +70,8 @@ export default {
   ACCESS_NOTES_STORAGE: "ACCESS_NOTES_STORAGE",
   ACTIVE_ACCOUNT_STORAGE: "ACTIVE_ACCOUNT_STORAGE",
   PUSH_TOKEN_STORAGE: "PUSH_TOKEN_STORACE",
+  SERVICES_STORAGE: "SERVICES_STORAGE",
+  LOAD_TIME_STORAGE: "LOAD_TIME_STORAGE",
   /*************** End Storage Constants *****************/
 
   // API
@@ -102,15 +110,23 @@ export default {
   MESSENGER: "http://m.me/488903867833451",
   WHATSAPP: "+260966621305",
 
-  API_CREDS: {
-    username: "lwsc_mobile_app_dev",
-    password: "#www@1234_lwsc_app",
-  },
+  API_CREDS:
+    ENV == "PROD"
+      ? {
+          username: "lwsc_mobile_app_production_v1",
+          password: " #$@LWSC2020@%^@!$@^&@%$",
+        }
+      : {
+          username: "lwsc_mobile_app_dev",
+          password: "#www@1234_lwsc_app",
+        },
 
   API_BASE_URL:
-  (ENV === 'DEV' || ENV === 'TEST')
-    ? 'http://41.72.107.14:3020/api/v1/'
-    : 'https://middleware.microtech.co.zm:3000/api/v1',
+    ENV === "DEV" || ENV === "TEST"
+      ? "http://41.72.107.14:3020/api/v1/"
+      : "https://middleware.microtech.co.zm:3000/api/v1",
+
+  Authorization: "Basic " + btoa(`lwsc_mobile_app_dev:#www@1234_lwsc_app`),
 
   INTERNET_FAILURE: {
     title: "NO INTERNET",

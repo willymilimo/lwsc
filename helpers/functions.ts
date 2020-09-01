@@ -32,12 +32,12 @@ export function formatDateTime(date: Date | string) {
   let d = new Date(date),
     month = "" + (d.getMonth() + 1),
     day = "" + d.getDate(),
-    year = "" +d.getFullYear(),
-    hour = "" +d.getHours(),
-    minute = "" +d.getMinutes(),
-    seconds = "" +d.getSeconds();
+    year = "" + d.getFullYear(),
+    hour = "" + d.getHours(),
+    minute = "" + d.getMinutes(),
+    seconds = "" + d.getSeconds();
 
-    console.log(d);
+  console.log(d);
 
   if (month.length < 2) month = "0" + month;
   if (day.length < 2) day = "0" + day;
@@ -45,15 +45,26 @@ export function formatDateTime(date: Date | string) {
   if (minute.length < 2) minute = "0" + minute;
   if (month.length < 2) seconds = "0" + seconds;
 
-  return `${[year, month, day].join("-")} ${[hour, minute, seconds].join(':')}`;
+  return `${[year, month, day].join("-")} ${[hour, minute, seconds].join(":")}`;
 }
 
-export function uuid(){
+export function uuid() {
   var dt = new Date().getTime();
-  var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      var r = (dt + Math.random()*16)%16 | 0;
-      dt = Math.floor(dt/16);
-      return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+  var uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (
+    c
+  ) {
+    var r = (dt + Math.random() * 16) % 16 | 0;
+    dt = Math.floor(dt / 16);
+    return (c == "x" ? r : (r & 0x3) | 0x8).toString(16);
   });
   return uuid;
+}
+
+export function isMoreThanOneDay(loadTime: Date) {
+  const oneDay = 60 * 60 * 24 * 1000;
+  return new Date().valueOf() - loadTime.valueOf() > oneDay;
+}
+
+export function capitalize(text: string) {
+  return text.charAt(0).toUpperCase() + text.toLocaleLowerCase().slice(1);
 }

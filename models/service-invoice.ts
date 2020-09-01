@@ -7,6 +7,7 @@ export interface ServiceInvoiceI {
   fee_charge: number;
   total_charge: number;
   totalcharge: number;
+  post_to_customer_balance: boolean;
 }
 
 export class ServiceInvoice implements ServiceInvoiceI {
@@ -17,6 +18,7 @@ export class ServiceInvoice implements ServiceInvoiceI {
   penalty_charge: number;
   fee_charge: number;
   total_charge: number;
+  post_to_customer_balance: boolean;
 
   constructor({
     active,
@@ -26,6 +28,7 @@ export class ServiceInvoice implements ServiceInvoiceI {
     penalty_charge,
     fee_charge,
     total_charge,
+    post_to_customer_balance
   }: ServiceInvoiceI) {
     this.active = active;
     this._id = _id;
@@ -34,6 +37,7 @@ export class ServiceInvoice implements ServiceInvoiceI {
     this.penalty_charge = penalty_charge;
     this.fee_charge = fee_charge;
     this.total_charge = total_charge;
+    this.post_to_customer_balance = post_to_customer_balance;
   }
 
   get totalcharge(): number {

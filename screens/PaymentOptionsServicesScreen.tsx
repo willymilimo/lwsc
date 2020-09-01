@@ -32,19 +32,18 @@ import { LinearGradient } from "expo-linear-gradient";
 interface PaymentMethodScreenI {
   navigation: NavType;
   route: {
-    params:
-      | AccountI
-      | PrepaidI
-      | string
-      | {
-          invoice: ServiceInvoiceI;
-          service: ServiceApplicationI;
-          bookNumber: BookNumberI;
-        };
+    params: {
+      invoice: ServiceInvoiceI;
+      service: ServiceApplicationI;
+      bookNumber: BookNumberI;
+    };
   };
 }
 
-const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
+const PaymentOptionsServicesScreen = ({
+  navigation,
+  route,
+}: PaymentMethodScreenI) => {
   const { params } = route;
   const { container } = styles;
   const [checked, setChecked] = useState(PaymentChannel.airtel);
@@ -88,6 +87,8 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
       is_subscribed = false;
     };
   }, [route]);
+
+  console.log(params)
 
   return (
     <LinearGradient
@@ -204,7 +205,7 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
                             />
                           </View>
                         </TouchableHighlight>
-                        <Divider style={{backgroundColor: "#5a86e4"}} />
+                        <Divider style={{ backgroundColor: "#5a86e4" }} />
                       </View>
                     );
                   })}
@@ -221,7 +222,7 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
                 labelStyle={{ fontSize: 17 }}
                 mode="contained"
                 onPress={() =>
-                  navigation.navigate(Strings.PaymentScreen, {
+                  navigation.navigate(Strings.MakeServicePaymentScreen, {
                     method: selectedChannel,
                     params,
                   })
@@ -237,7 +238,7 @@ const PaymentMethodScreen = ({ navigation, route }: PaymentMethodScreenI) => {
   );
 };
 
-export default PaymentMethodScreen;
+export default PaymentOptionsServicesScreen;
 
 const getImage = (id: string) => {
   switch (id) {

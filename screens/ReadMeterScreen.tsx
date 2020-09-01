@@ -4,7 +4,6 @@ import {
   Text,
   View,
   Alert,
-  BackHandler,
   Dimensions,
   Platform,
   Picker,
@@ -18,7 +17,6 @@ import {
   Subheading,
 } from "react-native-paper";
 import Colors from "../constants/Colors";
-import * as Location from "expo-location";
 import { useNavigation } from "@react-navigation/native";
 const { width, height } = Dimensions.get("window");
 
@@ -34,10 +32,9 @@ import {
   Entypo,
   MaterialCommunityIcons,
   SimpleLineIcons,
-  Feather,
 } from "@expo/vector-icons";
-import MapView, { Marker } from "react-native-maps";
-import { TouchableOpacity, ScrollView } from "react-native-gesture-handler";
+import MapView from "react-native-maps";
+import {  ScrollView } from "react-native-gesture-handler";
 import { bindActionCreators } from "redux";
 import {
   setAccessNotes,
@@ -53,12 +50,11 @@ import {
 } from "../models/axios";
 import { formatDate, formatDateTime } from "../helpers/functions";
 import { UserReducerI } from "../redux/reducers/user";
+import { LinearGradient } from "expo-linear-gradient";
+import MapComponent from "./reusable/MapComponent";
 
-const ASPECT_RATIO = width / height;
 const LATITUDE = -15.37496;
 const LONGITUDE = 28.382121;
-const LATITUDE_DELTA = 0.00922; //0.0922;
-const LONGITUDE_DELTA = 0.00421; // 0.0421; //LATITUDE_DELTA * ASPECT_RATIO;
 
 export const MeterItem = ({
   icon,
@@ -104,15 +100,13 @@ const ReadMeterScreen = ({
   user,
 }: PropI) => {
   let map: MapView;
-  const { container, mapContainer, mapStyle } = styles;
-  const { manNumber, billGroup, property, cycle_id } = route.params;
+  const { container } = styles;
+  const { billGroup, property, cycle_id } = route.params;
   const navigator = useNavigation();
   const [displayItems, setDisplayItems] = useState(accessNotes);
   const [region, setRegion] = React.useState({
     latitude: LATITUDE,
     longitude: LONGITUDE,
-    latitudeDelta: LATITUDE_DELTA,
-    longitudeDelta: LONGITUDE_DELTA,
   });
   const [meterReading, setMeterReading] = useState<InputItemType<number>>({
     value: 0,
@@ -129,36 +123,62 @@ const ReadMeterScreen = ({
   const [loading, setLoading] = useState(false);
   const [uploadFiles, setUploadFiles] = useState<UploadFileI[]>();
 
+  const initializeAccess = (access: NoAccessI[]) => {
+    access.forEach(({ code, DESCRIBE }) => {
+      if (DESCRIBE.toLocaleLowerCase().includes("no message")) {
+        setAccess({
+          value: code.toString(),
+          error: false,
+        });
+      }
+    });
+  };
+
+  const initializeNotes = (notes: NotesI[]) => {
+    notes.forEach(({ CODE, DESCRIBE }) => {
+      if (DESCRIBE.toLocaleLowerCase().includes("no note")) {
+        setNote({
+          value: CODE.toString(),
+          error: false,
+        });
+      }
+    });
+  };
+
   useEffect(() => {
     let is_subscribed = true;
 
     const bootstrap = async () => {
       setLoading(true);
+      const self_reading = user.authToken == "";
 
       try {
-        await getLocationAsync();
-
         if (!accessNotes.no_access.length) {
           const { status, data } = await fetchNoAccessOptions();
           if (status === 200 && data.success) {
             setANAccess(data.payload.recordset);
             displayItems.no_access = data.payload.recordset;
             setDisplayItems(displayItems);
+            if (self_reading) initializeAccess(data.payload.recordset);
           } else {
             throw new Error("failed to retrieve records");
           }
+        } else if (self_reading) {
+          initializeAccess(accessNotes.no_access);
         }
 
         if (!accessNotes.notes.length) {
           const { status, data } = await fetchAccessNotes();
           if (status === 200 && data.success) {
             setANNotes(data.payload.recordset);
-            // console.log(data.payload.recordset);
             displayItems.notes = data.payload.recordset;
             setDisplayItems(displayItems);
+            if (self_reading) initializeNotes(data.payload.recordset);
           } else {
             throw new Error("failed to retrieve records");
           }
+        } else if (self_reading) {
+          initializeNotes(accessNotes.notes);
         }
       } catch (err) {
         Alert.alert(
@@ -179,55 +199,6 @@ const ReadMeterScreen = ({
       is_subscribed = false;
     };
   }, []);
-
-  const getLocationAsync = async () => {
-    try {
-      let { status } = await Location.requestPermissionsAsync();
-      if (status !== "granted") {
-        const { title, message } = Strings.LOCATION_PERMISSION;
-        Alert.alert(title, message, [
-          {
-            text: "Grant Permission",
-            onPress: async () => await getLocationAsync(),
-          },
-          { text: "Deny", onPress: () => BackHandler.exitApp() },
-        ]);
-      } else {
-        let location = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.BestForNavigation,
-        });
-        setRegion({
-          ...region,
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        });
-      }
-    } catch (error) {
-      const { title, message } = Strings.SELF_REPORTING_PROBLEM;
-      Alert.alert(title, message, [
-        { text: "Ok", onPress: () => navigator.goBack() },
-      ]);
-    }
-  };
-
-  const onPressZoomOut = () => {
-    console.log(region.latitudeDelta / 10, region.longitudeDelta / 10);
-    setRegion({
-      ...region,
-      latitudeDelta: region.latitudeDelta / 10,
-      longitudeDelta: region.longitudeDelta / 10,
-    });
-    map.animateToRegion(region, 100);
-  };
-
-  const onPressZoomIn = () => {
-    setRegion({
-      ...region,
-      latitudeDelta: region.latitudeDelta * 10,
-      longitudeDelta: region.longitudeDelta * 10,
-    });
-    map.animateToRegion(region, 100);
-  };
 
   const submitMeterReading = () => {
     const date = new Date();
@@ -264,10 +235,6 @@ const ReadMeterScreen = ({
           );
         } else {
           throw new Error(JSON.stringify(data));
-          // Alert.alert(
-          //   Strings.METER_READING_SUBMIT_FAILURE.title,
-          //   Strings.METER_READING_SUBMIT_FAILURE.message
-          // );
         }
       })
       .catch(() =>
@@ -281,343 +248,269 @@ const ReadMeterScreen = ({
   };
 
   return (
-    <ScrollView style={container}>
-      <Modal animationType="slide" transparent visible={loading}>
-        <View style={[styles.centeredView, { backgroundColor: "#00000077" }]}>
-          <View style={styles.modalView}>
-            <ActivityIndicator size="large" color={Colors.LwscOrange} />
+    <LinearGradient
+      start={[0, 0]}
+      end={[1, 0]}
+      colors={["#56cbf1", "#5a86e4"]}
+      style={{ display: "flex", flex: 1 }}
+    >
+      <ScrollView style={container}>
+        <Modal animationType="slide" transparent visible={loading}>
+          <View style={[styles.centeredView, { backgroundColor: "#00000077" }]}>
+            <View style={styles.modalView}>
+              <ActivityIndicator size="large" color={Colors.LwscOrange} />
+            </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
 
-      <View style={mapContainer}>
-        <MapView
-          ref={(ref) => (map = ref as MapView)}
-          zoomEnabled={true}
-          showsUserLocation={true}
-          region={region}
-          onRegionChangeComplete={() => setRegion(region)}
-          initialRegion={region}
-          style={mapStyle}
-        >
-          <Marker
-            // draggable
-            // onDragEnd={(e) =>
-            //   setRegion({
-            //     ...region,
-            //     latitude: e.nativeEvent.coordinate.latitude,
-            //     longitude: e.nativeEvent.coordinate.longitude,
-            //   })
-            // }
-            coordinate={{
-              longitude: region.longitude,
-              latitude: region.latitude,
-            }}
-            pinColor={`${Colors.LwscRed}`}
-          />
-        </MapView>
-        <FAB
-          onPress={onPressZoomOut}
-          style={{
-            position: "absolute",
-            margin: 16,
-            right: 0,
-            bottom: 50,
-            backgroundColor: "#ffffff77",
-            borderWidth: 0.75,
-            borderColor: `${Colors.LwscBlack}01`,
-          }}
-          small
-          icon={({ color }) => (
-            <Feather
-              name="zoom-in"
-              size={25}
-              color={color}
-              style={{ backgroundColor: "transparent" }}
-            />
-          )}
-        />
-        <FAB
-          onPress={onPressZoomIn}
-          style={{
-            position: "absolute",
-            margin: 16,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "#ffffff77",
-            borderWidth: 0.75,
-            borderColor: `${Colors.LwscBlack}01`,
-          }}
-          small
-          icon={({ color }) => (
-            <Feather
-              name="zoom-out"
-              size={25}
-              color={color}
-              style={{ backgroundColor: "transparent" }}
-            />
-          )}
-        />
-        {/* <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[
-              styles.bubble,
-              { backgroundColor: `${Colors.LwscBlack}33`, borderRadius: 10 },
-            ]}
-          >
-            <Text style={styles.bubbleText}>Drag marker to your location</Text>
-          </TouchableOpacity>
-        </View> */}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            onPress={async () => await getLocationAsync()}
-            style={styles.bubble}
-          >
-            <Text style={styles.bubbleText}>
-              Tap to center to your location
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+        <MapComponent setRegionCallback={setRegion} />
 
-      <View style={{ padding: 15 }}>
-        <ImageUploadComponent
-          buttonName="Capture Meter Reading"
-          uploadCallback={setUploadFiles}
-          deleteCallback={() => setUploadFiles(undefined)}
-        />
-        <View>
-          {/* <MeterItem
-            icon={
-              <Ionicons name="ios-person" size={25} color={Colors.linkBlue} />
-            }
-            title="Operational Status"
-            value={manNumber}
-          /> */}
-          <MeterItem
-            icon={
-              <MaterialCommunityIcons
-                name="dots-horizontal-circle-outline"
-                size={19}
-                color={Colors.linkBlue}
-              />
-            }
-            title="Operational Status"
-            value={property.Meter_Status}
+        <View style={{ paddingVertical: 15, paddingHorizontal: 10 }}>
+          <ImageUploadComponent
+            buttonName="Capture Meter Reading"
+            uploadCallback={setUploadFiles}
+            deleteCallback={() => setUploadFiles(undefined)}
+            color={Colors.linkBlue}
+            contentStyle={{ backgroundColor: "white" }}
           />
-          <MeterItem
-            icon={
-              <MaterialCommunityIcons
-                size={20}
-                color={Colors.linkBlue}
-                name="home-group"
-              />
-            }
-            title="Bill Group"
-            value={`${billGroup.GROUP_ID} - ${billGroup.DESCRIPTION}`}
-          />
-          <MeterItem
-            icon={
-              <Ionicons
-                name="md-speedometer"
-                size={25}
-                color={Colors.linkBlue}
-              />
-            }
-            title="Account-Meter Number"
-            value={`${property.AccountNumber} - ${property.MeterNumber}`}
-          />
-          <MeterItem
-            icon={<Entypo name="address" color={Colors.linkBlue} size={25} />}
-            title="Address"
-            value={`${property.Customer_Address}`}
-          />
-          {property.PLOT_NO && (
+          <View style={styles.content}>
+            <MeterItem
+              icon={
+                <MaterialCommunityIcons
+                  name="dots-horizontal-circle-outline"
+                  size={19}
+                  color={Colors.linkBlue}
+                />
+              }
+              title="Operational Status"
+              value={property.Meter_Status}
+            />
+            <MeterItem
+              icon={
+                <MaterialCommunityIcons
+                  size={20}
+                  color={Colors.linkBlue}
+                  name="home-group"
+                />
+              }
+              title="Bill Group"
+              value={`${billGroup.GROUP_ID} - ${billGroup.DESCRIPTION}`}
+            />
             <MeterItem
               icon={
                 <Ionicons
-                  name={`${Platform.OS === "ios" ? "ios" : "md"}-home`}
+                  name="md-speedometer"
                   size={25}
                   color={Colors.linkBlue}
                 />
               }
-              title="Plot Number"
-              value={property.PLOT_NO}
+              title="Account-Meter Number"
+              value={`${property.AccountNumber} - ${property.MeterNumber}`}
             />
-          )}
-          <MeterItem
-            icon={<Entypo name="location" size={20} color={Colors.linkBlue} />}
-            title="Township"
-            value={property.Township}
-          />
-          <MeterItem
-            icon={
-              <MaterialCommunityIcons
-                name="timetable"
-                size={20}
-                color={Colors.linkBlue}
-              />
-            }
-            title="Previous Reading Date"
-            value={property.previousReadingDate.toDateString()}
-          />
-          <MeterItem
-            icon={
-              <SimpleLineIcons
-                name="speedometer"
-                size={19}
-                color={Colors.linkBlue}
-              />
-            }
-            title="Previous Reading"
-            value={property.PreviousReading}
-          />
-        </View>
-
-        <TextInput
-          style={{ marginTop: 10, backgroundColor: "white" }}
-          disabled={loading}
-          mode="outlined"
-          label={"Meter Reading"}
-          value={meterReading.value.toString()}
-          error={meterReading.error}
-          onChangeText={(value) => {
-            const val = parseFloat(value);
-            setMeterReading({
-              value: isNaN(val) ? 0 : val,
-              error: isNaN(val) || val < property.PreviousReading,
-            });
-          }}
-        />
-
-        <View
-          style={{
-            borderWidth: 1,
-            borderBottomColor: Colors.borderColorDark,
-            borderStyle: "solid",
-            borderRadius: 5,
-            marginTop: 10,
-          }}
-        >
-          <Picker
-            selectedValue={access.value}
-            onValueChange={(itemValue, index) => {
-              setAccess({
-                value: itemValue,
-                error: !displayItems.no_access.some(
-                  (value) => value.code === itemValue
-                ),
-              });
-            }}
-          >
-            <Picker.Item
-              label="-- Select Access Description --"
-              value="-- Select Access Description --"
+            <MeterItem
+              icon={<Entypo name="address" color={Colors.linkBlue} size={25} />}
+              title="Address"
+              value={`${property.Customer_Address}`}
             />
-            {displayItems.no_access.map((noac) => {
-              // console.log(noac);
-              return (
-                <Picker.Item
-                  key={`${noac.DESCRIBE}_${noac.code}`}
-                  label={noac.DESCRIBE}
-                  value={noac.code}
+            {!!property.PLOT_NO && (
+              <MeterItem
+                icon={
+                  <Ionicons
+                    name={`${Platform.OS === "ios" ? "ios" : "md"}-home`}
+                    size={25}
+                    color={Colors.linkBlue}
+                  />
+                }
+                title="Plot Number"
+                value={property.PLOT_NO}
+              />
+            )}
+            <MeterItem
+              icon={
+                <Entypo name="location" size={20} color={Colors.linkBlue} />
+              }
+              title="Township"
+              value={property.Township}
+            />
+            <MeterItem
+              icon={
+                <MaterialCommunityIcons
+                  name="timetable"
+                  size={20}
+                  color={Colors.linkBlue}
                 />
-              );
-            })}
-          </Picker>
-        </View>
+              }
+              title="Previous Reading Date"
+              value={property.previousReadingDate.toDateString()}
+            />
+            <MeterItem
+              icon={
+                <SimpleLineIcons
+                  name="speedometer"
+                  size={19}
+                  color={Colors.linkBlue}
+                />
+              }
+              title="Previous Reading"
+              value={property.PreviousReading}
+            />
+          </View>
 
-        <View
-          style={{
-            borderWidth: 1,
-            borderBottomColor: Colors.borderColorDark,
-            borderStyle: "solid",
-            borderRadius: 5,
-            marginTop: 10,
-          }}
-        >
-          <Picker
-            selectedValue={note.value}
-            onValueChange={(itemValue, index) => {
-              setNote({
-                value: itemValue,
-                error: !displayItems.notes.some(
-                  (value) => value.CODE === itemValue
-                ),
-              });
-            }}
-          >
-            <Picker.Item label="-- Select Note --" value="-- Select Note --" />
-            {displayItems.notes.map((an) => (
-              <Picker.Item
-                key={`${an.DESCRIBE}_${an.CODE}`}
-                label={an.DESCRIBE}
-                value={an.CODE}
-              />
-            ))}
-          </Picker>
-        </View>
+          <View style={styles.content}>
+            <TextInput
+              style={{ marginTop: 10, backgroundColor: "white" }}
+              disabled={loading}
+              mode="outlined"
+              label={"Meter Reading"}
+              value={meterReading.value.toString()}
+              error={meterReading.error}
+              onChangeText={(value) => {
+                const val = parseFloat(value);
+                setMeterReading({
+                  value: isNaN(val) ? 0 : val,
+                  error: isNaN(val) || val < property.PreviousReading,
+                });
+              }}
+            />
 
-        {(meterReading.error ||
-          meterReading.value === 0 ||
-          note.value === "-- Select Note --" ||
-          note.error ||
-          access.value === "-- Select Access Description --" ||
-          access.error ||
-          !uploadFiles ||
-          !uploadFiles.length) && (
-          <Subheading
-            style={{
-              color: "maroon",
-              borderColor: Colors.danger.border,
-              backgroundColor: Colors.danger.background,
-              padding: 8,
+            {user.authToken !== "" && (
+              <>
+                <View
+                  style={{
+                    borderWidth: 1,
+                    borderBottomColor: Colors.borderColorDark,
+                    borderStyle: "solid",
+                    borderRadius: 5,
+                    marginTop: 10,
+                  }}
+                >
+                  <Picker
+                    selectedValue={access.value}
+                    onValueChange={(itemValue, index) => {
+                      setAccess({
+                        value: itemValue,
+                        error: !displayItems.no_access.some(
+                          (value) => value.code === itemValue
+                        ),
+                      });
+                    }}
+                  >
+                    <Picker.Item
+                      label="-- Select Access Description --"
+                      value="-- Select Access Description --"
+                    />
+                    {displayItems.no_access.map((noac) => {
+                      // console.log(noac);
+                      return (
+                        <Picker.Item
+                          key={`${noac.DESCRIBE}_${noac.code}`}
+                          label={noac.DESCRIBE}
+                          value={noac.code}
+                        />
+                      );
+                    })}
+                  </Picker>
+                </View>
+
+                <View
+                  style={{
+                    borderWidth: 1,
+                    borderBottomColor: Colors.borderColorDark,
+                    borderStyle: "solid",
+                    borderRadius: 5,
+                    marginTop: 10,
+                  }}
+                >
+                  <Picker
+                    selectedValue={note.value}
+                    onValueChange={(itemValue, index) => {
+                      setNote({
+                        value: itemValue,
+                        error: !displayItems.notes.some(
+                          (value) => value.CODE === itemValue
+                        ),
+                      });
+                    }}
+                  >
+                    <Picker.Item
+                      label="-- Select Note --"
+                      value="-- Select Note --"
+                    />
+                    {displayItems.notes.map((an) => (
+                      <Picker.Item
+                        key={`${an.DESCRIBE}_${an.CODE}`}
+                        label={an.DESCRIBE}
+                        value={an.CODE}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+              </>
+            )}
+
+            {(meterReading.error ||
+              meterReading.value === 0 ||
+              note.value === "-- Select Note --" ||
+              note.error ||
+              access.value === "-- Select Access Description --" ||
+              access.error ||
+              !uploadFiles ||
+              !uploadFiles.length) && (
+              <Subheading
+                style={{
+                  color: "maroon",
+                  borderColor: Colors.danger.border,
+                  backgroundColor: Colors.danger.background,
+                  padding: 8,
+                  borderRadius: 5,
+                  textAlign: "center",
+                  marginTop: 10,
+                }}
+              >
+                {!uploadFiles || !uploadFiles.length
+                  ? "Ensure you capture the meter reading"
+                  : meterReading.error || meterReading.value === 0
+                  ? "Ensure meter reading is greater or equal to previous reading"
+                  : access.value === "-- Select Access Description --" ||
+                    access.error
+                  ? "Ensure you select an access description"
+                  : note.value === "-- Select Note --" || note.error
+                  ? "Ensure you select a note"
+                  : ""}
+              </Subheading>
+            )}
+          </View>
+
+          <Button
+            style={{ marginTop: 15 }}
+            contentStyle={{
+              borderColor: Colors.linkBlue,
+              borderWidth: 0.75,
               borderRadius: 5,
-              textAlign: "center",
-              marginTop: 10,
+              backgroundColor: `${Colors.LwscBlue}`,
             }}
+            labelStyle={{ color: "#fff" }}
+            color={`${Colors.LwscBlue}`}
+            loading={loading}
+            disabled={
+              loading ||
+              meterReading.error ||
+              meterReading.value === 0 ||
+              note.value === "-- Select Note --" ||
+              note.error ||
+              access.value === "-- Select Access Description --" ||
+              access.error ||
+              !uploadFiles ||
+              !uploadFiles.length
+            }
+            mode="outlined"
+            onPress={submitMeterReading}
           >
-            {!uploadFiles || !uploadFiles.length
-              ? "Ensure you capture the meter reading"
-              : meterReading.error || meterReading.value === 0
-              ? "Ensure meter reading is greater or equal to previous reading"
-              : access.value === "-- Select Access Description --" ||
-                access.error
-              ? "Ensure you select an access description"
-              : note.value === "-- Select Note --" || note.error
-              ? "Ensure you select a note"
-              : ""}
-          </Subheading>
-        )}
-
-        <Button
-          style={{ marginTop: 15 }}
-          contentStyle={{
-            borderColor: Colors.linkBlue,
-            borderWidth: 0.75,
-            borderRadius: 5,
-            backgroundColor: `${Colors.linkBlue}22`,
-          }}
-          color={`${Colors.LwscBlue}bb`}
-          loading={loading}
-          disabled={
-            loading ||
-            meterReading.error ||
-            meterReading.value === 0 ||
-            note.value === "-- Select Note --" ||
-            note.error ||
-            access.value === "-- Select Access Description --" ||
-            access.error ||
-            !uploadFiles ||
-            !uploadFiles.length
-          }
-          mode="outlined"
-          onPress={submitMeterReading}
-        >
-          Submit Reading
-        </Button>
-      </View>
-    </ScrollView>
+            Submit Reading
+          </Button>
+        </View>
+      </ScrollView>
+    </LinearGradient>
   );
 };
 
@@ -642,7 +535,25 @@ const styles = StyleSheet.create({
   container: {
     display: "flex",
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "white",
+    // backgroundColor: "white",
+  },
+  content: {
+    borderRadius: 5,
+    display: "flex",
+    flexDirection: "column",
+    padding: 10,
+    marginTop: 10,
+    backgroundColor: "#fff",
+    shadowColor: `${Colors.linkBlue}22`,
+
+    elevation: 5,
+
+    shadowOffset: {
+      width: 1,
+      height: 1,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 1,
   },
   fab: {
     backgroundColor: "red",

@@ -26,9 +26,12 @@ import { RootReducerI } from "../redux/reducers";
 import { bindActionCreators } from "redux";
 import { setServiceTypes } from "../redux/actions/services";
 import { fetchServices } from "../models/axios";
+import { LinearGradient } from "expo-linear-gradient";
+import { isMoreThanOneDay } from "../helpers/functions";
 
 interface ServicesI {
   navigation: NavType;
+  loadTime: Date;
   serviceTypes: ServiceItemI[];
   setServiceTypes(serviceType: ServiceItemI[]): void;
 }
@@ -36,6 +39,7 @@ interface ServicesI {
 const ServicesScreen = ({
   navigation,
   serviceTypes,
+  loadTime,
   setServiceTypes,
 }: ServicesI) => {
   const { container, btnsBox, iconContainer } = styles;
@@ -44,26 +48,36 @@ const ServicesScreen = ({
   useEffect(() => {
     let is_subscribed = true;
 
-    if (!serviceTypes.length) {
+    // console.log(serviceTypes)
+    // console.log(
+    //   'all => ' + is_subscribed && (isMoreThanOneDay(loadTime) || serviceTypes.length == 0),
+    //   '\nis_subscribed => ' + is_subscribed,
+    //   '\nisMoreThanOneDay => ' + isMoreThanOneDay(loadTime),
+    //   '\nserviceTypes.length => ' + serviceTypes.length
+    // );
+
+    if (
+      is_subscribed &&
+      (isMoreThanOneDay(loadTime) || serviceTypes.length == 0)
+    ) {
+      // console.log('fetching.......')
       setLoading(true);
       fetchServices()
         .then(({ status, data }) => {
-          if (is_subscribed) {
-            const { success, payload, error, message } = data;
-            // console.log(status, data)
+          const { success, payload, error, message } = data;
+          // console.log(status, data.payload)
 
-            if (status === 200 && success) {
-              setServiceTypes(
-                payload
-                  .filter((item) => item.is_active)
-                  .map((item) => new ServiceItem(item))
-              );
-            } else {
-              Alert.alert(
-                "Services Error",
-                error || message || "Failed to retrieve services."
-              );
-            }
+          if (status === 200 && success) {
+            setServiceTypes(
+              payload
+                .filter((item) => item.is_active)
+                .map((item) => new ServiceItem(item))
+            );
+          } else {
+            Alert.alert(
+              "Services Error",
+              error || message || "Failed to retrieve services."
+            );
           }
         })
         .catch((err) => {
@@ -81,7 +95,7 @@ const ServicesScreen = ({
     return () => {
       is_subscribed = false;
     };
-  }, [serviceTypes]);
+  }, [serviceTypes, loadTime]);
 
   const createIcon = (
     icon: string,
@@ -142,102 +156,110 @@ const ServicesScreen = ({
   };
 
   return (
-    <ScrollView style={container}>
-      <View style={btnsBox}>
-        {loading ? (
-          <View style={{ display: "flex", flex: 1, alignItems: "center" }}>
-            <ActivityIndicator
-              size={50}
-              animating={true}
-              color={Colors.colorGreen}
-            />
-          </View>
-        ) : !serviceTypes.length ? (
-          <Text style={{ paddingHorizontal: 10 }}>No services available</Text>
-        ) : (
-          serviceTypes.map((service) => {
-            const { _id, thumbnail_img, title, app_icon } = service;
-            return (
-              <View
-                key={_id}
-                style={{
-                  width: Layouts.window.width / 3,
-                  height: Layouts.window.width / 3,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
+    <LinearGradient
+      start={[0, 0]}
+      end={[1, 0]}
+      colors={["#56cbf1", "#5a86e4"]}
+      style={{ display: "flex", flex: 1 }}
+    >
+      <ScrollView style={container}>
+        <View style={btnsBox}>
+          {loading ? (
+            <View style={{ display: "flex", flex: 1, alignItems: "center" }}>
+              <ActivityIndicator
+                size={50}
+                animating={true}
+                color={Colors.whiteColor}
+              />
+            </View>
+          ) : !serviceTypes.length ? (
+            <Text style={{ paddingHorizontal: 10 }}>No services available</Text>
+          ) : (
+            serviceTypes.map((service) => {
+              const { _id, thumbnail_img, title, app_icon } = service;
+              return (
                 <View
+                  key={_id}
                   style={{
-                    width: "82%",
-                    height: "82%",
-                    borderRadius: 10,
-                    backgroundColor: "#fff",
-                    shadowColor: `${Colors.linkBlue}22`,
-
-                    elevation: 5,
-
-                    shadowOffset: {
-                      width: 1,
-                      height: 1,
-                    },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 1,
+                    width: Layouts.window.width / 3,
+                    height: Layouts.window.width / 3,
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                 >
-                  <TouchableHighlight
-                    underlayColor="#55555533"
-                    onPress={() =>
-                      navigation.navigate(Strings.GeneralServiceForm, {
-                        title: title,
-                        service,
-                      })
-                    }
+                  <View
                     style={{
-                      padding: 5,
-                      height: "100%",
+                      width: "82%",
+                      height: "82%",
                       borderRadius: 10,
-                      alignItems: "center",
-                      justifyContent: "center",
+                      backgroundColor: "#fff",
+                      shadowColor: `${Colors.linkBlue}22`,
+
+                      elevation: 5,
+
+                      shadowOffset: {
+                        width: 1,
+                        height: 1,
+                      },
+                      shadowOpacity: 0.25,
+                      shadowRadius: 1,
                     }}
                   >
-                    <React.Fragment>
-                      <View
-                        style={[
-                          iconContainer,
-                          {
-                            height: "55%",
-                            width: "55%",
-                            backgroundColor: app_icon.bgColor,
-                          },
-                        ]}
-                      >
-                        {createIcon(thumbnail_img, app_icon)}
-                      </View>
-                      <Text
-                        style={{
-                          marginHorizontal: 5,
-                          fontWeight: "600",
-                          textAlign: "center",
-                          fontSize: Layouts.isSmallDevice ? 11 : 13,
-                        }}
-                      >
-                        {title}
-                      </Text>
-                    </React.Fragment>
-                  </TouchableHighlight>
+                    <TouchableHighlight
+                      underlayColor="#55555533"
+                      onPress={() =>
+                        navigation.navigate(Strings.GeneralServiceForm, {
+                          title: title,
+                          service,
+                        })
+                      }
+                      style={{
+                        padding: 5,
+                        height: "100%",
+                        borderRadius: 10,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <React.Fragment>
+                        <View
+                          style={[
+                            iconContainer,
+                            {
+                              height: "55%",
+                              width: "55%",
+                              backgroundColor: app_icon.bgColor,
+                            },
+                          ]}
+                        >
+                          {createIcon(thumbnail_img, app_icon)}
+                        </View>
+                        <Text
+                          style={{
+                            marginHorizontal: 5,
+                            fontWeight: "600",
+                            textAlign: "center",
+                            fontSize: Layouts.isSmallDevice ? 11 : 13,
+                          }}
+                        >
+                          {title}
+                        </Text>
+                      </React.Fragment>
+                    </TouchableHighlight>
+                  </View>
                 </View>
-              </View>
-            );
-          })
-        )}
-      </View>
-    </ScrollView>
+              );
+            })
+          )}
+        </View>
+      </ScrollView>
+    </LinearGradient>
   );
 };
 
-const mapPropsToState = ({ services }: RootReducerI) => ({
+const mapPropsToState = ({ services, loadTime }: RootReducerI) => ({
   serviceTypes: services,
+  loadTime,
 });
 const mapDispatchToProps = (dispatch: any) =>
   bindActionCreators(

@@ -33,17 +33,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
   },
-
-  centeredView: {
-    // flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 22,
-  },
   surface: {
     padding: 20,
-    // height: 80,
-    // width: 80,
     alignItems: "center",
     justifyContent: "center",
     elevation: 4,

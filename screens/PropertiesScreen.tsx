@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Modal, Alert } from "react-native";
+import { StyleSheet, Text, View, Alert } from "react-native";
 import { RootReducerI } from "../redux/reducers";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
@@ -12,7 +12,14 @@ import {
   BillGroupI,
 } from "../models/meter-reading";
 import { fetchAllCustomerDetailsByBillGroup } from "../models/axios";
-import { ActivityIndicator, Searchbar, List } from "react-native-paper";
+import {
+  ActivityIndicator,
+  Searchbar,
+  List,
+  Provider,
+  Portal,
+  Modal,
+} from "react-native-paper";
 import Colors from "../constants/Colors";
 import { FlatList } from "react-native-gesture-handler";
 import Strings from "../constants/Strings";
@@ -50,8 +57,6 @@ PropI) => {
     []
   );
   const [searchQuery, setSearchQuery] = React.useState("");
-
-  // console.log(navigation)
 
   const onChangeSearch = (query: string) => {
     setSearchQuery(query);
@@ -132,12 +137,12 @@ PropI) => {
         [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
       );
     }
+    console.log("here now.......");
     setLoading(false);
   };
 
   const renderListItem = ({ item }: { item: PropertyI }) => {
     //   const desc =c
-    // console.log(item);
 
     return (
       <List.Item
@@ -152,7 +157,7 @@ PropI) => {
         titleNumberOfLines={2}
         title={`${item.AccountNumber} - ${item.MeterNumber} - ${item.lineNumber}`}
         description={`${item.PLOT_NO} ${item.Customer_Address} ${item.Township}`.trim()}
-        descriptionStyle={{fontSize: 12}}
+        descriptionStyle={{ fontSize: 12 }}
         left={(props) => (
           <List.Icon
             {...props}
@@ -169,45 +174,58 @@ PropI) => {
     );
   };
 
+  console.log(loading);
   return (
-    <View style={styles.container}>
-      <Modal animationType="slide" transparent visible={loading}>
-        <View style={[styles.centeredView, { backgroundColor: "#00000077" }]}>
-          <View style={styles.modalView}>
-            <ActivityIndicator size="large" color={Colors.LwscOrange} />
-            <Text
-              style={{
-                marginTop: 20,
-                textAlign: "center",
-              }}
-            >
-              Loading properties...
-            </Text>
-            <Text
-              style={{
-                marginTop: 20,
-                textAlign: "center",
-              }}
-            >{`Please wait...`}</Text>
+    <>
+      <View style={styles.container}>
+        {loading ? (
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <ActivityIndicator size="large" color={Colors.LwscOrange} />
+              <Text
+                style={{
+                  marginTop: 20,
+                  textAlign: "center",
+                }}
+              >
+                Loading properties
+              </Text>
+              <Text
+                style={{
+                  marginTop: 20,
+                  textAlign: "center",
+                }}
+              >{`Please wait...`}</Text>
+            </View>
           </View>
-        </View>
-      </Modal>
-      <Searchbar
-        placeholder={`Search Property`}
-        onChangeText={onChangeSearch}
-        value={searchQuery}
-      />
-      <FlatList
-        removeClippedSubviews={true}
-        maxToRenderPerBatch={20}
-        initialNumToRender={20}
-        data={filteredDisplayList.length ? filteredDisplayList : displayList}
-        keyExtractor={(item: PropertyI) =>
-          `${item.BILLGROUP}_${item.BOOK_NO}_${item.MeterNumber}`
-        }
-        renderItem={renderListItem}
-      />
-    </View>
+        ) : !Object.keys(displayList).length ? (
+          <Text>
+            Unable to fetch properties. Please ensure you are connected to the
+            internet.
+          </Text>
+        ) : (
+          <>
+            <Searchbar
+              placeholder={`Search Property`}
+              onChangeText={onChangeSearch}
+              value={searchQuery}
+            />
+            <FlatList
+              removeClippedSubviews={true}
+              maxToRenderPerBatch={20}
+              initialNumToRender={20}
+              data={
+                filteredDisplayList.length ? filteredDisplayList : displayList
+              }
+              keyExtractor={(item: PropertyI) =>
+                `${item.BILLGROUP}_${item.BOOK_NO}_${item.MeterNumber}`
+              }
+              renderItem={renderListItem}
+            />
+          </>
+        )}
+      </View>
+    </>
   );
 };
 
@@ -231,7 +249,7 @@ const styles = StyleSheet.create({
     // paddingHorizontal: 15,
   },
   centeredView: {
-    flex: 1,
+    // flex: 1,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 22,

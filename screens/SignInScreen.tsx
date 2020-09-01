@@ -5,7 +5,6 @@ import {
   Modal,
   ImageBackground,
   Alert,
-  Text,
 } from "react-native";
 import { connect } from "react-redux";
 import { RootReducerI } from "../redux/reducers";
@@ -13,7 +12,7 @@ import { UserReducerI } from "../redux/reducers/user";
 import { ScrollView } from "react-native-gesture-handler";
 import { LinearGradient } from "expo-linear-gradient";
 import Layouts from "../constants/Layouts";
-import { logo } from "../constants/Images";
+import { logo_transparent } from "../constants/Images";
 import {
   Subheading,
   Title,
@@ -105,7 +104,7 @@ const SignInScreen = ({ user, setUserReducer }: PropI) => {
         <View style={contentBox}>
           <ImageBackground
             style={imgContainer}
-            source={logo}
+            source={logo_transparent}
             imageStyle={{ width: 120, height: 120 }}
           />
           <View style={topper}></View>
@@ -171,10 +170,9 @@ const SignInScreen = ({ user, setUserReducer }: PropI) => {
                 color={Colors.linkBlue}
                 labelStyle={{ textTransform: "capitalize" }}
                 onPress={() => {
-                  // navigator.navigate(Strings.SelectAreaScreen, {
-                  //   toRoute: Strings.PropertiesScreen,
-                  // })
-                  Alert.alert("Coming soon", "Coming soon");
+                  navigator.navigate(Strings.SelectAreaScreenNoLogin, {
+                    toRoute: Strings.PropertiesScreen,
+                  });
                 }}
               >
                 Tap Here
@@ -199,7 +197,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(SignInScreen);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "red",
+    backgroundColor: "#56cbf1",
   },
   gradientStyle: {
     height: Layouts.window.height,

@@ -34,6 +34,7 @@ import { setActiveAccount } from "../redux/actions/active-account";
 import { ActiveAccountReducerI } from "../redux/reducers/active-account";
 import { PropertyI, Property } from "../models/meter-reading";
 import { useNavigation } from "@react-navigation/native";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface MakePaymentScreenI {
   accounts: AccountReducerI;
@@ -180,113 +181,120 @@ const MakePaymentScreen = ({
 
   return (
     <View style={container}>
-      <ScrollView style={box}>
-        {payItems.length ? (
-          payItems.map((acc) => (
-            <BillComponent
-              key={`${acc.CUSTKEY} - ${acc.ID_NO} - ${acc.CUSTOMER_ID}`}
-              account={acc}
-              onPress={() =>
-                navigator.navigate(Strings.PaymentMethodScreen, acc)
-              }
-            />
-          ))
-        ) : (
-          <View style={missingAccount}>
-            <Text style={maText}>
-              You have not added any account/meter to your profile
-            </Text>
-            <Button
-              style={{ marginTop: 15 }}
-              contentStyle={{
-                borderColor: Colors.linkBlue,
-                borderWidth: 0.75,
-                borderRadius: 5,
-                backgroundColor: `${Colors.linkBlue}22`,
-              }}
-              color={`${Colors.LwscBlue}bb`}
-              //   loading={loading}
-              //   icon="send"
-              mode="outlined"
-              onPress={() => setShowDialog(true)}
-            >
-              Add Account/Meter
-            </Button>
-          </View>
-        )}
-      </ScrollView>
-      <Portal>
-        <Dialog visible={showDialog} onDismiss={() => setShowDialog(false)}>
-          <Dialog.Title>{`Add ${type}`}</Dialog.Title>
-          <Dialog.Content>
-            <RadioButton.Group
-              onValueChange={(value) => setType(value as AddType)}
-              value={type}
-            >
-              <View style={flexRow}>
+      <LinearGradient
+        start={[0, 0]}
+        end={[1, 0]}
+        colors={["#56cbf1", "#5a86e4"]}
+        style={{ display: "flex", flex: 1 }}
+      >
+        <ScrollView style={box}>
+          {payItems.length ? (
+            payItems.map((acc) => (
+              <BillComponent
+                key={`${acc.CUSTKEY} - ${acc.ID_NO} - ${acc.CUSTOMER_ID}`}
+                account={acc}
+                onPress={() =>
+                  navigator.navigate(Strings.PaymentMethodScreen, acc)
+                }
+              />
+            ))
+          ) : (
+            <View style={missingAccount}>
+              <Text style={maText}>
+                You have not added any account/meter to your profile
+              </Text>
+              <Button
+                style={{ marginTop: 15 }}
+                contentStyle={{
+                  borderColor: Colors.linkBlue,
+                  borderWidth: 0.75,
+                  borderRadius: 5,
+                  backgroundColor: `${Colors.linkBlue}22`,
+                }}
+                color={`${Colors.LwscBlue}bb`}
+                //   loading={loading}
+                //   icon="send"
+                mode="outlined"
+                onPress={() => setShowDialog(true)}
+              >
+                Add Account/Meter
+              </Button>
+            </View>
+          )}
+        </ScrollView>
+        <Portal>
+          <Dialog visible={showDialog} onDismiss={() => setShowDialog(false)}>
+            <Dialog.Title>{`Add ${type}`}</Dialog.Title>
+            <Dialog.Content>
+              <RadioButton.Group
+                onValueChange={(value) => setType(value as AddType)}
+                value={type}
+              >
                 <View style={flexRow}>
-                  <Text style={radioLabelStyle}>Account</Text>
-                  <RadioButton color="#3366cc" value={AddType.account} />
+                  <View style={flexRow}>
+                    <Text style={radioLabelStyle}>Account</Text>
+                    <RadioButton color="#3366cc" value={AddType.account} />
+                  </View>
+                  <View style={flexRow}>
+                    <Text style={radioLabelStyle}>Meter</Text>
+                    <RadioButton color="#3366cc" value={AddType.meter} />
+                  </View>
                 </View>
-                <View style={flexRow}>
-                  <Text style={radioLabelStyle}>Meter</Text>
-                  <RadioButton color="#3366cc" value={AddType.meter} />
-                </View>
-              </View>
-            </RadioButton.Group>
-            <TextInput
-              mode="outlined"
-              label={`${type} Number`}
-              keyboardType="number-pad"
-              value={meterAccountNo}
-              disabled={loading}
-              autoFocus={true}
-              onChangeText={(text) => setMeterAccountNo(text.trim())}
-            />
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button
-              loading={loading}
-              disabled={loading}
-              onPress={() => handleAccountMeterSubmit()}
-            >
-              Submit
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+              </RadioButton.Group>
+              <TextInput
+                mode="outlined"
+                label={`${type} Number`}
+                keyboardType="number-pad"
+                value={meterAccountNo}
+                disabled={loading}
+                autoFocus={true}
+                onChangeText={(text) => setMeterAccountNo(text.trim())}
+              />
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button
+                loading={loading}
+                disabled={loading}
+                onPress={() => handleAccountMeterSubmit()}
+              >
+                Submit
+              </Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
 
-      <LwscFAB
-        visible={!showDialog}
-        onPress={() => {
-          setIsBuyForAnother(false);
-          setShowDialog(true);
-        }}
-        label="Add Account/Meter"
-        labelStyle={{ width: 145 }}
-        icon={{
-          name: `${Platform.OS === "ios" ? "ios" : "md"}-add`,
-          type: Ionicons,
-        }}
-        style={{ bottom: 75 }}
-        backgroundColor={Colors.LwscBlue}
-        color="white"
-      />
-      <LwscFAB
-        visible={!showDialog}
-        onPress={() => {
-          setIsBuyForAnother(true);
-          setShowDialog(true);
-        }}
-        label="Pay for Another"
-        labelStyle={{ width: 120 }}
-        icon={{
-          name: `hands-helping`,
-          type: FontAwesome5,
-        }}
-        backgroundColor={Colors.LwscBlue}
-        color="white"
-      />
+        <LwscFAB
+          visible={!showDialog}
+          onPress={() => {
+            setIsBuyForAnother(false);
+            setShowDialog(true);
+          }}
+          label="Add Account/Meter"
+          labelStyle={{ backgroundColor: Colors.whiteColor, width: 145 }}
+          icon={{
+            name: `${Platform.OS === "ios" ? "ios" : "md"}-add`,
+            type: Ionicons,
+          }}
+          style={{ bottom: 75 }}
+          backgroundColor={Colors.LwscBlue}
+          color="white"
+        />
+        <LwscFAB
+          visible={!showDialog}
+          onPress={() => {
+            setIsBuyForAnother(true);
+            setShowDialog(true);
+          }}
+          label="Pay for Another"
+          labelStyle={{ backgroundColor: Colors.whiteColor, width: 120 }}
+          icon={{
+            name: `hands-helping`,
+            type: FontAwesome5,
+          }}
+          backgroundColor={Colors.LwscBlue}
+          color="white"
+        />
+      </LinearGradient>
     </View>
   );
 };
@@ -343,5 +351,9 @@ const styles = StyleSheet.create({
   },
   maText: {
     marginBottom: 10,
+  },
+  gradientStyle: {
+    display: "flex",
+    flex: 1,
   },
 });

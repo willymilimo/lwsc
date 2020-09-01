@@ -12,7 +12,10 @@ import { List, Searchbar, ActivityIndicator } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Colors from "../constants/Colors";
 import { FlatList } from "react-native-gesture-handler";
-import { ServiceApplicationI, ServiceApplication } from "../models/service-application";
+import {
+  ServiceApplicationI,
+  ServiceApplication,
+} from "../models/service-application";
 import { ServiceReportI } from "../models/service-report";
 import { BillGroupReducerI } from "../redux/reducers/bill-groups";
 import Strings from "../constants/Strings";
@@ -29,7 +32,7 @@ interface PropI {
   setBookNumbers(bookNumbers: BookNumberReducerI): void;
 }
 
-const SelectAreaScreen = ({
+const SelectAreaScreenNoLogin = ({
   route,
   bookNumbers,
   billGroups,
@@ -73,7 +76,7 @@ const SelectAreaScreen = ({
   const validate = async (billGroup: string) => {
     try {
       const { status, data } = await validateBillWindow(billGroup);
-      // console.log(data);
+      console.log(status, data);
       if (status === 200 && data.success) {
         return data.payload.CYCLE_ID;
       }
@@ -89,21 +92,21 @@ const SelectAreaScreen = ({
         if (application instanceof ServiceApplication) {
           application.area = item.CODE;
         }
-        // setLoading(true);
-        // const cycle_id = await validate(item.BILLGROUP);
-        // setLoading(false);
+        setLoading(true);
+        const cycle_id = await validate(item.BILLGROUP);
+        setLoading(false);
 
-        // if (cycle_id) {
-        navigator.navigate(toRoute, {
-          bookNumber: item,
-          billGroup: billGroups[item.BILLGROUP],
-          // cycle_id,
-          item: application,
-        });
-        // } else {
-        //   const { title, message } = Strings.BILLING_CYCLE;
-        //   Alert.alert(title, message);
-        // }
+        if (cycle_id) {
+          navigator.navigate(toRoute, {
+            bookNumber: item,
+            billGroup: billGroups[item.BILLGROUP],
+            cycle_id,
+            item: application,
+          });
+        } else {
+          const { title, message } = Strings.BILLING_CYCLE;
+          Alert.alert(title, message);
+        }
       }}
       title={item.DESCRIBE}
       description={`${item.CODE} - ${item.NO_WALKS} walks`}
@@ -214,7 +217,7 @@ const mapStateToProps = ({ bookNumbers, billGroups }: RootReducerI) => ({
 const mapDispatchToProps = (dispatch: any) =>
   bindActionCreators({ setBookNumbers }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(SelectAreaScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(SelectAreaScreenNoLogin);
 
 const styles = StyleSheet.create({
   container: {

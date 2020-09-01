@@ -7,8 +7,8 @@ export default function DeprecationScreen() {
   const handleUpdate = () => {
     const play_appstore =
       Platform.OS == "ios"
-        ? `https://itunes.apple.com/google`
-        : `market://details?id=google`;
+        ? `https://itunes.apple.com/com.lwsc.utility`
+        : `market://details?id=com.lwsc.utility`;
 
     Linking.canOpenURL(play_appstore)
       .then((isSupported) => {

@@ -13,6 +13,7 @@ import Colors from "../constants/Colors";
 import Strings from "../constants/Strings";
 import ReadMeterScreen from "../screens/ReadMeterScreen";
 import HeaderRightComponent from "./HeaderRightComponent";
+import SelectAreaScreenNoLogin from "../screens/SelectAreaScreenNoLogin";
 
 const Stack = createStackNavigator();
 
@@ -22,14 +23,15 @@ interface PropI {
 const MeterReadingNavigator = ({ user }: PropI) => {
   const navigator = useNavigation();
   const [isLoggedIn, setIsLoggedIn] = useState(
-    user.authToken && user.createdAt && user.manNumber
+    user.authToken && user.createdAt
   );
 
   useEffect(() => {
     let is_subscribed = true;
 
+    console.log(is_subscribed, user.authToken, user.createdAt);
     if (is_subscribed) {
-      setIsLoggedIn(user.authToken && user.createdAt && user.manNumber);
+      setIsLoggedIn(user.authToken && user.createdAt);
     }
 
     return () => {
@@ -47,7 +49,10 @@ const MeterReadingNavigator = ({ user }: PropI) => {
         headerTitleStyle: {
           fontWeight: "bold",
         },
-        headerRight: ({tintColor}: any) => <HeaderRightComponent tintColor={tintColor} />,
+        headerRight: ({ tintColor }: any) =>
+          user.authToken ? (
+            <HeaderRightComponent tintColor={tintColor} />
+          ) : null,
       }}
     >
       {!isLoggedIn ? (
@@ -64,13 +69,17 @@ const MeterReadingNavigator = ({ user }: PropI) => {
             }}
           />
           <Stack.Screen
-            name={Strings.SelectAreaScreen}
-            component={SelectAreaScreen}
-            initialParams={{ toRoute: Strings.SelectAreaScreen }}
+            name={Strings.SelectAreaScreenNoLogin}
+            component={SelectAreaScreenNoLogin}
+            initialParams={{ toRoute: Strings.SelectAreaScreenNoLogin }}
           />
           <Stack.Screen
             name={Strings.PropertiesScreen}
             component={PropertiesScreen}
+          />
+          <Stack.Screen
+            name={Strings.ReadMeterScreen}
+            component={ReadMeterScreen}
           />
         </>
       ) : (
