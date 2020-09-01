@@ -72,9 +72,9 @@ export default function MapComponent({ setRegionCallback, bubbleText }: PropI) {
     }
   };
 
-  //   useEffect(() => {
-  //     if (isMapReady) getLocationAsync();
-  //   }, [isMapReady]);
+    useEffect(() => {
+      if (isMapReady) getLocationAsync();
+    }, [isMapReady]);
 
   const onPressZoomOut = () => {
     setRegion({

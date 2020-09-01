@@ -72,7 +72,7 @@ interface PropI {
   setPaymentHistory(history: StatementI[]): void;
   setUserReducer(userReducer: UserReducerI): void;
   setLoadTime(loadTime: Date): void;
-  setServiceType(services: ServiceItemI[]): void;
+  setServiceTypes(services: ServiceItemI[]): void;
 }
 
 const Loader = () => {
@@ -124,7 +124,7 @@ const Bootstrap = ({
   setPaymentHistory,
   setUserReducer,
   setLoadTime,
-  setServiceType,
+  setServiceTypes,
 }: PropI) => {
   const [activeTheme, setActiveTheme] = React.useState(themeReducer.theme);
   const [loading, setLoading] = useState(true);

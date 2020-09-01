@@ -5,7 +5,7 @@ import { Provider } from "react-redux";
 import store from "./redux/store";
 import * as Sentry from "sentry-expo";
 import { navigationRef } from "./navigation/RootNavigation";
-import { StatusBar } from "react-native";
+import { StatusBar, Platform } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
 import Colors from "./constants/Colors";
 import Strings from "./constants/Strings";
@@ -23,10 +23,10 @@ export default function App() {
   const [internetRecheable, setInternetRecheable] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener((state) => {
+    const unsubscribe = NetInfo.addEventListener(({isConnected, isInternetReachable}) => {
       // console.log("Connection type", state.type);
       // console.log("Is connected?", state.isConnected);
-      setInternetRecheable(!!state.isInternetReachable);
+      setInternetRecheable(Platform.OS === 'android' ? !!isInternetReachable : isConnected);
     });
     // To unsubscribe to these update, just use:
     unsubscribe();
