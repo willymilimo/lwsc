@@ -7,7 +7,7 @@
       "android",
       "web"
     ],
-    "version": "1.0.4",
+    "version": "1.0.5",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -28,11 +28,11 @@
       "config": {
         "googleMapsApiKey": "AIzaSyC3SzcYHLM2kzExSzk-QlNo1Dl_5xRk-bo"
       },
-      "buildNumber": "1.0.4"
+      "buildNumber": "1.0.5"
     },
     "android": {
       "package": "com.lwsc.utility",
-      "versionCode": 4,
+      "versionCode": 5,
       "useNextNotificationsApi": true,
       "config": {
         "googleMaps": {
