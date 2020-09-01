@@ -19,6 +19,7 @@ import FeacalSludgeMgt from "../assets/feacal_sludge_mgt.svg";
 import Strings from "../constants/Strings";
 import { useNavigation } from "@react-navigation/native";
 import { SimpleLineIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 
 enum FocusItem {
   startDate,
@@ -31,7 +32,7 @@ interface PropI {
 
 export default function ConsumptionScreen({ route }: PropI) {
   const navigator = useNavigation();
-  const { container, filter, dateBox, subheading } = styles;
+  const { container, filter, dateBox, subheading, wrapper, triangle } = styles;
   const { identity } = route.params;
   const [consumptionList, setConsumptionList] = useState<ConsumptionI[]>([]);
   const [startDate, setStartDate] = useState("");
@@ -136,90 +137,100 @@ export default function ConsumptionScreen({ route }: PropI) {
   };
 
   return (
-    <View style={container}>
-      <View style={filter}>
-        <View style={dateBox}>
-          {!!(startDate && endDate) && (
-            <Subheading style={subheading}>Start Date</Subheading>
-          )}
-          <Button
-            color={Colors.LwscSelectedBlue}
-            mode="outlined"
-            onPress={() => {
-              setFocus(FocusItem.startDate);
-              setShowCalendar(true);
-            }}
-          >
-            {startDate || "Start Date"}
-          </Button>
+    <LinearGradient
+      start={[0, 0]}
+      end={[1, 0]}
+      colors={["#56cbf1", "#5a86e4"]}
+      style={{ display: "flex", flex: 1 }}
+    >
+      <View style={container}>
+        <View style={wrapper}>
+          <View style={triangle}></View>
         </View>
-        <View style={{ ...dateBox, opacity: startDate ? 1 : 0 }}>
-          {!!(startDate && endDate) && (
-            <Subheading style={subheading}>End Date</Subheading>
-          )}
-          <Button
-            color={Colors.LwscSelectedBlue}
-            mode="outlined"
-            onPress={() => {
-              setFocus(FocusItem.endDate);
-              setShowCalendar(true);
+        {/* <View style={filter}>
+          <View style={dateBox}>
+            {!!(startDate && endDate) && (
+              <Subheading style={subheading}>Start Date</Subheading>
+            )}
+            <Button
+              color={Colors.LwscSelectedBlue}
+              mode="outlined"
+              onPress={() => {
+                setFocus(FocusItem.startDate);
+                setShowCalendar(true);
+              }}
+            >
+              {startDate || "Start Date"}
+            </Button>
+          </View>
+          <View style={{ ...dateBox, opacity: startDate ? 1 : 0 }}>
+            {!!(startDate && endDate) && (
+              <Subheading style={subheading}>End Date</Subheading>
+            )}
+            <Button
+              color={Colors.LwscSelectedBlue}
+              mode="outlined"
+              onPress={() => {
+                setFocus(FocusItem.endDate);
+                setShowCalendar(true);
+              }}
+            >
+              {endDate || "End Date"}
+            </Button>
+          </View>
+          <View style={{ ...dateBox, justifyContent: "flex-end" }}>
+            <Button
+              color={Colors.danger.color}
+              style={{
+                alignSelf: "baseline",
+                backgroundColor: `${Colors.danger.background}77`,
+                borderColor: Colors.danger.border,
+              }}
+              labelStyle={{ color: Colors.danger.color }}
+              mode="outlined"
+              onPress={() => {
+                setStartDate("");
+                setEndDate("");
+                setConsumptionList([]);
+              }}
+            >
+              Clear
+            </Button>
+          </View>
+        </View> */}
+        {showCalendar ? (
+          <Calendar
+            maxDate={formatDate(new Date())}
+            onDayPress={(day) => {
+              if (focus === FocusItem.startDate) {
+                setStartDate(day.dateString);
+              } else if (new Date(startDate) < new Date(day.dateString)) {
+                setEndDate(day.dateString);
+              }
             }}
-          >
-            {endDate || "End Date"}
-          </Button>
-        </View>
-        <View style={{ ...dateBox, justifyContent: "flex-end" }}>
-          <Button
-            color={Colors.danger.color}
-            style={{
-              alignSelf: "baseline",
-              backgroundColor: `${Colors.danger.background}77`,
-              borderColor: Colors.danger.border,
-            }}
-            labelStyle={{ color: Colors.danger.color }}
-            mode="outlined"
-            onPress={() => {
-              setStartDate("");
-              setEndDate("");
-              setConsumptionList([]);
-            }}
-          >
-            Clear
-          </Button>
-        </View>
+          />
+        ) : loading ? (
+          <ActivityIndicator
+            style={{ marginTop: 20 }}
+            size="large"
+            color={Colors.LwscOrange}
+          />
+        ) : consumptionList.length ? (
+          <FlatList
+            removeClippedSubviews={true}
+            maxToRenderPerBatch={20}
+            initialNumToRender={20}
+            data={consumptionList}
+            keyExtractor={() => uuid()}
+            renderItem={renderListItem}
+          />
+        ) : (
+          <Text style={{ margin: 15 }}>
+            There is no consumption information for the specified time period
+          </Text>
+        )}
       </View>
-      {showCalendar ? (
-        <Calendar
-          maxDate={formatDate(new Date())}
-          onDayPress={(day) => {
-            if (focus === FocusItem.startDate) {
-              setStartDate(day.dateString);
-            } else if (new Date(startDate) < new Date(day.dateString)) {
-              setEndDate(day.dateString);
-            }
-          }}
-        />
-      ) : loading ? (
-        <ActivityIndicator
-          style={{ marginTop: 20 }}
-          size="large"
-          color={Colors.LwscOrange}
-        />
-      ) : consumptionList.length ? (
-        <FlatList
-          removeClippedSubviews={true}
-          maxToRenderPerBatch={20}
-          initialNumToRender={20}
-          data={consumptionList}
-          keyExtractor={() => uuid()}
-          renderItem={renderListItem}
-        />
-      ) : (
-        <Text style={{ margin: 15 }}>
-          There is no consumption information for the specified time period
-        </Text>
-      )}
-    </View>
+    </LinearGradient>
   );
 }
 
@@ -227,7 +238,10 @@ const styles = StyleSheet.create({
   container: {
     display: "flex",
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "white",
+  },
+  wrapper: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start'
   },
   filter: {
     display: "flex",
@@ -247,4 +261,23 @@ const styles = StyleSheet.create({
     paddingLeft: 5,
     color: Colors.LwscBlue,
   },
+  triangle: {
+    width: 0,
+    height: 0,
+    backgroundColor: 'transparent',
+    borderStyle: 'solid',
+    borderLeftWidth: 35,
+    borderRightWidth: 35,
+    borderBottomWidth: 60,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor:"yellow",
+    transform: [
+        { rotate: '90deg' }
+    ],
+    margin: 0,
+    marginLeft: -6,
+    borderWidth: 0,
+    borderColor:"transparent"
+}
 });

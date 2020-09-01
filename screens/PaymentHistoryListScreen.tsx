@@ -11,6 +11,7 @@ import BillComponent from "../components/BillComponent";
 import Colors from "../constants/Colors";
 import LwscFAB from "../components/LwscFAB";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface PaymentHistoryScreenI {
   route: { params: { isConsumption: boolean } };
@@ -28,72 +29,79 @@ const PaymentHistoryListScreen = ({
   const payItems = Object.values(accounts);
   console.log(payItems);
   return (
-    <View style={styles.container}>
-      <ScrollView style={box}>
-        {payItems.length ? ( // 41130324183  03008164
-          payItems.map((acc) => (
-            <BillComponent
-              key={Math.random().toString(36).substring(10)}
-              account={acc}
-              onPress={() =>
-                navigator.navigate(
-                  isConsumption
-                    ? Strings.ConsumptionScreen
-                    : Strings.PaymentHistoryScreen,
-                  {
-                    identity: acc,
-                  }
-                )
-              }
-            />
-          ))
-        ) : (
-          <View style={missingAccount}>
-            <Text style={maText}>
-              You have not added any account/meter to your profile
-            </Text>
-            <Button
-              style={{ marginTop: 15 }}
-              contentStyle={{
-                borderColor: Colors.linkBlue,
-                borderWidth: 0.75,
-                borderRadius: 5,
-                backgroundColor: `${Colors.linkBlue}22`,
-              }}
-              color={`${Colors.LwscBlue}bb`}
-              //   loading={loading}
-              //   icon="send"
-              mode="outlined"
-              onPress={() =>
-                navigator.navigate(Strings.HomeTabNavigator, {
-                  screen: "Accounts",
-                  showAddDialog: true,
-                })
-              }
-            >
-              Add Account/Meter
-            </Button>
-          </View>
-        )}
-      </ScrollView>
-      <LwscFAB
-        visible={true}
-        onPress={() =>
-          navigator.navigate(Strings.HomeTabNavigator, {
-            screen: "Accounts",
-            showAddDialog: true,
-          })
-        }
-        label="Add Account/Meter"
-        labelStyle={{ width: 145 }}
-        icon={{
-          name: `${Platform.OS === "ios" ? "ios" : "md"}-add`,
-          type: Ionicons,
-        }}
-        backgroundColor={Colors.LwscBlue}
-        color="white"
-      />
-    </View>
+    <LinearGradient
+      start={[0, 0]}
+      end={[1, 0]}
+      colors={["#56cbf1", "#5a86e4"]}
+      style={{ display: "flex", flex: 1 }}
+    >
+      <View style={styles.container}>
+        <ScrollView style={box}>
+          {payItems.length ? ( // 41130324183  03008164
+            payItems.map((acc) => (
+              <BillComponent
+                key={Math.random().toString(36).substring(10)}
+                account={acc}
+                onPress={() =>
+                  navigator.navigate(
+                    isConsumption
+                      ? Strings.ConsumptionScreen
+                      : Strings.PaymentHistoryScreen,
+                    {
+                      identity: acc,
+                    }
+                  )
+                }
+              />
+            ))
+          ) : (
+            <View style={missingAccount}>
+              <Text style={maText}>
+                You have not added any account/meter to your profile
+              </Text>
+              <Button
+                style={{ marginTop: 15 }}
+                contentStyle={{
+                  borderColor: Colors.linkBlue,
+                  borderWidth: 0.75,
+                  borderRadius: 5,
+                  backgroundColor: `${Colors.linkBlue}22`,
+                }}
+                color={`${Colors.LwscBlue}bb`}
+                //   loading={loading}
+                //   icon="send"
+                mode="outlined"
+                onPress={() =>
+                  navigator.navigate(Strings.HomeTabNavigator, {
+                    screen: "Accounts",
+                    showAddDialog: true,
+                  })
+                }
+              >
+                Add Account/Meter
+              </Button>
+            </View>
+          )}
+        </ScrollView>
+        <LwscFAB
+          visible={true}
+          onPress={() =>
+            navigator.navigate(Strings.HomeTabNavigator, {
+              screen: "Accounts",
+              showAddDialog: true,
+            })
+          }
+          label="Add Account/Meter"
+          labelStyle={{ width: 145 }}
+          icon={{
+            name: `${Platform.OS === "ios" ? "ios" : "md"}-add`,
+            type: Ionicons,
+          }}
+          backgroundColor={Colors.LwscBlue}
+          color="white"
+        />
+      </View>
+    </LinearGradient>
   );
 };
 
@@ -106,7 +114,7 @@ export default connect(mapStateToProps)(PaymentHistoryListScreen);
 const styles = StyleSheet.create({
   container: {
     display: "flex",
-    flex: 1,
+    flex: 1
   },
   flexRow: {
     display: "flex",
@@ -120,7 +128,6 @@ const styles = StyleSheet.create({
   box: {
     display: "flex",
     flex: 1,
-    padding: 15,
   },
   formBox: {
     backgroundColor: "red",

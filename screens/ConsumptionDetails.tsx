@@ -4,6 +4,7 @@ import { ConsumptionI } from "../models/consumption";
 import { ScrollView } from "react-native-gesture-handler";
 import { Subheading, Divider, Title, Caption } from "react-native-paper";
 import { toFixed } from "../helpers/functions";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface PropI {
   route: { params: { item: ConsumptionI } };
@@ -30,76 +31,82 @@ export default function ConsumptionDetails({ route }: PropI) {
     dateTo,
   } = item;
   return (
-    <ScrollView style={container}>
-      <View style={flexRow}>
-        <Subheading style={heading}>Billing Date</Subheading>
-        <Subheading style={value}>{billingDate.toLocaleString()}</Subheading>
-      </View>
-      <Divider
-        style={{
-          marginVertical: 5,
-        }}
-      />
-      <Caption style={{ fontSize: 12.5, color: "#444" }}>{item[""]}</Caption>
-      <Divider
-        style={{
-          marginVertical: 5,
-        }}
-      />
-      {DESCRIPTION && (
-        <>
-          <Caption style={{ fontSize: 12.5, color: "#444" }}>
-            {DESCRIPTION}
-          </Caption>
-          <Divider
-            style={{
-              marginVertical: 5,
-            }}
-          />
-        </>
-      )}
-      <Title>Consumption Information</Title>
-      <View style={flexRow}>
-        <Subheading style={heading}>Account #</Subheading>
-        <Subheading style={value}>{custkey}</Subheading>
-      </View>
-      {DATE_FROM && (
+    <LinearGradient
+      start={[0, 0]}
+      end={[1, 0]}
+      colors={["#56cbf1", "#5a86e4"]}
+      style={{ display: "flex", flex: 1 }}
+    >
+      <ScrollView style={container}>
         <View style={flexRow}>
-          <Subheading style={heading}>Date From</Subheading>
-          <Subheading style={value}>{dateFrom.toLocaleString()}</Subheading>
+          <Subheading style={heading}>Billing Date</Subheading>
+          <Subheading style={value}>{billingDate.toLocaleString()}</Subheading>
         </View>
-      )}
-      {DATE_TO && (
+        <Divider
+          style={{
+            marginVertical: 5,
+          }}
+        />
+        <Caption style={{ fontSize: 12.5, color: "#444" }}>{item[""]}</Caption>
+        <Divider
+          style={{
+            marginVertical: 5,
+          }}
+        />
+        {DESCRIPTION && (
+          <>
+            <Caption style={{ fontSize: 12.5, color: "#444" }}>
+              {DESCRIPTION}
+            </Caption>
+            <Divider
+              style={{
+                marginVertical: 5,
+              }}
+            />
+          </>
+        )}
+        <Title>Consumption Information</Title>
         <View style={flexRow}>
-          <Subheading style={heading}>Date To</Subheading>
-          <Subheading style={value}>{dateTo.toLocaleString()}</Subheading>
+          <Subheading style={heading}>Account #</Subheading>
+          <Subheading style={value}>{custkey}</Subheading>
         </View>
-      )}
-      {PR_READING !== null && (
-        <View style={flexRow}>
-          <Subheading style={heading}>Previous Reading</Subheading>
-          <Subheading style={value}>{PR_READING}</Subheading>
-        </View>
-      )}
-      {CR_READING !== null && (
-        <View style={flexRow}>
-          <Subheading style={heading}>Current Reading</Subheading>
-          <Subheading style={value}>{CR_READING}</Subheading>
-        </View>
-      )}
-      {CONSUMP !== null && (
-        <View style={flexRow}>
-          <Subheading style={heading}>Consumption</Subheading>
-          <Subheading style={value}>{CONSUMP}</Subheading>
-        </View>
-      )}
-      {AMOUNT && (
-        <View style={flexRow}>
-          <Subheading style={heading}>Amount</Subheading>
-          <Subheading style={value}>{`ZMW ${toFixed(AMOUNT)}`}</Subheading>
-        </View>
-      )}
-      {/*{phone_number && (
+        {DATE_FROM && (
+          <View style={flexRow}>
+            <Subheading style={heading}>Date From</Subheading>
+            <Subheading style={value}>{dateFrom.toLocaleString()}</Subheading>
+          </View>
+        )}
+        {DATE_TO && (
+          <View style={flexRow}>
+            <Subheading style={heading}>Date To</Subheading>
+            <Subheading style={value}>{dateTo.toLocaleString()}</Subheading>
+          </View>
+        )}
+        {PR_READING !== null && (
+          <View style={flexRow}>
+            <Subheading style={heading}>Previous Reading</Subheading>
+            <Subheading style={value}>{PR_READING}</Subheading>
+          </View>
+        )}
+        {CR_READING !== null && (
+          <View style={flexRow}>
+            <Subheading style={heading}>Current Reading</Subheading>
+            <Subheading style={value}>{CR_READING}</Subheading>
+          </View>
+        )}
+        {CONSUMP !== null && (
+          <View style={flexRow}>
+            <Subheading style={heading}>Consumption</Subheading>
+            <Subheading style={value}>{CONSUMP}</Subheading>
+          </View>
+        )}
+        {AMOUNT && (
+          <View style={flexRow}>
+            <Subheading style={heading}>Amount</Subheading>
+            <Subheading style={value}>{`ZMW ${toFixed(AMOUNT)}`}</Subheading>
+          </View>
+        )}
+        {/*{phone_number && (
         <View style={flexRow}>
           <Subheading style={heading}>Phone</Subheading>
           <Subheading style={value}>{phone_number}</Subheading>
@@ -129,7 +136,8 @@ export default function ConsumptionDetails({ route }: PropI) {
           {customer_type}
         </Subheading>
       </View> */}
-    </ScrollView>
+      </ScrollView>
+    </LinearGradient>
   );
 }
 
