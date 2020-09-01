@@ -4,7 +4,6 @@ import {
   Text,
   View,
   Alert,
-  BackHandler,
   Dimensions,
   Platform,
   Picker,
@@ -18,7 +17,6 @@ import {
   Subheading,
 } from "react-native-paper";
 import Colors from "../constants/Colors";
-import * as Location from "expo-location";
 import { useNavigation } from "@react-navigation/native";
 const { width, height } = Dimensions.get("window");
 
@@ -34,10 +32,9 @@ import {
   Entypo,
   MaterialCommunityIcons,
   SimpleLineIcons,
-  Feather,
 } from "@expo/vector-icons";
-import MapView, { Marker } from "react-native-maps";
-import { TouchableOpacity, ScrollView } from "react-native-gesture-handler";
+import MapView from "react-native-maps";
+import {  ScrollView } from "react-native-gesture-handler";
 import { bindActionCreators } from "redux";
 import {
   setAccessNotes,
@@ -54,12 +51,10 @@ import {
 import { formatDate, formatDateTime } from "../helpers/functions";
 import { UserReducerI } from "../redux/reducers/user";
 import { LinearGradient } from "expo-linear-gradient";
+import MapComponent from "./reusable/MapComponent";
 
-const ASPECT_RATIO = width / height;
 const LATITUDE = -15.37496;
 const LONGITUDE = 28.382121;
-const LATITUDE_DELTA = 0.00922; //0.0922;
-const LONGITUDE_DELTA = 0.00421; // 0.0421; //LATITUDE_DELTA * ASPECT_RATIO;
 
 export const MeterItem = ({
   icon,
@@ -105,15 +100,13 @@ const ReadMeterScreen = ({
   user,
 }: PropI) => {
   let map: MapView;
-  const { container, mapContainer, mapStyle } = styles;
+  const { container } = styles;
   const { billGroup, property, cycle_id } = route.params;
   const navigator = useNavigation();
   const [displayItems, setDisplayItems] = useState(accessNotes);
   const [region, setRegion] = React.useState({
     latitude: LATITUDE,
     longitude: LONGITUDE,
-    latitudeDelta: LATITUDE_DELTA,
-    longitudeDelta: LONGITUDE_DELTA,
   });
   const [meterReading, setMeterReading] = useState<InputItemType<number>>({
     value: 0,
@@ -160,8 +153,6 @@ const ReadMeterScreen = ({
       const self_reading = user.authToken == "";
 
       try {
-        await getLocationAsync();
-
         if (!accessNotes.no_access.length) {
           const { status, data } = await fetchNoAccessOptions();
           if (status === 200 && data.success) {
@@ -208,55 +199,6 @@ const ReadMeterScreen = ({
       is_subscribed = false;
     };
   }, []);
-
-  const getLocationAsync = async () => {
-    try {
-      let { status } = await Location.requestPermissionsAsync();
-      if (status !== "granted") {
-        const { title, message } = Strings.LOCATION_PERMISSION;
-        Alert.alert(title, message, [
-          {
-            text: "Grant Permission",
-            onPress: async () => await getLocationAsync(),
-          },
-          { text: "Deny", onPress: () => BackHandler.exitApp() },
-        ]);
-      } else {
-        let location = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.BestForNavigation,
-        });
-        setRegion({
-          ...region,
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        });
-      }
-    } catch (error) {
-      const { title, message } = Strings.SELF_REPORTING_PROBLEM;
-      Alert.alert(title, message, [
-        { text: "Ok", onPress: () => navigator.goBack() },
-      ]);
-    }
-  };
-
-  const onPressZoomOut = () => {
-    console.log(region.latitudeDelta / 10, region.longitudeDelta / 10);
-    setRegion({
-      ...region,
-      latitudeDelta: region.latitudeDelta / 10,
-      longitudeDelta: region.longitudeDelta / 10,
-    });
-    map.animateToRegion(region, 100);
-  };
-
-  const onPressZoomIn = () => {
-    setRegion({
-      ...region,
-      latitudeDelta: region.latitudeDelta * 10,
-      longitudeDelta: region.longitudeDelta * 10,
-    });
-    map.animateToRegion(region, 100);
-  };
 
   const submitMeterReading = () => {
     const date = new Date();
@@ -321,77 +263,7 @@ const ReadMeterScreen = ({
           </View>
         </Modal>
 
-        <View style={mapContainer}>
-          <MapView
-            ref={(ref) => (map = ref as MapView)}
-            zoomEnabled={true}
-            showsUserLocation={true}
-            region={region}
-            onRegionChangeComplete={() => setRegion(region)}
-            initialRegion={region}
-            style={mapStyle}
-          >
-            <Marker
-              coordinate={{
-                longitude: region.longitude,
-                latitude: region.latitude,
-              }}
-              pinColor={`${Colors.LwscRed}`}
-            />
-          </MapView>
-          <FAB
-            onPress={onPressZoomOut}
-            style={{
-              position: "absolute",
-              margin: 16,
-              right: 0,
-              bottom: 50,
-              backgroundColor: "#ffffff77",
-              borderWidth: 0.75,
-              borderColor: `${Colors.LwscBlack}01`,
-            }}
-            small
-            icon={({ color }) => (
-              <Feather
-                name="zoom-in"
-                size={25}
-                color={color}
-                style={{ backgroundColor: "transparent" }}
-              />
-            )}
-          />
-          <FAB
-            onPress={onPressZoomIn}
-            style={{
-              position: "absolute",
-              margin: 16,
-              right: 0,
-              bottom: 0,
-              backgroundColor: "#ffffff77",
-              borderWidth: 0.75,
-              borderColor: `${Colors.LwscBlack}01`,
-            }}
-            small
-            icon={({ color }) => (
-              <Feather
-                name="zoom-out"
-                size={25}
-                color={color}
-                style={{ backgroundColor: "transparent" }}
-              />
-            )}
-          />
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              onPress={async () => await getLocationAsync()}
-              style={styles.bubble}
-            >
-              <Text style={styles.bubbleText}>
-                Tap to center to your location
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        <MapComponent setRegionCallback={setRegion} />
 
         <View style={{ paddingVertical: 15, paddingHorizontal: 10 }}>
           <ImageUploadComponent

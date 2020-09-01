@@ -96,7 +96,7 @@ const ReportLeakageScreen = () => {
     >
       <ScrollView style={container}>
         <MapComponent setRegionCallback={setRegion} bubbleText="Drag marker to location of the leak"/>
-        {/*<View style={{ paddingVertical: 15, paddingHorizontal: 15 }}>
+        <View style={{ paddingVertical: 15, paddingHorizontal: 15 }}>
           <ImageUploadComponent
             contentStyle={{ backgroundColor: "#fff" }}
             uploadCallback={setUploadFiles}
@@ -246,7 +246,7 @@ const ReportLeakageScreen = () => {
           >
             Continue
           </Button>
-        </View> */}
+        </View>
       </ScrollView>
     </LinearGradient>
   );

@@ -38,10 +38,6 @@ const HomeScreen = ({ theme, route }: HomeI) => {
   } = styles;
   const navigation = useNavigation();
 
-  React.useEffect(() => {
-    Alert.alert("Version 1.0");
-  })
-
   return (
     <SafeAreaView style={container}>
       <LinearGradient

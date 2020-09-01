@@ -201,6 +201,7 @@ export default function GeneralServiceForm({
             placeholder="e.g. 1020893"
             value={account_meter.value}
             error={account_meter.error}
+            keyboardType="number-pad"
             disabled={loading}
             onChangeText={(text) =>
               setAccountMeter({

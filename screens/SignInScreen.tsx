@@ -12,7 +12,7 @@ import { UserReducerI } from "../redux/reducers/user";
 import { ScrollView } from "react-native-gesture-handler";
 import { LinearGradient } from "expo-linear-gradient";
 import Layouts from "../constants/Layouts";
-import { logo } from "../constants/Images";
+import { logo_transparent } from "../constants/Images";
 import {
   Subheading,
   Title,
@@ -104,7 +104,7 @@ const SignInScreen = ({ user, setUserReducer }: PropI) => {
         <View style={contentBox}>
           <ImageBackground
             style={imgContainer}
-            source={logo}
+            source={logo_transparent}
             imageStyle={{ width: 120, height: 120 }}
           />
           <View style={topper}></View>
