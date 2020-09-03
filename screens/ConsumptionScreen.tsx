@@ -308,7 +308,7 @@ export default function ConsumptionScreen({ route }: PropI) {
                       dateItemText,
                       focus == FocusItem.endDate ? {} : fText,
                     ]}
-                  >{`31/${endMonth.replace("31", "")}/${endYear}`}</Text>
+                  >{`31/${endMonth.replace(/(31|28|29|30)/, "")}/${endYear}`}</Text>
                 )}
               </View>
             </View>

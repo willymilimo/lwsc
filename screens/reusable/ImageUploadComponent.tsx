@@ -52,7 +52,7 @@ export default function ImageUploadComponent({
     try {
       const manipResult = await ImageManipulator.manipulateAsync(
         image.uri,
-        [],
+        [], // { resize: { width: 50, height: 50 } }
         { compress: 1, format: ImageManipulator.SaveFormat.JPEG, base64: true }
       );
 
