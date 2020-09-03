@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, Alert } from "react-native";
+import { StyleSheet, Text, View, Alert, Picker } from "react-native";
 import { ConsumptionI, Consumption } from "../models/consumption";
 import { PropertyI, Property } from "../models/meter-reading";
 import { AccountI, Account } from "../models/account";
@@ -9,17 +9,49 @@ import {
   Subheading,
   ActivityIndicator,
   List,
+  Portal,
+  Modal,
+  Provider,
+  Menu,
+  Divider,
 } from "react-native-paper";
 import { Calendar } from "react-native-calendars";
 import Colors from "../constants/Colors";
 import { formatDate, uuid } from "../helpers/functions";
-import { FlatList } from "react-native-gesture-handler";
+import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 import ConsumptionSVG from "../assets/consumption.svg";
 import FeacalSludgeMgt from "../assets/feacal_sludge_mgt.svg";
 import Strings from "../constants/Strings";
 import { useNavigation } from "@react-navigation/native";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+
+const months = [
+  { month: "January", days: 31, num: "01" },
+  { month: "February", days: 28, num: "02" },
+  { month: "March", days: 31, num: "03" },
+  { month: "April", days: 30, num: "04" },
+  { month: "May", days: 31, num: "05" },
+  { month: "June", days: 30, num: "06" },
+  { month: "July", days: 31, num: "07" },
+  { month: "August", days: 31, num: "08" },
+  { month: "September", days: 30, num: "09" },
+  { month: "October", days: 31, num: "10" },
+  { month: "November", days: 30, num: "11" },
+  { month: "December", days: 31, num: "12" },
+];
+
+const getYears = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const years = [];
+
+  for (let i = year; i > year - 3; i--) {
+    years.push(i);
+  }
+
+  return years;
+};
 
 enum FocusItem {
   startDate,
@@ -32,58 +64,76 @@ interface PropI {
 
 export default function ConsumptionScreen({ route }: PropI) {
   const navigator = useNavigation();
-  const { container, filter, dateBox, subheading, wrapper, triangle } = styles;
+  const {
+    container,
+    filter,
+    dateBox,
+    subheading,
+    wrapper,
+    flexRow,
+    triangle,
+    dateItem,
+    dateItemText,
+    fText,
+    itemsSet,
+  } = styles;
   const { identity } = route.params;
   const [consumptionList, setConsumptionList] = useState<ConsumptionI[]>([]);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showCalendar, setShowCalendar] = useState(true);
+  const [showCalendar, setShowCalendar] = useState(false);
   const [focus, setFocus] = useState<FocusItem>(FocusItem.startDate);
+
+  const [startYear, setStartYear] = useState(0);
+  const [endYear, setEndYear] = useState(0);
+  const [startMonth, setStartMonth] = useState("");
+  const [endMonth, setEndMonth] = useState("");
 
   useEffect(() => {
     let is_subscribed = true;
 
-    if (is_subscribed && startDate.length && endDate.length) {
-      setShowCalendar(!(startDate && endDate));
+    if (is_subscribed && startYear && endYear && startMonth && endMonth) {
+      // setShowCalendar(!(startDate && endDate));
       fetchConsumptionList();
     }
 
     return () => {
       is_subscribed = false;
     };
-  }, [startDate, endDate]);
+  }, [startYear, endYear, startMonth, endMonth]);
 
   const fetchConsumptionList = () => {
-    const start = startDate.replace(/-/g, "");
-    const end = endDate.replace(/-/g, "");
-    const id =
-      identity instanceof Account
-        ? identity.CUSTKEY
-        : identity instanceof Property
-        ? identity.MeterNumber
-        : (identity as string);
-    setLoading(true);
-    fetchComsumption(id, start, end)
-      .then(({ status, data }) => {
-        if (status === 200 && data.success) {
-          const { recordset } = data.payload;
-          setConsumptionList(recordset.map((item) => new Consumption(item)));
-        } else {
-          throw new Error(
-            `Failed to retrieve consumption for ${id} in period ${start} - ${end}`
+    const start = startYear + startMonth;
+    const end = endYear + endMonth;
+
+    if (start < end) {
+      const id =
+        identity instanceof Account
+          ? identity.CUSTKEY
+          : identity instanceof Property
+          ? identity.MeterNumber
+          : (identity as string);
+      setLoading(true);
+      fetchComsumption(id, start, end)
+        .then(({ status, data }) => {
+          if (status === 200 && data.success) {
+            const { recordset } = data.payload;
+            setConsumptionList(recordset.map((item) => new Consumption(item)));
+          } else {
+            throw new Error(
+              `Failed to retrieve consumption for ${id} in period ${start} - ${end}`
+            );
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          Alert.alert(
+            Strings.SELF_REPORTING_PROBLEM.title,
+            Strings.SELF_REPORTING_PROBLEM.message
+            //   [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
           );
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        Alert.alert(
-          Strings.SELF_REPORTING_PROBLEM.title,
-          Strings.SELF_REPORTING_PROBLEM.message
-          //   [{ onPress: () => navigator.navigate(Strings.HomeTabNavigator) }]
-        );
-      })
-      .finally(() => setLoading(false));
+        })
+        .finally(() => setLoading(false));
+    }
   };
 
   // FeacalSludgeMgt, tachometer-alt FA5
@@ -136,99 +186,239 @@ export default function ConsumptionScreen({ route }: PropI) {
     );
   };
 
+  const startSet = !!(startYear && startMonth);
+  const endSet = !!(endYear && endMonth);
+
   return (
     <LinearGradient
       start={[0, 0]}
       end={[1, 0]}
-      colors={["#56cbf1", "#5a86e4"]}
+      colors={["#fff", "#fff"]}
       style={{ display: "flex", flex: 1 }}
     >
       <View style={container}>
-        <View style={wrapper}>
-          <View style={triangle}></View>
-        </View>
-        {/* <View style={filter}>
-          <View style={dateBox}>
-            {!!(startDate && endDate) && (
-              <Subheading style={subheading}>Start Date</Subheading>
-            )}
-            <Button
-              color={Colors.LwscSelectedBlue}
-              mode="outlined"
-              onPress={() => {
-                setFocus(FocusItem.startDate);
-                setShowCalendar(true);
-              }}
-            >
-              {startDate || "Start Date"}
-            </Button>
-          </View>
-          <View style={{ ...dateBox, opacity: startDate ? 1 : 0 }}>
-            {!!(startDate && endDate) && (
-              <Subheading style={subheading}>End Date</Subheading>
-            )}
-            <Button
-              color={Colors.LwscSelectedBlue}
-              mode="outlined"
-              onPress={() => {
-                setFocus(FocusItem.endDate);
-                setShowCalendar(true);
-              }}
-            >
-              {endDate || "End Date"}
-            </Button>
-          </View>
-          <View style={{ ...dateBox, justifyContent: "flex-end" }}>
-            <Button
-              color={Colors.danger.color}
-              style={{
-                alignSelf: "baseline",
-                backgroundColor: `${Colors.danger.background}77`,
-                borderColor: Colors.danger.border,
-              }}
-              labelStyle={{ color: Colors.danger.color }}
-              mode="outlined"
-              onPress={() => {
-                setStartDate("");
-                setEndDate("");
-                setConsumptionList([]);
-              }}
-            >
-              Clear
-            </Button>
-          </View>
-        </View> */}
-        {showCalendar ? (
-          <Calendar
-            maxDate={formatDate(new Date())}
-            onDayPress={(day) => {
-              if (focus === FocusItem.startDate) {
-                setStartDate(day.dateString);
-              } else if (new Date(startDate) < new Date(day.dateString)) {
-                setEndDate(day.dateString);
-              }
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              setShowCalendar(true);
+              setFocus(FocusItem.startDate);
+              setStartMonth("");
+              setStartYear(0);
             }}
-          />
-        ) : loading ? (
-          <ActivityIndicator
-            style={{ marginTop: 20 }}
-            size="large"
-            color={Colors.LwscOrange}
-          />
-        ) : consumptionList.length ? (
-          <FlatList
-            removeClippedSubviews={true}
-            maxToRenderPerBatch={20}
-            initialNumToRender={20}
-            data={consumptionList}
-            keyExtractor={() => uuid()}
-            renderItem={renderListItem}
-          />
-        ) : (
-          <Text style={{ margin: 15 }}>
-            There is no consumption information for the specified time period
-          </Text>
-        )}
+          >
+            <View style={flexRow}>
+              <View
+                style={[
+                  dateItem,
+                  startSet
+                    ? { backgroundColor: Colors.linkBlue }
+                    : focus == FocusItem.startDate
+                    ? {}
+                    : { backgroundColor: "#bbbbbb90" },
+                ]}
+              >
+                <Text
+                  style={[
+                    dateItemText,
+                    startSet
+                      ? itemsSet
+                      : focus == FocusItem.startDate
+                      ? {}
+                      : fText,
+                  ]}
+                >
+                  Start Date
+                </Text>
+                {startSet && (
+                  <Text
+                    style={[
+                      dateItemText,
+                      startSet
+                        ? itemsSet
+                        : focus == FocusItem.startDate
+                        ? {}
+                        : fText,
+                    ]}
+                  >{`01/${startMonth.replace("01", "")}/${startYear}`}</Text>
+                )}
+              </View>
+              <View
+                style={[
+                  triangle,
+                  startSet
+                    ? { borderBottomColor: Colors.linkBlue }
+                    : focus == FocusItem.startDate
+                    ? {}
+                    : {
+                        borderBottomColor: "#bbbbbb90",
+                      },
+                ]}
+              ></View>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setShowCalendar(true);
+              setFocus(FocusItem.endDate);
+            }}
+          >
+            <View style={flexRow}>
+              <View
+                style={[
+                  {
+                    ...triangle,
+                    transform: [{ rotate: "-90deg" }],
+                    marginLeft: 0,
+                    marginRight: -5,
+                  },
+                  endSet
+                    ? { borderBottomColor: Colors.linkBlue }
+                    : focus == FocusItem.endDate
+                    ? {}
+                    : { borderBottomColor: "#bbbbbb90" },
+                ]}
+              ></View>
+              <View
+                style={[
+                  dateItem,
+                  endSet
+                    ? { backgroundColor: Colors.linkBlue }
+                    : focus == FocusItem.endDate
+                    ? {}
+                    : { backgroundColor: "#bbbbbb90" },
+                ]}
+              >
+                <Text
+                  style={[
+                    dateItemText,
+                    endSet ? itemsSet : focus == FocusItem.endDate ? {} : fText,
+                  ]}
+                >
+                  End Date
+                </Text>
+                {endSet && (
+                  <Text
+                    style={[
+                      dateItemText,
+                      focus == FocusItem.endDate ? {} : fText,
+                    ]}
+                  >{`31/${endMonth.replace("31", "")}/${endYear}`}</Text>
+                )}
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
+        <View style={{ backgroundColor: "white" }}>
+          {loading ? (
+            <ActivityIndicator
+              style={{ marginTop: 20 }}
+              size="large"
+              color={Colors.LwscOrange}
+            />
+          ) : consumptionList.length ? (
+            <FlatList
+              removeClippedSubviews={true}
+              maxToRenderPerBatch={20}
+              initialNumToRender={20}
+              data={consumptionList}
+              keyExtractor={() => uuid()}
+              renderItem={renderListItem}
+            />
+          ) : (
+            <Text style={{ margin: 15 }}>
+              There is no consumption information for the specified time period
+            </Text>
+          )}
+        </View>
+        <Provider>
+          <Portal>
+            <Modal
+              contentContainerStyle={{
+                // flex: 1,
+                height: 100,
+              }}
+              visible={showCalendar}
+              onDismiss={() => setShowCalendar(false)}
+            >
+              <View
+                style={{
+                  justifyContent: "flex-start",
+                  flex: 1,
+                }}
+              >
+                <View style={{ backgroundColor: "#fff" }}>
+                  <Picker
+                    selectedValue={
+                      focus == FocusItem.startDate ? startYear : endYear
+                    }
+                    onValueChange={(itemValue, itemIndex) => {
+                      if (focus == FocusItem.startDate) {
+                        setStartYear(itemValue);
+                        if (itemValue && startMonth) {
+                          setShowCalendar(false);
+                          setFocus(FocusItem.endDate);
+                        }
+                      } else {
+                        setEndYear(itemValue);
+                        if (itemValue && endMonth) {
+                          setShowCalendar(false);
+                        }
+                      }
+                    }}
+                  >
+                    <Picker.Item key={0} value={0} label="Select Year" />
+                    {getYears().map((year) => (
+                      <Picker.Item
+                        key={year}
+                        value={year}
+                        label={year.toString()}
+                      />
+                    ))}
+                  </Picker>
+                  <Divider />
+                </View>
+                <View style={{ backgroundColor: "#fff" }}>
+                  <Picker
+                    selectedValue={
+                      focus == FocusItem.startDate ? startMonth : endMonth
+                    }
+                    onValueChange={(itemValue, itemIndex) => {
+                      if (focus == FocusItem.startDate) {
+                        setStartMonth(itemValue);
+                        if (startYear && itemValue) {
+                          setShowCalendar(false);
+                          setFocus(FocusItem.endDate);
+                        }
+                      } else {
+                        setEndMonth(itemValue);
+                        if (endYear && itemValue) {
+                          setShowCalendar(false);
+                        }
+                      }
+                    }}
+                  >
+                    <Picker.Item key="" value="" label="Select Month" />
+                    {months.map(({ month, days, num }) => (
+                      <Picker.Item
+                        key={month}
+                        value={`${num}${
+                          focus == FocusItem.startDate ? "01" : days
+                        }`}
+                        label={month}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+              </View>
+            </Modal>
+          </Portal>
+        </Provider>
       </View>
     </LinearGradient>
   );
@@ -240,8 +430,8 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   wrapper: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start'
+    flexDirection: "row",
+    display: "flex",
   },
   filter: {
     display: "flex",
@@ -261,23 +451,46 @@ const styles = StyleSheet.create({
     paddingLeft: 5,
     color: Colors.LwscBlue,
   },
+  flexRow: {
+    display: "flex",
+    flexDirection: "row",
+    backgroundColor: "transparent",
+  },
   triangle: {
     width: 0,
     height: 0,
-    backgroundColor: 'transparent',
-    borderStyle: 'solid',
+    backgroundColor: "transparent",
+    borderStyle: "solid",
     borderLeftWidth: 35,
     borderRightWidth: 35,
     borderBottomWidth: 60,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderBottomColor:"yellow",
-    transform: [
-        { rotate: '90deg' }
-    ],
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent",
+    borderBottomColor: `${Colors.LwscBlue}`,
+    transform: [{ rotate: "90deg" }],
     margin: 0,
-    marginLeft: -6,
+    marginLeft: -5,
     borderWidth: 0,
-    borderColor:"transparent"
-}
+    borderColor: "transparent",
+  },
+  dateItem: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: Colors.LwscBlue,
+    paddingHorizontal: 20,
+    // flex: 1,
+  },
+  dateItemText: {
+    color: "white",
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  fText: {
+    marginTop: 5,
+    color: Colors.LwscBlue,
+  },
+  itemsSet: {
+    color: "#fff",
+  },
 });

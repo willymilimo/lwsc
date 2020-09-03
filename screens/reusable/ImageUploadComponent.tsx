@@ -53,10 +53,10 @@ export default function ImageUploadComponent({
       const manipResult = await ImageManipulator.manipulateAsync(
         image.uri,
         [],
-        { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
+        { compress: 1, format: ImageManipulator.SaveFormat.JPEG, base64: true }
       );
 
-      const {status, data} = await upload(manipResult.uri);
+      const { status, data } = await upload(manipResult.base64 as string);
 
       if (status === 200 && data.success && data.payload.length) {
         uploadCallback(data.payload);

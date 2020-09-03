@@ -25,6 +25,7 @@ import { PaymentChannelI } from "../types/payment-channel";
 import Strings from "../constants/Strings";
 import { ServiceInvoiceI } from "./service-invoice";
 import mime from "mime";
+import { Buffer } from "buffer";
 
 // axios.defaults.auth = Strings.API_CREDS;
 // axios.defaults.headers.Authorization = "Basic bHdzY19tb2JpbGVfYXBwX2Rldjojd3d3QDEyMzRfbHdzY19hcHA=";
@@ -129,25 +130,24 @@ export const applyForPaymentSchedule = async (account: AccountI) => {
 };
 
 export const upload = async (uri: string): Promise<any> => {
-  let apiUrl = "https://lwsc.microtech.co.zm/api/v1/uploads/files/disk/create";
-
+  // let apiUrl = "https://lwsc.microtech.co.zm/api/v1/uploads/files/disk/create";
+  let apiUrl = "http://192.168.8.100:80/upload";
   const newImageUri = "file:///" + uri.split("file:/").join("");
+  console.log(apiUrl);
 
-  const formData = new FormData();
-  formData.append("image", {
-    uri: newImageUri,
-    type: mime.getType(newImageUri) as string,
-    name: newImageUri.split("/").pop(),
-  } as any);
+  const data = new Buffer(uri, "base64");
 
-  return await axios.post(apiUrl, formData, {
-    headers: {
-      "content-type": "multipart/form-data",
-      Authorization:
-        "Basic " +
-        btoa(`${Strings.API_CREDS.username}:${Strings.API_CREDS.password}`),
-    },
-  });
+  return await axios.post(
+    apiUrl,
+    { photo: uri },
+    {
+      headers: {
+        Authorization:
+          "Basic " +
+          btoa(`${Strings.API_CREDS.username}:${Strings.API_CREDS.password}`),
+      },
+    }
+  );
 };
 
 export const uploadFiles = async (
@@ -157,8 +157,8 @@ export const uploadFiles = async (
   uris.forEach((uri, i) => {
     // fd.append(`reading${i}`, file);
     const newImageUri = "file:///" + uri.split("file:/").join("");
-    console.log(uri);
-    console.log(newImageUri);
+    // console.log(uri);
+    // console.log(newImageUri);
 
     // let uriParts = uri.split(".");
     // let fileType = uriParts[uriParts.length - 1];
@@ -294,6 +294,7 @@ export const fetchComsumption = async (
   startDate: string,
   endDate: string
 ): Promise<AxiosResponse<IResponse<{ recordset: ConsumptionI[] }>>> => {
+  // console.log(startDate, endDate);
   return await axios.get(
     `billing/consumption/records/fetch?account_number=${accountNumber}&lower_limit_date=${startDate}&upper_limit_date=${endDate}`
   );
@@ -312,9 +313,6 @@ export const login = async (
 export const validateBillWindow = async (
   billGroup: string
 ): Promise<AxiosResponse<IResponse<{ CYCLE_ID: number }>>> => {
-  console.log(
-    `billing/window-status/fetch?source=edams&bill_group=${billGroup}`
-  );
   return await axios.get(
     `billing/window-status/fetch?source=edams&bill_group=${billGroup}`
   );
@@ -338,9 +336,6 @@ export const fetchServiceInvoice = async (
   service_type: string,
   account_number: string
 ): Promise<AxiosResponse<IResponse<ServiceInvoiceI>>> => {
-  console.log(
-    `services/invoices/fetch?service_type=${service_type}&account_number=${account_number}`
-  );
   return await axios.get(
     `services/invoices/fetch?service_type=${service_type}&account_number=${account_number}`
   );

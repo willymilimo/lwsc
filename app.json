@@ -7,9 +7,9 @@
       "android",
       "web"
     ],
-    "version": "1.0.5",
+    "version": "1.0.6",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icon_transparent.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -28,11 +28,11 @@
       "config": {
         "googleMapsApiKey": "AIzaSyC3SzcYHLM2kzExSzk-QlNo1Dl_5xRk-bo"
       },
-      "buildNumber": "1.0.5"
+      "buildNumber": "1.0.6"
     },
     "android": {
       "package": "com.lwsc.utility",
-      "versionCode": 5,
+      "versionCode": 6,
       "useNextNotificationsApi": true,
       "config": {
         "googleMaps": {

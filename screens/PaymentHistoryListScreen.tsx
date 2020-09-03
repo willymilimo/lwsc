@@ -65,7 +65,7 @@ const PaymentHistoryListScreen = ({
                   borderColor: Colors.linkBlue,
                   borderWidth: 0.75,
                   borderRadius: 5,
-                  backgroundColor: `${Colors.linkBlue}22`,
+                  backgroundColor: `#fff`,
                 }}
                 color={`${Colors.LwscBlue}bb`}
                 //   loading={loading}
@@ -92,7 +92,7 @@ const PaymentHistoryListScreen = ({
             })
           }
           label="Add Account/Meter"
-          labelStyle={{ width: 145 }}
+          labelStyle={{ width: 145, backgroundColor: '#fff' }}
           icon={{
             name: `${Platform.OS === "ios" ? "ios" : "md"}-add`,
             type: Ionicons,
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     width: 100,
   },
   missingAccount: {
-    // backgroundColor: 'pink'
+    padding: 15
   },
   maText: {
     marginBottom: 10,

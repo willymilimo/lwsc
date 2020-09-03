@@ -231,7 +231,7 @@ const ManageAccountScreen = ({
                   borderColor: Colors.linkBlue,
                   borderWidth: 0.75,
                   borderRadius: 5,
-                  backgroundColor: `${Colors.linkBlue}22`,
+                  backgroundColor: '#fff',
                 }}
                 color={`${Colors.LwscBlue}bb`}
                 //   loading={loading}

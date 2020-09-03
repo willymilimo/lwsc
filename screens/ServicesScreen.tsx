@@ -31,7 +31,6 @@ import { isMoreThanOneDay } from "../helpers/functions";
 
 interface ServicesI {
   navigation: NavType;
-  loadTime: Date;
   serviceTypes: ServiceItemI[];
   setServiceTypes(serviceType: ServiceItemI[]): void;
 }
@@ -39,7 +38,6 @@ interface ServicesI {
 const ServicesScreen = ({
   navigation,
   serviceTypes,
-  loadTime,
   setServiceTypes,
 }: ServicesI) => {
   const { container, btnsBox, iconContainer } = styles;
@@ -48,24 +46,13 @@ const ServicesScreen = ({
   useEffect(() => {
     let is_subscribed = true;
 
-    // console.log(serviceTypes)
-    // console.log(
-    //   'all => ' + is_subscribed && (isMoreThanOneDay(loadTime) || serviceTypes.length == 0),
-    //   '\nis_subscribed => ' + is_subscribed,
-    //   '\nisMoreThanOneDay => ' + isMoreThanOneDay(loadTime),
-    //   '\nserviceTypes.length => ' + serviceTypes.length
-    // );
-
-    if (
-      is_subscribed &&
-      (isMoreThanOneDay(loadTime) || serviceTypes.length == 0)
-    ) {
+    if (is_subscribed && serviceTypes.length == 0) {
       // console.log('fetching.......')
       setLoading(true);
       fetchServices()
         .then(({ status, data }) => {
           const { success, payload, error, message } = data;
-          // console.log(status, data.payload)
+          console.log(status);
 
           if (status === 200 && success) {
             setServiceTypes(
@@ -81,7 +68,7 @@ const ServicesScreen = ({
           }
         })
         .catch((err) => {
-          // console.log(err);
+          console.log(err);
           if (is_subscribed) {
             const { title, message } = Strings.SELF_REPORTING_PROBLEM;
             Alert.alert(title, message);
@@ -95,7 +82,7 @@ const ServicesScreen = ({
     return () => {
       is_subscribed = false;
     };
-  }, [serviceTypes, loadTime]);
+  }, [serviceTypes]);
 
   const createIcon = (
     icon: string,
@@ -257,9 +244,8 @@ const ServicesScreen = ({
   );
 };
 
-const mapPropsToState = ({ services, loadTime }: RootReducerI) => ({
+const mapPropsToState = ({ services }: RootReducerI) => ({
   serviceTypes: services,
-  loadTime,
 });
 const mapDispatchToProps = (dispatch: any) =>
   bindActionCreators(
