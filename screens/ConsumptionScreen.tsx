@@ -350,6 +350,7 @@ export default function ConsumptionScreen({ route }: PropI) {
                 style={{
                   justifyContent: "flex-start",
                   flex: 1,
+                  paddingHorizontal: 15
                 }}
               >
                 <View style={{ backgroundColor: "#fff" }}>

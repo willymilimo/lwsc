@@ -130,10 +130,10 @@ export const applyForPaymentSchedule = async (account: AccountI) => {
 };
 
 export const upload = async (uri: string): Promise<any> => {
-  // let apiUrl = "https://lwsc.microtech.co.zm/api/v1/uploads/files/disk/create";
-  let apiUrl = "http://192.168.8.100:80/upload";
-  const newImageUri = "file:///" + uri.split("file:/").join("");
-  console.log(apiUrl);
+  let apiUrl = "https://lwsc.microtech.co.zm/api/v1/uploads/files/disk/create";
+  // let apiUrl = "http://192.168.8.100:80/upload";
+  // const newImageUri = "file:///" + uri.split("file:/").join("");
+  // console.log(apiUrl);
 
   const data = new Buffer(uri, "base64");
 
